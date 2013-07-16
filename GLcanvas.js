@@ -45,6 +45,13 @@ function GLcanvas() {
     return this;
 }
 
+GLcanvas.prototype.init = function() {
+
+    // Any command line params specified?
+    var params = window.location.search;
+    if(params.length > 1) this.start(params.substring(1));
+}
+
 GLcanvas.prototype.createScene = function(objToDraw) {
 
     mazeMode = 0;
