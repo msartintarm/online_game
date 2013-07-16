@@ -79,8 +79,8 @@ GLcanvas.prototype.createScene = function(objToDraw) {
 	this.objects.push(new Skybox());
 	theMatrix.viewStadium();
 	stadiumMode = 1;
-	//privledged toggled in glmatrix now(go thro start sequence first)
-	//priveledgedMode.toggle();
+    } else if(objToDraw == "game") {
+	this.objects.push(new Game());
     } else if(objToDraw == "framebuffer") {
 	this.frames.push(new GLframe(FRAME_BUFF));
 	this.objects.push(new Quad(
