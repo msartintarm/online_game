@@ -1,6 +1,7 @@
+Game.grid = 50;
 
 function Game() {  
-    
+
     moveDist = 100.1;
     lookDist = 1/15;
 
@@ -22,7 +23,7 @@ function Game() {
     this.intro_string2 = new GLstring(document.getElementById("stadium_name").value + ".",
 				      TEXT_TEXTURE4, theCanvas.gl.shader_canvas);
 
-    var player_width = 50;
+    var player_width = Game.grid;
     this.player = new Quad(
 	[ player_width, 2 * player_width, -1],
 	[ player_width,                0, -1],
@@ -45,7 +46,7 @@ function Game() {
 	    [-floor_width, -2 * floor_width, -1],
 	    [ floor_width,                0, -1],
 	    [ floor_width, -2 * floor_width, -1])
-			.translate([i * floor_width, 0, 0])
+			.translate([i * floor_width * 2, 0, 0])
 			.setTexture(RUG_TEXTURE));
     }
 
@@ -61,6 +62,8 @@ function Game() {
 
 Game.prototype.initBuffers = function(gl_) {
 
+    this.mapKeys();
+
     this.player_string.initBuffers(gl_);
     this.intro_string2.initBuffers(gl_);
     this.player.initBuffers(gl_);
@@ -73,10 +76,37 @@ Game.prototype.initBuffers = function(gl_) {
 
 Game.prototype.draw = function(gl_) {
 
+    theMatrix.push();
+    theMatrix.translate(Game.movement);
     this.player.draw(gl_);
+    theMatrix.pop();
     this.background.draw(gl_);
     var i;
     for(i = 0; i < this.floor.length; ++i){
 	this.floor[i].draw(gl_);
     }
 };
+
+Game.movement = vec3.create();
+
+Game.prototype.mapKeys = function() {
+
+    document.onkeydown = function(the_event) {
+
+	switch(the_event.keyCode) {
+	case 39: // ->
+	    Game.movement[0] += Game.grid;
+	    break;
+	case 37: // left
+	    Game.movement[0] -= Game.grid;
+	    break;
+	case 38: // up
+	    break;
+	case 40: // down
+	    break;
+	default:
+	    break;
+	}
+    };
+};
+

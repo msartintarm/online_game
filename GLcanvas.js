@@ -194,6 +194,12 @@ GLcanvas.prototype.start = function(theScene) {
 	// Get rid of unused JS  memory
 	this.shader_source.cleanup();
 
+	// Set up to draw the scene periodically.
+	document.onmousedown = handleMouseDown;
+	document.onmouseup = handleMouseUp;
+	document.onmousemove = handleMouseMove;
+	document.onkeydown = handleKeyDown;
+
 	theMatrix.viewInit();
 	this.objects = [];
 	priveledgedMode.reset();
@@ -222,12 +228,6 @@ GLcanvas.prototype.start = function(theScene) {
 	this.gl.clearColor(0.1, 0.1, 0.1, 1.0);
 	this.gl.clearDepth(1.0);
 	this.gl.enable(this.gl.DEPTH_TEST);
-	
-	// Set up to draw the scene periodically.
-	document.onmousedown = handleMouseDown;
-	document.onmouseup = handleMouseUp;
-	document.onmousemove = handleMouseMove;
-	document.onkeydown = handleKeyDown;
     } else {
 	// If we have started GL already, 
 	//  just add the new model.
