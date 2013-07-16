@@ -62,6 +62,7 @@ function Game() {
 
 Game.prototype.initBuffers = function(gl_) {
 
+    Game.loadAudio("music/elements.mp3");
     this.mapKeys();
 
     this.player_string.initBuffers(gl_);
@@ -104,9 +105,68 @@ Game.prototype.mapKeys = function() {
 	    break;
 	case 40: // down
 	    break;
+	case 32: // Spacebar
+	    if(theCanvas.audio.playing) {
+		console.log(theCanvas.audio.time);
+		theCanvas.audio.offset += theCanvas.audio.currentTime - 
+		    theCanvas.audio.time;
+		console.log("Playing for " + theCanvas.audio.offset + 
+			    " seconds.");
+		theCanvas.audio_source.stop(0);
+	    } else {
+		// Load start time from offset.
+		theCanvas.audio_source = theCanvas.audio.createBufferSource();
+		theCanvas.audio_source.buffer = Game.audio_buffer;
+		theCanvas.audio_source.connect(theCanvas.audio.destination);
+		console.log("Starting after " + theCanvas.audio.offset + 
+			    " seconds.");
+		theCanvas.audio_source.start(0, theCanvas.audio.offset);
+		theCanvas.audio.time = theCanvas.audio.currentTime;
+	    }
+	    theCanvas.audio.playing = !theCanvas.audio.playing;
+	    break;
 	default:
 	    break;
 	}
     };
 };
 
+/**
+ * This code is written from scratch, using the following as a ref:
+ * http://chromium.googlecode.com/svn/trunk/samples/audio/index.html
+*/
+Game.loadAudio = function(url) {
+
+    if(!theCanvas.audio) {
+	theCanvas.audio = new webkitAudioContext();
+	theCanvas.analyser = theCanvas.audio.createAnalyser();
+	theCanvas.analyser.fftSize = 2048;
+
+	theCanvas.audio_source = theCanvas.audio.createBufferSource();
+	theCanvas.audio_source.connect(theCanvas.analyser);
+	theCanvas.analyser.connect(theCanvas.audio.destination);
+    }
+
+
+    var request = new XMLHttpRequest();
+    request.open("GET", url, true);
+    request.responseType = "arraybuffer"; // I'm assuming this is MIME
+
+    theCanvas.audio_time = 0;
+
+    request.onload = function() {
+	theCanvas.audio.decodeAudioData(
+	    request.response,
+	    function(the_buffer) {
+		Game.audio_buffer = the_buffer;
+		theCanvas.audio_source.buffer = Game.audio_buffer;
+		// Save initial time we start audio, so we can pause / play.
+		theCanvas.audio.time = theCanvas.audio.currentTime;
+		theCanvas.audio.offset = 0;
+		theCanvas.audio.playing = true;
+		theCanvas.audio_source.start(0,0);
+	    }
+	);
+    };
+    request.send();
+};
