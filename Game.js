@@ -1,11 +1,13 @@
-Game.grid = 50;
 
 function Game() {  
 
     moveDist = 100.1;
     lookDist = 1/15;
 
+    this.grid = 50;
     this.hit_sound = [];
+    this.movement = vec3.create();
+
     
     this.hit_sound[0] = new Audio("drums_1.wav");
     this.hit_sound[0].load();
@@ -23,7 +25,7 @@ function Game() {
     this.intro_string2 = new GLstring(document.getElementById("stadium_name").value + ".",
 				      TEXT_TEXTURE4, theCanvas.gl.shader_canvas);
 
-    var player_width = Game.grid;
+    var player_width = this.grid;
     this.player = new Quad(
 	[ player_width, 2 * player_width, -1],
 	[ player_width,                0, -1],
@@ -62,7 +64,7 @@ function Game() {
 
 Game.prototype.initBuffers = function(gl_) {
 
-    Game.loadAudio("music/elements.mp3");
+    this.createAudio("music/elements.mp3");
     this.mapKeys();
 
     this.player_string.initBuffers(gl_);
@@ -78,7 +80,7 @@ Game.prototype.initBuffers = function(gl_) {
 Game.prototype.draw = function(gl_) {
 
     theMatrix.push();
-    theMatrix.translate(Game.movement);
+    theMatrix.translate(this.movement);
     this.player.draw(gl_);
     theMatrix.pop();
     this.background.draw(gl_);
@@ -86,9 +88,18 @@ Game.prototype.draw = function(gl_) {
     for(i = 0; i < this.floor.length; ++i){
 	this.floor[i].draw(gl_);
     }
+    var FFTData = new Uint8Array(this.analyser.frequencyBinCount);
+    this.analyser.getByteFrequencyData(FFTData);
+    var i;
+    var music_data = "";
+    for(i = 0; i < 25 && i < FFTData.length; ++i) {
+	if(FFTData[i] < 100) music_data += " "; 
+	if(FFTData[i] < 10) music_data += " "; 
+	if(FFTData[i] === 0) music_data += "  ";
+	else music_data += FFTData[i] + ",";
+    }
+    console.log(music_data);
 };
-
-Game.movement = vec3.create();
 
 Game.prototype.mapKeys = function() {
 
@@ -96,77 +107,85 @@ Game.prototype.mapKeys = function() {
 
 	switch(the_event.keyCode) {
 	case 39: // ->
-	    Game.movement[0] += Game.grid;
+	    this.movement[0] += this.grid;
 	    break;
 	case 37: // left
-	    Game.movement[0] -= Game.grid;
+	    this.movement[0] -= this.grid;
 	    break;
 	case 38: // up
 	    break;
 	case 40: // down
 	    break;
 	case 32: // Spacebar
-	    if(theCanvas.audio.playing) {
-		console.log(theCanvas.audio.time);
-		theCanvas.audio.offset += theCanvas.audio.currentTime - 
-		    theCanvas.audio.time;
-		console.log("Playing for " + theCanvas.audio.offset + 
-			    " seconds.");
-		theCanvas.audio_source.stop(0);
+	    var audio = this.audio[0];
+	    if(audio.playing) {
+		console.log(audio.elapsed_time);
+		audio.offset += this.web_audio.currentTime - 
+		    audio.time;
+		console.log("Playing for " + audio.offset + " seconds.");
+		audio.source.stop(0);
 	    } else {
 		// Load start time from offset.
-		theCanvas.audio_source = theCanvas.audio.createBufferSource();
-		theCanvas.audio_source.buffer = Game.audio_buffer;
-		theCanvas.audio_source.connect(theCanvas.audio.destination);
-		console.log("Starting after " + theCanvas.audio.offset + 
-			    " seconds.");
-		theCanvas.audio_source.start(0, theCanvas.audio.offset);
-		theCanvas.audio.time = theCanvas.audio.currentTime;
+		audio.source = this.web_audio.createBufferSource();
+		audio.source.buffer = audio.buffer;
+		audio.source.connect(this.web_audio.destination);
+		console.log("Starting after " + audio.offset + " seconds.");
+		audio.source.start(0, theCanvas.audio.offset);
+		audio.elapsed_time = this.web_audio.currentTime;
 	    }
-	    theCanvas.audio.playing = !theCanvas.audio.playing;
+	    audio.playing = !audio.playing;
 	    break;
 	default:
 	    break;
 	}
-    };
+    }.bind(this);
+};
+
+Game.prototype.handleAudioRequest = function(gl_audio, request) {
+
+    function decode_return(the_buffer) {
+	this.buffer = the_buffer;
+    }
+
+    this.web_audio.decodeAudioData(
+	request.response,
+	function(the_buffer) {
+	    gl_audio.buffer = the_buffer;
+	    // Save initial time we start audio, so we can pause / play.
+	    gl_audio.source = this.web_audio.createBufferSource();
+	    gl_audio.source.connect(this.analyser);
+	    gl_audio.source.buffer = gl_audio.buffer;
+	    gl_audio.elapsed_time = this.web_audio.currentTime;
+	    gl_audio.offset = 0;
+	    gl_audio.playing = true;
+	    gl_audio.source.start(0,0);
+	}.bind(this)
+    );
 };
 
 /**
- * This code is written from scratch, using the following as a ref:
+ * Creates an audio element, sets it up, and starts it.
+ * Uses the following as a ref:
  * http://chromium.googlecode.com/svn/trunk/samples/audio/index.html
 */
-Game.loadAudio = function(url) {
 
-    if(!theCanvas.audio) {
-	theCanvas.audio = new webkitAudioContext();
-	theCanvas.analyser = theCanvas.audio.createAnalyser();
-	theCanvas.analyser.fftSize = 2048;
+Game.prototype.createAudio = function(url) {
 
-	theCanvas.audio_source = theCanvas.audio.createBufferSource();
-	theCanvas.audio_source.connect(theCanvas.analyser);
-	theCanvas.analyser.connect(theCanvas.audio.destination);
-    }
-
+    if(!this.web_audio) this.initWebAudio();
 
     var request = new XMLHttpRequest();
     request.open("GET", url, true);
-    request.responseType = "arraybuffer"; // I'm assuming this is MIME
-
-    theCanvas.audio_time = 0;
-
-    request.onload = function() {
-	theCanvas.audio.decodeAudioData(
-	    request.response,
-	    function(the_buffer) {
-		Game.audio_buffer = the_buffer;
-		theCanvas.audio_source.buffer = Game.audio_buffer;
-		// Save initial time we start audio, so we can pause / play.
-		theCanvas.audio.time = theCanvas.audio.currentTime;
-		theCanvas.audio.offset = 0;
-		theCanvas.audio.playing = true;
-		theCanvas.audio_source.start(0,0);
-	    }
-	);
-    };
+    request.responseType = "arraybuffer"; // Does this work for any MIME request?
+    // Once request has loaded, load and start audio buffer
+    request.onload = this.handleAudioRequest.bind(this, this.audio[0], request);
     request.send();
+};
+
+Game.prototype.initWebAudio = function() {
+
+    this.web_audio = new webkitAudioContext();
+    this.analyser = this.web_audio.createAnalyser();
+    this.analyser.fftSize = 32;
+    this.analyser.connect(this.web_audio.destination);
+    this.audio = [{}];
 };
