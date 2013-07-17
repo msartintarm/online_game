@@ -88,19 +88,23 @@ Game.prototype.draw = function(gl_) {
     for(i = 0; i < this.floor.length; ++i){
 	this.floor[i].draw(gl_);
     }
-    var FFTData = new Uint8Array(this.analyser.frequencyBinCount);
-    this.analyser.getByteFrequencyData(FFTData);
-    var i;
-    var music_data = "";
+    if (log_music) {
+	var FFTData = new Uint8Array(this.analyser.frequencyBinCount);
+	this.analyser.getByteTimeDomainData(FFTData);
+	var i;
+	if(FFTData[0] < 100) console.log(FFTData[0]); 
+	else console.log("-");
+/*
     for(i = 0; i < 25 && i < FFTData.length; ++i) {
 	if(FFTData[i] < 100) music_data += " "; 
 	if(FFTData[i] < 10) music_data += " "; 
 	if(FFTData[i] === 0) music_data += "  ";
 	else music_data += FFTData[i] + ",";
     }
-    console.log(music_data);
+ */
+    }
 };
-
+var log_music = true;
 Game.prototype.mapKeys = function() {
 
     document.onkeydown = function(the_event) {
@@ -113,6 +117,7 @@ Game.prototype.mapKeys = function() {
 	    this.movement[0] -= this.grid;
 	    break;
 	case 38: // up
+	    log_music = !log_music;
 	    break;
 	case 40: // down
 	    break;
@@ -142,10 +147,6 @@ Game.prototype.mapKeys = function() {
 };
 
 Game.prototype.handleAudioRequest = function(gl_audio, request) {
-
-    function decode_return(the_buffer) {
-	this.buffer = the_buffer;
-    }
 
     this.web_audio.decodeAudioData(
 	request.response,
@@ -183,9 +184,13 @@ Game.prototype.createAudio = function(url) {
 
 Game.prototype.initWebAudio = function() {
 
-    this.web_audio = new webkitAudioContext();
+    if (typeof AudioContext !== "undefined") this.web_audio = new AudioContext();
+    else if (typeof webkitAudioContext !== "undefined") this.web_audio = new webkitAudioContext();
+    else throw new Error('Use a browser that supports AudioContext for music.');
+
     this.analyser = this.web_audio.createAnalyser();
     this.analyser.fftSize = 32;
     this.analyser.connect(this.web_audio.destination);
+
     this.audio = [{}];
 };
