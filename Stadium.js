@@ -1,3 +1,4 @@
+define("Stadium", ["StadiumPiece"], function() {
 
 var ballInitSeqOver; //signals to GLmatrix when all the balls are in place
 var frame_draw = false;
@@ -364,3 +365,5 @@ Stadium.prototype.checkPosition = function() {
     }
     return true;
 };
+
+});

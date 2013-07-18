@@ -1,3 +1,5 @@
+define("Stool", ["Cylinder", "Disk", "Torus"], function() {
+
 const base_leg_distance = (19.625/2)/6;
 const base_leg_width = (0.6/6);
 const min_stool_height = 24.75/6;
@@ -122,3 +124,5 @@ Stool.prototype.draw = function(gl_) {
     theMatrix.pop();
     
 };
+
+});

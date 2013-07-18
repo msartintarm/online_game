@@ -1,3 +1,5 @@
+define("Light", ["Sphere"], function() {
+
 function Light() {
     colorVec = [0,0,0];
     if(!stadiumMode)
@@ -19,3 +21,5 @@ Light.prototype.draw = function(gl_) {
     this.o.draw(gl_);
     theMatrix.pop();
 }
+
+});

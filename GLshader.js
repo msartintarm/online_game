@@ -1,4 +1,4 @@
-
+define("GLshader", [], function() {
 
 function GLshader() {
     this.fragment = [];
@@ -338,3 +338,4 @@ GLshader.prototype.cleanup = function() {
     this.v_decls = null;
 };
 
+});

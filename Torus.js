@@ -1,3 +1,5 @@
+define("Torus", ["GLobject"], function() {
+
 function Torus(innerRadius, outerRadius) { 
 
     var slices = 50;
@@ -56,3 +58,5 @@ Torus.prototype.setShader = _oSetShader;
 Torus.prototype.translate = _oTranslate;
 Torus.prototype.initBuffers = _oInitBuffers;
 Torus.prototype.draw = _oDraw;
+
+});

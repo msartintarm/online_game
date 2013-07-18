@@ -1,4 +1,4 @@
-var colorVec;
+define("StoolPyramid", ["Stool", "Quad"], function() {
 
 function StoolPyramid() { 
     this.objs = [];
@@ -96,3 +96,5 @@ StoolPyramid.prototype.drawBase = function(gl_, size) {
 			     (size - 2) * d_]);
     }
 };
+
+});

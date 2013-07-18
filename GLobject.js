@@ -1,3 +1,5 @@
+define(function() {
+
 /**
  * GLobject abstracts away buffers and arrays of data, 
  *  allowing us to work at a high level without 
@@ -447,3 +449,5 @@ GLobject.prototype.draw = function(gl_) {
 };
 
 var FLATNORMS = false;
+
+});

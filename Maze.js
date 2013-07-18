@@ -1,3 +1,5 @@
+define("Maze", ["MazePiece"], function() {
+
 var start;
 
 function Maze() {  
@@ -154,3 +156,5 @@ Maze.prototype.checkPosition = function() {
     }
     return true;
 }
+
+});

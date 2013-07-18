@@ -1,3 +1,5 @@
+define(function() {
+
 /**
    Internally handles matrixes that will be loaded to GL
 
@@ -588,3 +590,5 @@ GLmatrix.prototype.pop = function() {
     mat4.copy(this.mMatrix, this.mStack.pop());
     this.mMatrixChanged = true;
 };
+
+});

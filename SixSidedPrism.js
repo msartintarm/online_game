@@ -1,3 +1,5 @@
+define("SixSidedPrism", ["Quad"], function() {
+
 /**
    Front face (facing X):    Back face (facing X):
     AD                        EH
@@ -116,3 +118,4 @@ SixSidedPrism.prototype.draw = function(gl_) {
     this.q6.draw(gl_);
 };
 
+});

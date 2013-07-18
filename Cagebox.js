@@ -1,3 +1,5 @@
+define("Cagebox", ["SixSidedPrism"], function() {
+
 /**
  *  This is an enormous cube, and the viewer
  *  resides in the interior.
@@ -27,3 +29,5 @@ function Cagebox() {
 
 Cagebox.prototype.initBuffers = _oInitBuffers;
 Cagebox.prototype.draw = _oDraw;
+
+});

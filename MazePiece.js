@@ -1,3 +1,4 @@
+define("MazePiece", ["SixSidedPrism"], function() {
 
 /* 
 this function stamps out the walls for one maze piece
@@ -174,3 +175,5 @@ MazePiece.prototype.draw = function(gl_) {
 	this.objs[i].draw(gl_);
     }
 };
+
+});

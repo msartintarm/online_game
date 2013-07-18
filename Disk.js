@@ -1,5 +1,7 @@
 var colorVec;
 
+define("Disk", ["GLobject"], function() {
+
 function Disk(inner_radius, outer_radius, slices, loops) {
 
     this.o = new GLobject();
@@ -53,3 +55,5 @@ Disk.prototype.flip = _oFlip;
 Disk.prototype.setShader = _oSetShader;
 Disk.prototype.translate = _oTranslate;
 Disk.prototype.draw = _oDraw;
+
+});

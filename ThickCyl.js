@@ -1,3 +1,5 @@
+define("ThickCyl", ["Disk", "Cyl"], function() {
+
 /**
    ThickCyl. 
  */
@@ -31,3 +33,5 @@ ThickCyl.prototype.scale = _objsScale;
 ThickCyl.prototype.translate = _objsTranslate;
 ThickCyl.prototype.initBuffers = _objsInitBuffers;
 ThickCyl.prototype.draw = _objsDraw;
+
+});

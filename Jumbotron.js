@@ -1,3 +1,5 @@
+define("Jumbotron", ["GLstring", "ThickCyl", "SixSidedPrism"], function() {
+
 /**
    A four-screen Jumbotron. Modeled from
    http://upload.wikimedia.org/wikipedia/commons/e/ee/TD_Banknorth_Garden_Jumbotron.jpg
@@ -131,3 +133,5 @@ Jumbotron.prototype.draw = function(gl_) {
     }
     theMatrix.pop();
 };
+
+});

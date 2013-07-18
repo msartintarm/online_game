@@ -9,55 +9,21 @@
     <link rel='icon' type='image/x-icon' href='./favicon.ico'/>
 
     <!-- External JS math libraries -->
-    <script src="libs/gl-matrix.js" type="text/javascript" async="async"></script> 
-    <script src="libs/webgl-utils.js" type="text/javascript" async="async"></script>
+    <script src="libs/gl-matrix.js" type="text/javascript" ></script> 
+    <script src="libs/webgl-utils.js" type="text/javascript" ></script>
 
     <!-- Global constants and functions -->
-    <script src="functions.js" type="text/javascript" async="async"></script>
-    <script src="constants.js" type="text/javascript" async="async"></script>
+    <script src="functions.js" type="text/javascript"></script>
+    <script src="constants.js" type="text/javascript"></script>
 
-    <!-- GL classes -->
-    <script src="GLobject.js" type="text/javascript" async="async"></script>
-    <script src="GLmatrix.js" type="text/javascript" async="async"></script>
-    <script src="GLtexture.js" type="text/javascript" async="async"></script>
-    <script src="GLframe.js" type="text/javascript" async="async"></script>
-    <script src="GLshader.js" type="text/javascript" async="async"></script>
-    <script src="GLcanvas.js" type="text/javascript" async="async"></script>
-    <script src="GLstring.js" type="text/javascript" async="async"></script>
-
-    <!-- Simple objects -->
-    <script src="Cylinder.js" type="text/javascript" async="async"></script>
-    <script src="Sphere.js" type="text/javascript" async="async"></script>
-    <script src="Torus.js" type="text/javascript" async="async"></script>
-    <script src="Disk.js" type="text/javascript" async="async"></script>
-    <script src="Quad.js" type="text/javascript" async="async"></script>
-
-    <!-- Complex objects lv.1 -->
-    <script src="Stool.js" type="text/javascript" async="async"></script>
-    <script src="Light.js" type="text/javascript" async="async"></script>
-    <script src="SixSidedPrism.js" type="text/javascript" async="async"></script>
-    <script src="Ball.js" type="text/javascript" async="async"></script>
-    <script src="ThickCyl.js" type="text/javascript" async="async"></script>
-    
-    <!-- Complex objects lv.2 -->
-    <script src="StoolPyramid.js" type="text/javascript" async="async"></script>
-    <script src="MazePiece.js" type="text/javascript" async="async"></script>
-    <script src="StadiumPiece.js" type="text/javascript" async="async"></script>
-    <script src="Jumbotron.js" type="text/javascript" async="async"></script>
-
-    <!-- Environments -->
-    <script src="Skybox.js" type="text/javascript" async="async"></script>
-    <script src="Maze.js" type="text/javascript" async="async"></script>
-    <script src="Stadium.js" type="text/javascript" async="async"></script>
-    <script src="Cagebox.js" type="text/javascript" async="async"></script>
-    <script src="Game.js" type="text/javascript" async="async"></script>
+    <script data-main="load_all" src="test/require.js"></script>
 
     <canvas id="textureCanvas" style="display:none;">
       I'm sorry your browser does not support the HTML5 canvas element.
     </canvas>
   </head>
 
-  <body onload="theCanvas = new GLcanvas(); theCanvas.init();">
+  <body>
     <div id='wrap'>
       <div id='header'>
         <div class='one_third'>WebGL:</div>

@@ -1,3 +1,5 @@
+define("StadiumPiece", ["SixSidedPrism"], function() {
+
 /* 
 This function stamps out the walls for one maze piece
 
@@ -395,3 +397,5 @@ StadiumPiece.prototype.draw = function(gl_) {
     
     }
 };
+
+});

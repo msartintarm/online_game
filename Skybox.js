@@ -1,3 +1,4 @@
+define("Skybox", ["SixSidedPrism"], function() {
 
 /**
  *  This is an enormous cube, and the viewer
@@ -20,3 +21,5 @@ function Skybox() {
 
 Skybox.prototype.initBuffers = _oInitBuffers;
 Skybox.prototype.draw = _oDraw;
+
+});

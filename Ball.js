@@ -1,3 +1,5 @@
+define("Ball", ["Sphere", "Quad"], function() {
+
 function Ball(position, numBalls, texture_num) {
 //    this.velocity;
 //    this.position;
@@ -296,3 +298,4 @@ Ball.prototype.updatePosition = function(revert){
     }
 }
 
+});

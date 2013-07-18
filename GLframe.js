@@ -1,3 +1,5 @@
+define("GLframe", ["GLcanvas"], function() {
+
 /*
  * Internally manages a texture and frame.
  *
@@ -156,3 +158,5 @@ GLframe.prototype.drawScene = function(gl_) {
 //    gl_.bindTexture(gl_.TEXTURE_2D, null);
 //    this.debug;
 };
+
+});

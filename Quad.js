@@ -1,3 +1,5 @@
+define("Quad", ["GLobject"], function() {
+
 /*
 a c 
 b d
@@ -130,3 +132,5 @@ Quad.prototype.rotateNeg = _oRotateNeg;
 Quad.prototype.translate = _oTranslate;
 Quad.prototype.setShader = _oSetShader;
 Quad.prototype.draw = _oDraw;
+
+});

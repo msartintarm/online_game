@@ -1,3 +1,4 @@
+define("Game", ["Quad", "GLstring"], function() {
 
 function Game() {  
 
@@ -100,8 +101,11 @@ Game.prototype.draw = function(gl_) {
 
 	var FFTData = new Uint8Array(this.analyser.frequencyBinCount);
 	this.analyser.getByteFrequencyData(FFTData);
+
+	FFTData.forEach(function(
+
 	var i;
-	var sum = FFTData[0] + FFTData[1] + FFTData[2];
+	var sum = FFTData[0] * FFTData[1] * FFTData[2];
 	if(this.total === null) this.total = sum;
 	if(sum/this.total > 1.5) console.log("%.2f", sum / this.total); 
 	this.total *= 0.75;
@@ -275,3 +279,5 @@ Game.prototype.createAudio = function(url) {
     request.onload = this.handleAudioRequest.bind(this, this.audio[0], request);
     request.send();
 };
+
+});

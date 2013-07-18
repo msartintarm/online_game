@@ -1,3 +1,5 @@
+define("GLstring", , function() {
+
 /**
    Creates a texture and fills it with the contents of a string.
    'theStr ing.texture_num' should be used externally to find
@@ -80,4 +82,4 @@ GLstring.prototype.update = function(gl_, new_string) {
     this.initBuffers(gl_);
 };
 
-
+});

@@ -1,3 +1,4 @@
+define("GLcanvas", ["GLmatrix"], function() {
 
 /**
  * Object holding modelview and perspective matrices.
@@ -415,4 +416,6 @@ GLcanvas.prototype.initUniform = function(gl_shader, uni) {
     gl_shader.unis[uni] = this.gl.getUniformLocation(gl_shader, uni);
 };
 
-var theCanvas;
+window.theCanvas = "";
+
+});

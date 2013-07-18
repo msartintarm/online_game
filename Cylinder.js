@@ -1,3 +1,5 @@
+define("Cylinder", ["GLobject"], function() {
+
 function Cylinder(base_radius, top_radius, height, slices, stacks) { 
     this.o = new GLobject();
 
@@ -181,3 +183,5 @@ Cylinder.prototype.rotateNeg = _oRotateNeg;
 Cylinder.prototype.setShader = _oSetShader;
 Cylinder.prototype.translate = _oTranslate;
 Cylinder.prototype.draw = _oDraw;
+
+});
