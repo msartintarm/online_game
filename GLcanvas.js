@@ -361,6 +361,7 @@ GLcanvas.prototype.initShaders = function(gl_shader, frag, vert) {
 
     this.initUniform(gl_shader, "ballHitu")
     this.initUniform(gl_shader, "frames_elapsed_u")
+    this.initUniform(gl_shader, "hi_hat_u")
     this.initUniform(gl_shader, "has_collided_u")
     this.initUniform(gl_shader, "u_kernel")
     this.initUniform(gl_shader, "u_textureSize")

@@ -251,9 +251,14 @@ onclick="theCanvas.changeShaders('shader-fs', 'vertex-shader-bad')"/>
 	
       </div>
       <div class="title" id="title4" > </div>            
-      
+
     </div>
-    
-</div>
-</body>
+    <!-- Put this element one tag scope higher to hide it. -->
+      <div class="shaders" id="shader1" >
+	<textarea id="shader_decls" rows="20"></textarea>
+	<textarea id="frag_shader_1" rows="20"></textarea>
+	<textarea id="frag_shader_2" rows="20"></textarea>
+
+      </div>            
+  </body>
 </html>

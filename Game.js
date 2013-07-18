@@ -7,6 +7,8 @@ function Game() {
     this.grid = 50;
     this.hit_sound = [];
     this.movement = vec3.create();
+    this.floor_movement = vec3.create();
+    this.bg_movement = vec3.create();
     this.total = null;
     
     this.hit_sound[0] = new Audio("drums_1.wav");
@@ -32,12 +34,12 @@ function Game() {
 	[-player_width, 2 * player_width, -1],
 	[-player_width,                0, -1]);
 
-    var bg_width = 600;
+    var bg_width = 1200;
     this.background = new Quad(
-	[-bg_width, bg_width, -2],
-	[-bg_width,-bg_width, -2],
-	[ bg_width, bg_width, -2],
-	[ bg_width,-bg_width, -2]);
+	[-bg_width, bg_width, -20],
+	[-bg_width,-bg_width, -20],
+	[ bg_width, bg_width, -20],
+	[ bg_width,-bg_width, -20]);
 
     this.floor = [];
     var floor_width = player_width;
@@ -59,13 +61,17 @@ function Game() {
     
     theMatrix.vTranslate([0,0,1000]);
 
+    this.player.xPos = 0;
+    this.player.yPos = 0;
+
     return this;
 }
 
 Game.prototype.initBuffers = function(gl_) {
 
     if(!this.web_audio) this.initWebAudio();
-    this.createAudio("music/elements.mp3");
+//    this.createAudio("music/elements.mp3");
+    this.createAudio("music/beats.mp3");
     this.mapKeys();
 
     this.player_string.initBuffers(gl_);
@@ -78,32 +84,47 @@ Game.prototype.initBuffers = function(gl_) {
     }
 };
 
+Game.hi_hat = 0;
 
 Game.prototype.up_count = 0;
 Game.prototype.down_count = 0;
 Game.prototype.draw = function(gl_) {
 
-    this.jump();
+    if (this.inJump === true) this.jump();
 
     theMatrix.push();
     theMatrix.translate(this.movement);
     this.player.draw(gl_);
     theMatrix.pop();
+    theMatrix.push();
+    theMatrix.translate(this.bg_movement);
     this.background.draw(gl_);
+    theMatrix.pop();
     var i;
+    theMatrix.push();
+    theMatrix.translate(this.floor_movement);
     for(i = 0; i < this.floor.length; ++i){
 	this.floor[i].draw(gl_);
     }
+    theMatrix.pop();
 
     
     if (log_music) {
 
 	var FFTData = new Uint8Array(this.analyser.frequencyBinCount);
 	this.analyser.getByteFrequencyData(FFTData);
-	var i;
+
+
 	var sum = FFTData[0] + FFTData[1] + FFTData[2];
 	if(this.total === null) this.total = sum;
-	if(sum/this.total > 1.5) console.log("%.2f", sum / this.total); 
+
+	if(sum/this.total > 16) { 
+	    console.log("%.2f", sum / this.total); 
+	    Game.hi_hat = 10;
+	} else {
+	    if (Game.hi_hat > 0) Game.hi_hat -= 1;
+	}
+
 	this.total *= 0.75;
 	this.total += (sum / 4);
 
@@ -146,11 +167,13 @@ Game.prototype.mapKeys = function() {
 	    if(this.right_key_down === true) break;
 	    this.right_key_down = true;
 	    this.movement[0] += this.grid;
+	    this.bg_movement[0] += this.grid / 30;
 	    break;
 	case 37: // left
 	    if(this.left_key_down === true) break;
 	    this.left_key_down = true;
 	    this.movement[0] -= this.grid;
+	    this.bg_movement[0] -= this.grid / 30;
 	    break;
 	case 38: // up
 	    if(this.jump_key_down === true) break;
@@ -171,6 +194,7 @@ Game.prototype.mapKeys = function() {
 		// Load start time from offset.
 		audio.source = this.web_audio.createBufferSource();
 		audio.source.buffer = audio.buffer;
+		audio.source.loop = true;
 		audio.source.connect(this.low_pass);
 		console.log("Starting after " + audio.offset + " seconds.");
 		audio.source.start(0, audio.offset);
@@ -204,7 +228,7 @@ Game.prototype.startJump = function() {
 }
 
 Game.prototype.jump = function() {
-    if (this.inJump === false) return;
+
     // Might change asynchronously; must assign within evaluation.?
 
     if (this.jumping_up === true) {
@@ -252,6 +276,7 @@ Game.prototype.handleAudioRequest = function(gl_audio, request) {
 	    gl_audio.source = this.web_audio.createBufferSource();
 	    gl_audio.source.connect(this.low_pass);
 	    gl_audio.source.buffer = gl_audio.buffer;
+	    gl_audio.source.loop = true;
 	    gl_audio.elapsed_time = this.web_audio.currentTime;
 	    gl_audio.offset = 0;
 	    gl_audio.playing = true;

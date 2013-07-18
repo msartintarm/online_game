@@ -9,6 +9,7 @@ precision mediump float;\n\
 \n\
 uniform float ambient_coeff_u;\n\
 uniform float frames_elapsed_u;\n\
+uniform float hi_hat_u;\n\
 uniform float diffuse_coeff_u;\n\
 uniform float specular_coeff_u;\n\
 uniform vec3 specular_color_u;\n\
@@ -99,6 +100,8 @@ varying vec3 lightNorm;\n\
 varying vec3 vertNorm;\n\
 ";
 
+    document.getElementById("shader_decls").value = this.v_decls;
+
     this.fragment["color"] = "\
 void colorize() {\n\
   vec3 ambColor = colorV / 3.0 * ambient_coeff_u;\n\
@@ -118,6 +121,7 @@ void colorTexture(sampler2D theSampler) {\n\
 float delta = 1.0 / 512.0;\n\
 float sway = sin(frames_elapsed_u / 50.0) / 2.0;\n\
 float sway2 = cos(frames_elapsed_u / 55.0) / 2.0;\n\
+float the_beat = hi_hat_u;\n\
 \n\
   vec3 textureColor = texture2D(theSampler, textureV).xyz;\n\
   textureColor[0] *= sway;\n\
@@ -127,6 +131,9 @@ float sway2 = cos(frames_elapsed_u / 55.0) / 2.0;\n\
   float background = clamp(length(textureColor) * 5.0, 0.8, 1.0);\n\
 \n\
   gl_FragColor = vec4(textureColor * 1.6, background);\n\
+  if(the_beat > 0.9) gl_FragColor = \n\
+    (20. - the_beat) / 20. * vec4(textureColor * 1.6, background) +\n\
+    the_beat / 20. * texture2D(theSampler, textureV);\n\
 }\n\
 \n\
 void main(void) {\n\
