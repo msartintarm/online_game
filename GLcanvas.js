@@ -139,10 +139,15 @@ GLcanvas.prototype.start = function(theScene) {
 
     if (this.gl === null) {
 	// One-time display methods
+
+    document.getElementById("header").style.display = "none";
+    document.getElementById("title2").style.display = "none";
+    document.getElementById("footer").style.display = "none";
+
 	this.canvas.style.display = "inline-block";
 	this.canvas.style.width = "100%";
 	this.canvas.width = this.canvas.offsetWidth - 16;
-	this.canvas.height = window.innerHeight - 150;
+	this.canvas.height = window.innerHeight - 25;
 
 	if(this.initGL() !== 0) {
 	    var theWindow = window.open(
@@ -194,7 +199,6 @@ GLcanvas.prototype.start = function(theScene) {
 	document.onmouseup = handleMouseUp;
 	document.onmousemove = handleMouseMove;
 
-	theMatrix.viewInit();
 	this.objects = [];
 	priveledgedMode.reset();
 	mazeMode = 0;
@@ -230,6 +234,7 @@ GLcanvas.prototype.start = function(theScene) {
 };
 
 GLcanvas.prototype.done_loading = function(timeout) { 
+
     // Wait 1.5 seconds for no reason
     setTimeout(tick,timeout); 
 };
@@ -266,7 +271,7 @@ GLcanvas.prototype.initGL = function() {
 
 GLcanvas.prototype.resize = function() {
     this.canvas.width = this.canvas.offsetWidth - 16;
-    this.canvas.height = window.innerHeight - 150;
+    this.canvas.height = window.innerHeight - 25;
     this.gl.viewport(0, 0, this.gl.drawingBufferWidth, 
 		     this.gl.drawingBufferHeight);
     theMatrix.perspective(zoom.val,

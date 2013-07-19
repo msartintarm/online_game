@@ -63,28 +63,6 @@ GLmatrix.prototype.ortho = function(left, right, bottom, top, near, far) {
     this.pMatrixChanged = true;
 };
 
-GLmatrix.prototype.modelInit = function() {
-    mat4.identity(this.mMatrix);
-};
-
-GLmatrix.prototype.modelUpdate = function() {
-    mat4.identity(this.mMatrix);
-    mat4.translate(this.mMatrix,
-		   this.mMatrix,
-		   [positionX.val,-positionY.val,0]);
-    mat4.rotate(
-	this.mMatrix,
-	this.mMatrix,
-	rotateY.val * Math.PI/180,
-	[this.r2, this.r2, 0]);
-    this.mMatrixChanged = true;
-};
-
-GLmatrix.prototype.viewInit = function() {
-    mat4.identity(this.vMatrix);
-    mat4.identity(this.vMatrixNew);
-};
-
 GLmatrix.prototype.viewMaze = function() {
     this.vTranslate([20,2,9.0]);
     this.vRotate(Math.PI, [0, 1, 0]);
@@ -393,9 +371,6 @@ GLmatrix.prototype.setViewUniforms = function(gl_, shader_) {
 
     gl_.uniformMatrix4fv(shader_.unis["pMatU"], false, this.pMatrix);
     gl_.uniformMatrix4fv(shader_.unis["vMatU"], false, this.ivMatrix);
-
-
-
     gl_.uniformMatrix4fv(shader_.unis["lMatU"], false, this.ilMatrix);
     gl_.uniform3fv(shader_.unis["lightPosU"], lightPos);
 };

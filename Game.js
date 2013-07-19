@@ -25,10 +25,13 @@ function Game() {
     this.hit_sound[3].load();
     this.hit_sound[4].load();
     
-    this.player_string = new GLstring(
-	"Player ", TEXT_TEXTURE, theCanvas.gl.shader_canvas);
-    this.intro_string2 = new GLstring(document.getElementById("stadium_name").value + ".",
-				      TEXT_TEXTURE4, theCanvas.gl.shader_canvas);
+    var name = document.getElementById("stadium_name").value;
+
+
+    this.player_string = new GLstring(name, 
+				      TEXT_TEXTURE, 
+				      theCanvas.gl.shader_canvas);
+    this.player_string.val = "Player";
 
     var player_width = this.grid;
     this.player = new Quad(
@@ -36,6 +39,11 @@ function Game() {
 	[ player_width,                0, -1],
 	[-player_width, 2 * player_width, -1],
 	[-player_width,                0, -1]);
+    this.player.setTexture(TEXT_TEXTURE);
+    this.player.setShader(theCanvas.gl.shader_canvas);
+    this.player.x_pos = 0;
+    this.player.y_pos = 0;
+    this.player.name = name;
 
     var bg_width = 1200;
     this.background = new Quad(
@@ -43,6 +51,8 @@ function Game() {
 	[-bg_width,-bg_width, -20],
 	[ bg_width, bg_width, -20],
 	[ bg_width,-bg_width, -20]);
+    this.background.setTexture(HEAVEN_TEXTURE);
+    this.background.setShader(theCanvas.gl.shader_canvas);
 
     this.floor = [];
     var floor_width = player_width;
@@ -57,15 +67,9 @@ function Game() {
 			.setTexture(RUG_TEXTURE));
     }
 
-    this.player.setTexture(TEXT_TEXTURE);
-    this.background.setTexture(HEAVEN_TEXTURE);
-    this.player.setShader(theCanvas.gl.shader_canvas);
-    this.background.setShader(theCanvas.gl.shader_canvas);
     
     theMatrix.vTranslate([0,0,1000]);
 
-    this.player.x_pos = 0;
-    this.player.y_pos = 0;
 
 
     this.initBuffers = function(gl_) {
@@ -75,7 +79,6 @@ function Game() {
 	this.audio[0] = this.createAudio("music/beats.mp3");
 
 	this.player_string.initBuffers(gl_);
-	this.intro_string2.initBuffers(gl_);
 	this.player.initBuffers(gl_);
 	this.background.initBuffers(gl_);
 	var i;
@@ -88,7 +91,27 @@ function Game() {
     this.down_count = 0;
     this.draw = function(gl_) {
 
-	if(this.in_left_move === true) this.player_string.update(gl_, "Left");
+	if(this.in_left_move === true) { 
+	    if (this.player_string.val !== "Left") {
+		this.player_string.update(gl_, "Left");
+		this.player_string.val = "Left";
+	    }
+	} else if (this.in_right_move === true) {
+	    if (this.player_string.val !== "Right") {
+		this.player_string.update(gl_, "Right");
+		this.player_string.val = "Right";
+	    }
+	} else if (this.in_jump === true) {
+	    if (this.player_string.val !== "Jump") {
+		this.player_string.update(gl_, "Jump");
+		this.player_string.val = "Jump";
+	    }
+	} else {
+	    if (this.player_string.val !== "Player") {
+		this.player_string.update(gl_, this.player.name);
+		this.player_string.val = "Player";
+	    }
+	}
 
 	this.updateMovement();
 

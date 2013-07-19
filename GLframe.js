@@ -92,8 +92,8 @@ GLframe.prototype.init = function(gl_) {
 
 var every_other = 0;
 GLframe.prototype.drawScene = function(gl_) {
-    if(frame_draw === true || (++every_other) % 5 !== 0) return;
 
+    if(frame_draw === true || (++every_other) % 5 !== 0) return;
 
     gl_.activeTexture(gl_.TEXTURE0 + this.active);
     gl_.viewport(0, 0, this.frameBuff.width, this.frameBuff.height);
@@ -103,17 +103,8 @@ GLframe.prototype.drawScene = function(gl_) {
     gl_.clear(gl_.COLOR_BUFFER_BIT | 
 	      gl_.DEPTH_BUFFER_BIT);
 
-    // 1.
-//    var tempMatrix1 = mat4.clone(theMatrix.pMatrix);
-//    theMatrix.push();
-
-    // 2.
-//    theMatrix.ortho(-10, 10, -10, 10, -1000, 1000);
-
     frame_draw = true;
     theMatrix.lightTranslate([0,-400,0]); 
-
-
     
     var tempMatrix = mat4.clone(theMatrix.vMatrix);
 
@@ -124,10 +115,7 @@ GLframe.prototype.drawScene = function(gl_) {
 		theMatrix.vMatrix, 
 		-Math.PI/2, [1,0,0]);
     theMatrix.vMatrixChanged = true;
-//    theMatrix.modelInit();
 
-    // 3.
-//    theMatrix.translate([0,0,-10]);
     theCanvas.drawScene();
 
     mat4.identity(theMatrix.vMatrix);
@@ -136,14 +124,8 @@ GLframe.prototype.drawScene = function(gl_) {
     this.playa.draw(gl_);
     frame_draw = false;
 
-
-
-    // 4,
-//    theMatrix.pop();
     mat4.copy(theMatrix.vMatrix, tempMatrix);
-//    mat4.copy(theMatrix.pMatrix, tempMatrix1);
     theMatrix.vMatrixChanged = true;
-//    theMatrix.pMatrixChanged = true;
 
     gl_.bindFramebuffer(gl_.FRAMEBUFFER, null);
     gl_.bindTexture(gl_.TEXTURE_2D, this.texture);
@@ -152,7 +134,4 @@ GLframe.prototype.drawScene = function(gl_) {
 		 gl_.drawingBufferWidth,
 		 gl_.drawingBufferHeight);
 
-    // 5.
-//    gl_.bindTexture(gl_.TEXTURE_2D, null);
-//    this.debug;
 };
