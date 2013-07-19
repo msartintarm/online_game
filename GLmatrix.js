@@ -40,7 +40,8 @@ function GLmatrix() {
     // Here is some random, unrelated stuff.
     this.r2 = Math.sqrt(2);
     this.mStack = [];
-    this.inJump = false;
+
+    this.distToMove = vec3.create();
 
     // Toggled by member function 'toggleSpeed'
     this.speedMode = 0;
@@ -119,11 +120,9 @@ GLmatrix.prototype.lightTranslate = function(vector) {
     this.lightMatrixChanged = true;
 };
 
-var transLightMatrix = mat4.create();
-
 GLmatrix.prototype.lightRotate = function(x_change, y_change) {
 
-    mat4.identity(transLightMatrix);
+    var transLightMatrix = mat4.create();
     mat4.rotate(
 	transLightMatrix,
 	transLightMatrix,
@@ -188,14 +187,6 @@ GLmatrix.prototype.lookDown = function() {
     }
 };
 
-GLmatrix.prototype.lookLeft = function(distance) {
-    if(!stadiumMode || (stadiumMode && StadiumInitSeqNum == 4 && !freeze)){
-	radiansToRotate = (lookDist * distance * Math.PI)/10;
-	rotateCount = 10;
-	vectorRotation = [0,1,0];
-    }
-};
-
 GLmatrix.prototype.lookRight = function(distance) {
     if(!stadiumMode || (stadiumMode && StadiumInitSeqNum == 4 && !freeze)){
 	radiansToRotate = (lookDist * distance * Math.PI)/10;
@@ -210,37 +201,6 @@ GLmatrix.prototype.turnAround = function(rads){
     vectorRotation = [0,1,0];
 };
 
-var moveDist = 20.1; //default to maze
-var lookDist = 1/10; //default to maze
-
-GLmatrix.prototype.moveRight = function() {
-    if(!stadiumMode || (stadiumMode && StadiumInitSeqNum == 4 && !freeze)){
-	distToMove = [-moveDist/10,0,0];
-	moveCount = 10;
-    }
-};
-
-GLmatrix.prototype.moveLeft = function() {
-    if(!stadiumMode || (stadiumMode && StadiumInitSeqNum == 4 && !freeze)){
-	distToMove = [moveDist/10,0,0];
-	moveCount = 10;
-    }
-};
-
-GLmatrix.prototype.moveUp = function() {
-    if(!stadiumMode || (stadiumMode && StadiumInitSeqNum == 4 && !freeze)){
-	distToMove = [0,moveDist/10,0];
-	moveCount = 10;
-    }
-};
-
-GLmatrix.prototype.moveDown = function() {
-    if(!stadiumMode || (stadiumMode && StadiumInitSeqNum == 4 && !freeze)){
-	distToMove = [0,-moveDist/10,0];
-	moveCount = 10;
-    }
-};
-
 GLmatrix.prototype.moveForward = function() {
     if(!stadiumMode || (stadiumMode && StadiumInitSeqNum == 4 && !freeze)){
         if(moveCount !== 0  && moveAccel <= 5){
@@ -249,7 +209,7 @@ GLmatrix.prototype.moveForward = function() {
         else if(moveCount === 0){
             moveAccel = 1;
         }
-        distToMove = [0,0,(-moveDist/10)*moveAccel];
+        this.distToMove = [0,0,(-moveDist/10)*moveAccel];
 
 
 //        console.log("Accelerating %d", moveAccel);
@@ -258,12 +218,16 @@ GLmatrix.prototype.moveForward = function() {
 };
 GLmatrix.prototype.moveBack = function() {
     if(!stadiumMode || (stadiumMode && StadiumInitSeqNum == 4) && !freeze){
-	distToMove = [0,0,moveDist/10];
+	this.distToMove = [0,0,moveDist/10];
 	moveCount = 10;
     }
 };
+
+var moveDist = 20.1; //default to maze
+var lookDist = 1/10; //default to maze
+
 GLmatrix.prototype.moveInToPlay = function() {
-	distToMove = [0,-1,-50/10];
+	this.distToMove = [0,-1,-50/10];
 	moveCount = 10;
 };
 GLmatrix.prototype.dropIn = function() {
@@ -275,7 +239,7 @@ GLmatrix.prototype.dropIn = function() {
     vec4.transformMat4(newPos, newPos, this.vMatrix);
     vec4.transformMat4(curPos, curPos, this.vMatrix);
 
-    distToMove = [0,(-curPos[1]/100)+(12.5/100),-(curPos[2]+400)/100];
+    this.distToMove = [0,(-curPos[1]/100)+(12.5/100),-(curPos[2]+400)/100];
     moveCount = 100;
     StadiumInitSeqNum = 2;
 };
@@ -345,23 +309,23 @@ GLmatrix.prototype.toggleSpeed = function() {
 
 var moveCount = 0;
 var moveAccel = 1;
-var distToMove = vec3.create();
+
 GLmatrix.prototype.gradualMove = function() {
 
     if(moveCount > 0) {
 	switch (this.speedMode) {
 	case 1: // Slow speed
 	    this.vTranslate(
-		vec3.scale(vec3.create(), distToMove, 0.1),
-		distToMove);
+		vec3.scale(vec3.create(), this.distToMove, 0.1),
+		this.distToMove);
 	    break;
 	case 2: // Fast speed
 	    this.vTranslate(
-		vec3.scale(vec3.create(), distToMove, 10.0),
-		distToMove);
+		vec3.scale(vec3.create(), this.distToMove, 10.0),
+		this.distToMove);
 	    break;
 	default:  // Normal speed
-	    this.vTranslate(distToMove);
+	    this.vTranslate(this.distToMove);
 	    break;
 	}
 	moveCount -= 1;
@@ -378,74 +342,6 @@ GLmatrix.prototype.gradualRotate = function() {
     }
 };
 
-/*
- * Jumps upwards, and rotates the user towards the Jumbotron
- * Pretends the viewer and Jumbotron are on the same axis
- */
-GLmatrix.prototype.jump = function() {
-
-    if(this.inJump === true  || freeze) return;
-    this.inJump = true;
-
-    // determine view vectors by transposing the known direction: (0,0,-1)
-    // we also need the LHS (-1,0,0) to see if the angle is less than 0.
-
-    var viewer_pos = vec4.fromValues(0, 0, 0, 1);
-    var curr_dir = vec4.fromValues(0, 0,-1, 1);
-    var left_dir = vec4.fromValues(-1, 0, 0, 1);
-    // this is actually where the Jumbotron would be if it were on ground
-    var jumbo_dir = vec3.fromValues(2640, 0, -2640);
-
-    // calc current positions
-    vec4.transformMat4(viewer_pos, viewer_pos, theMatrix.vMatrix);
-    vec4.transformMat4(curr_dir, curr_dir, theMatrix.vMatrix);
-    vec4.transformMat4(left_dir, left_dir, theMatrix.vMatrix);
-    viewer_pos[1] = 0;
-    curr_dir[1] = 0;
-    left_dir[1] = 0;
-
-    // calc current directions
-
-    vec3.sub(curr_dir, curr_dir, viewer_pos);
-    vec3.sub(jumbo_dir, jumbo_dir, viewer_pos);
-    vec3.sub(left_dir, left_dir, viewer_pos);
-    vec3.normalize(curr_dir, curr_dir);
-    vec3.normalize(jumbo_dir, jumbo_dir);
-    vec3.normalize(left_dir, left_dir);
-
-    // find angle from dot product
-    var the_angle = vec3.dot(jumbo_dir, curr_dir);
-    var is_front = (the_angle > 0);
-    if(the_angle !== 0) the_angle = Math.acos(the_angle);
-
-    // compensate for the range of arccos
-    var is_left = (vec3.dot(jumbo_dir, left_dir) > 0);
-    if(!is_left) the_angle = -the_angle;
-
-    if(envDEBUG_JUMP) {
-	console.log("current: " + vec3.str(curr_dir));
-	console.log("viewer: " + vec4.str(viewer_pos));
-	console.log("jumbo:   " + vec3.str(jumbo_dir));
-	if (!is_front) console.log("jumbotron is BACK.");
-	else console.log("jumbotron is FRONT.");
-	if (!is_left) console.log("jumbotron is RIGHT.");
-	else console.log("jumbotron is LEFT.");
-	console.log("angle:   " + the_angle + " degrees");
-    }
-
-    this.jump_rotation = the_angle;
-
-    // must be symmetrical
-    this.up3 = 2;
-    this.up2 = 8;
-    this.up1 = 16;
-    this.up0 = 5;
-    this.dn0 = 5;
-    this.dn1 = 16;
-    this.dn2 = 8;
-    this.dn3 = 2;
-    this.inJump = true;
-};
 
 GLmatrix.prototype.newViewAllowed = function() {
     if(mazeMode)
@@ -458,78 +354,24 @@ GLmatrix.prototype.newViewAllowed = function() {
  * Input: amount of time to go up for x squares.
  */
 GLmatrix.prototype.update = function() {
-    if(stadiumMode===1){
-	this.runStadiumInit();
-	myStadium.updateStadium();
-    }
 
     if(GLobject.has_collided > 0) GLobject.has_collided --;
 
     const x = 50.0;
-    if(this.inJump === false) {
-	this.gradualMove();
-	this.gradualRotate();
-	if(this.vMatrixNewChanged === false) { return; }
-	if( priveledgedMode.val || this.newViewAllowed()){
-	    // We only check the view if we are
-	    //  not in 'god mode'
+    this.gradualMove();
+    this.gradualRotate();
+    if(this.vMatrixNewChanged === false) { return; }
+    if( priveledgedMode.val || this.newViewAllowed()){
+	// We only check the view if we are
+	//  not in 'god mode'
 
-	    //Multiplies vMatrixNew * vMatrix
-	    //therefore if vMatrixNew==identity we have no movement
-	    this.vMul(this.vMatrixNew);
-	    this.vMatrixChanged = true;
-	}
-	mat4.identity(this.vMatrixNew);
-	return; 
+	//Multiplies vMatrixNew * vMatrix
+	//therefore if vMatrixNew==identity we have no movement
+	this.vMul(this.vMatrixNew);
+	this.vMatrixChanged = true;
     }
-    if(this.up3 >= 0) { 
-	this.vTranslate([0, 3*x, 0]); 
-	this.vRotate(Math.PI/64,[-1, 0, 0]); 
-	this.vRotate(this.jump_rotation / 30, [0, 1, 0]);
-	this.up3--;
-    } else if(this.up2 >= 0) { 
-	this.vTranslate([0, 2*x, 0]); 
-	this.vRotate(Math.PI/128,[-1, 0, 0]); 
-	this.vRotate(this.jump_rotation / 26, [0, 1, 0]);
-	this.up2--;
-    } else if(this.up1 >= 0) {
-	this.vTranslate([0, 1*x, 0]); 
-	this.vRotate(Math.PI/256,[-1, 0, 0]); 
-	this.vRotate(this.jump_rotation / 26, [0, 1, 0]);
-	this.up1--; 
-    } else if(this.up0 >= 0) {
-	this.vRotate(this.jump_rotation  * this.up0/ 100, [0, 1, 0]);
-	this.up0--; 
-    } else if(this.dn0 >= 0) { 
-	this.vRotate(this.jump_rotation * (5 - this.dn0) / 100, [0,-1, 0]);
-	this.dn0--;
-    } else if(this.dn1 >= 0) { 
-	this.vRotate(this.jump_rotation / 26, [0,-1, 0]);
-	this.vRotate(Math.PI/256,[1, 0, 0]); 
-	this.vTranslate([0,-1*x, 0]);
-	this.dn1--;
-    } else if(this.dn2 >= 0) {
-	this.vRotate(this.jump_rotation / 26, [0,-1, 0]);
-	this.vRotate(Math.PI/128,[1, 0, 0]); 
-	this.vTranslate([0,-2*x, 0]);
-	this.dn2--;
-    } else if(this.dn3 >= 0) {
-	this.vRotate(this.jump_rotation / 30, [0,-1, 0]);
-	this.vRotate(Math.PI/64,[1, 0, 0]); 
-	this.vTranslate([0,-3*x, 0]);
-	this.dn3--;
-    } else {
-	if(stadiumMode && StadiumInitSeqNum===4){
-	    freeze = 0;
-	    freezeOff = 1;
-	    //alert("Game back in play");
-	}
-	this.inJump = false; return; 
-    }
-
-    this.vMul(this.vMatrixNew);
     mat4.identity(this.vMatrixNew);
-    this.vMatrixChanged = true;
+    return; 
 };
 
 /**

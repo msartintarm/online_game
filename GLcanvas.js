@@ -193,7 +193,6 @@ GLcanvas.prototype.start = function(theScene) {
 	document.onmousedown = handleMouseDown;
 	document.onmouseup = handleMouseUp;
 	document.onmousemove = handleMouseMove;
-	document.onkeydown = handleKeyDown;
 
 	theMatrix.viewInit();
 	this.objects = [];

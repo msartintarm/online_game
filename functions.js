@@ -374,6 +374,7 @@ function handleMouseDown(event) {
 function handleMouseUp(event) {}
 
 function handleMouseMove(event) {
+
     if (mouse_movement === false) { return; }
 
     var move_x = event.clientX - click_x;
@@ -384,113 +385,6 @@ function handleMouseMove(event) {
 
     if(move_y < -0.1) theMatrix.moveForward();
     else if(move_y > 0.1) theMatrix.moveBack();
-/*
-    if(!stadiumMode){
-	if(lightWillRotate) {
-	    theMatrix.lightRotate(
-		Math.PI / 180 * 2 * ((newX - mouseX) / 10), 
-		Math.PI / 180 * 2 * ((newY - mouseY) / 10));
-	} else {
-	    theMatrix.lightTranslate(
-		[(newX - mouseX) / 30, 
-		 (mouseY - newY) / 30, 
-		 0]);
-	}
-	mouseX = newX;
-	mouseY = newY;
-    }
-
-*/
-
-}
-
-var wrongKey = false;
-var lightWillRotate = false;
-
-function handleKeyDown(theEvent) {
-
-    if(wrongKey) {
-	wrongKey = false;
-	document.getElementById("keyboard").innerHTML = "";
-    }
-
-    switch(theEvent.keyCode) {
-	
-    case 16: // shift
-	theMatrix.toggleSpeed();
-	break;
-    case 32: // spacebar
-	theMatrix.jump();
-	if(freeze === 0 && (StadiumInitSeqNum === 4 && stadiumMode)){
-	    freezeBirth = Math.round(new Date().getTime()/1000);
-	    freeze = 1;
-	    //alert("Game Paused");
-	}
-	document.getElementById("keyboard").innerHTML = 
-	    "Jump!";
-	break;
-    case 39: // ->
-	theMatrix.moveLeft();
-	document.getElementById("keyboard").innerHTML = 
-	    "Jump!";
-	break;
-    case 37: // left
-	theMatrix.moveRight();
-	break;
-    case 38: // up
-	theMatrix.moveForward();
-	break;
-    case 40: // down
-	theMatrix.moveBack();
-	break;
-    case 65: // a
-	theMatrix.lookLeft(2);
-	break;
-    case 68: // d
-	theMatrix.lookRight(2);
-	break;	
-    case 73: // i
-	if(priveledgedMode.val)
-	    theMatrix.lookUp();
-	break;
-    case 75: // k
-	if(priveledgedMode.val)
-	    theMatrix.lookDown();
-	break;
-    case 80: 
-	if(freeze === 0 && (StadiumInitSeqNum === 4 && stadiumMode)){
-	    freezeBirth = Math.round(new Date().getTime()/1000);
-	    freeze = 1;
-	    alert("Game Paused");
-	}
-	else if(stadiumMode && StadiumInitSeqNum===4){
-	    freeze = 0;
-	    freezeOff = 1;
-	    alert("Game back in play");
-	}
-	break;
-    case 87: // w
-	if(priveledgedMode.val)
-	    theMatrix.moveUp();
-	break;
-    case 83: // s
-	if(priveledgedMode.val)
-	    theMatrix.moveDown();
-	break;
-    case 112: // F1: cycle through shaders 
-	FLATNORMS = !FLATNORMS;
-	theCanvas.changeShaders('shader-fs', 'shader-vs');
-	break;
-    case 49: //1 : change ball shader
-	ball_shader_selectG++;
-	console.log("Ball shader: " + kNameG[ball_shader_selectG]);
-	break;
-    default:
-	wrongKey = true;
-	document.getElementById("keyboard").innerHTML = 
-	    "Key " + theEvent.keyCode + " is undefined.";
-	break;
-    }
 }
 
 function tick() {
