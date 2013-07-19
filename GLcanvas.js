@@ -13,7 +13,6 @@ function GLcanvas() {
     this.objects = [];
     this.textures = [];
     this.textureNums = [];
-    this.frames = [];
     this.frame_count = 0;
     this.canvas = document.getElementById("glcanvas");
     this.gl = null;
@@ -88,14 +87,6 @@ GLcanvas.prototype.createScene = function(objToDraw) {
 	stadiumMode = 1;
     } else if(objToDraw == "game") {
 	this.objects.push(new Game());
-    } else if(objToDraw == "framebuffer") {
-	this.frames.push(new GLframe(FRAME_BUFF));
-	this.objects.push(new Quad(
-	    [-1, 1,-4],
-	    [-1,-1,-4],
-	    [ 1, 1,-4],
-	    [ 1,-1,-4]).setTexture(FRAME_BUFF));
-
     } else if(objToDraw == "stadiumPiece") {
 	this.objects.push(new StadiumPiece(
 	    220, (FRONT|BACK|RIGHT|LEFT), 0, BRICK_TEXTURE,
@@ -217,11 +208,6 @@ GLcanvas.prototype.start = function(theScene) {
 	// Instantiate models
 	this.createScene(theScene);
 
-	// Instantiate any framebuffers created
-	for(var i = 0; i < this.frames.length; ++i) {
-	    this.frames[i].init(this.gl);
-	}
-
 	if(textures_loading !== 0) 
 	    document.getElementById("glcanvas_status").innerHTML += 
 	    "" + textures_loading + " textures.</br>";
@@ -307,10 +293,6 @@ GLcanvas.prototype.drawScene = function() {
   //  }
 
 //    if(envDEBUG === true && this.has_errors === true) { return; }
-
-    for(var i = 0; i < this.frames.length; ++i) {
-	this.frames[i].drawScene(this.gl);
-    }
 
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | 
 		  this.gl.DEPTH_BUFFER_BIT);
