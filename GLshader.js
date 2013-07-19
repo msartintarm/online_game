@@ -67,40 +67,8 @@ float specularV2 = dot(normalize(reflectionV2), \n\
 }\n\
 ";
 
-    this.v_decls = "\n\
-precision mediump float;  \n\
-\n\
-// Vector Attributes      \n\
-attribute vec3 vPosA;\n\
-attribute vec3 vNormA;\n\
-attribute vec3 vColA;\n\
-attribute vec2 textureA;\n\
-\n\
-// Matrixes\n\
-uniform mat4 pMatU; // Position\n\
-uniform mat4 mMatU; // Model\n\
-uniform mat4 vMatU; // View\n\
-uniform mat4 nMatU; // Normal\n\
-uniform mat4 lMatU; // Lighting\n\
-\n\
-// Position attributes\n\
-uniform vec3 lightPosU;\n\
-uniform vec3 viewPosU;\n\
-\n\
-// Passed to the fragment shader\n\
-varying vec3 distanceV;\n\
-varying float diffuseV;\n\
-varying vec3 colorV;\n\
-varying vec2 textureV;\n\
-\n\
-varying vec3 viewPosV;\n\
-varying vec3 vModel;\n\
-varying vec4 lModel;\n\
-varying vec3 lightNorm;\n\
-varying vec3 vertNorm;\n\
-";
+    this.v_decls = document.getElementById("shader_decls").value;
 
-    document.getElementById("shader_decls").value = this.v_decls;
 
     this.fragment["color"] = "\
 void colorize() {\n\
@@ -119,8 +87,8 @@ void main(void) {\n\
 void colorTexture(sampler2D theSampler) {\n\
 \n\
 float delta = 1.0 / 512.0;\n\
-float sway = sin(frames_elapsed_u / 50.0) / 2.0;\n\
-float sway2 = cos(frames_elapsed_u / 55.0) / 2.0;\n\
+float sway = sin(frames_elapsed_u / 100.0) / 2.0;\n\
+float sway2 = cos(frames_elapsed_u / 110.0) / 2.0;\n\
 float the_beat = hi_hat_u;\n\
 \n\
   vec3 textureColor = texture2D(theSampler, textureV).xyz;\n\

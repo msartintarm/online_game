@@ -247,7 +247,6 @@ GLcanvas.prototype.start = function(theScene) {
 
 };
 
-
 GLcanvas.prototype.done_loading = function(timeout) { 
     // Wait 1.5 seconds for no reason
     setTimeout(tick,timeout); 

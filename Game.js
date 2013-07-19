@@ -69,13 +69,27 @@ function Game() {
 
 Game.hi_hat = 0;
 var log_music = false;
-var jump_dist = [];
 
 var x;
 
+// Jump distance is a parabola from 0 to 900/4
+var jump_dist = [];
 for (x = 0; x <= 30; ++x) {
     jump_dist.push ((900 / 4) - (x*x / 4));
 }
+
+// Move distance is a group of numbers, normalized so their sum is 1.0
+var move_dist = [];
+var move_total = 0;
+for (x = 0; x <= 8; ++x) {
+    var move_num = x*x;
+    move_dist.push (move_num);
+    move_total += move_num;
+}
+for (x = 0; x <= 8; ++x) {
+    move_dist[x] /= move_total;
+}
+
 
 Game.prototype = {
 
@@ -174,12 +188,12 @@ Game.prototype = {
 	    case 39: // right
 		if(this.right_key_down === true) break;
 		this.right_key_down = true;
-		this.in_right_move = true;
+		this.startRightMove();
 		break;
 	    case 37: // left
 		if(this.left_key_down === true) break;
 		this.left_key_down = true;
-		this.in_left_move = true;
+		this.startLeftMove();
 		break;
 	    case 38: // up
 		if(this.jump_key_down === true) break;
@@ -218,6 +232,8 @@ Game.prototype = {
     in_left_move: false,
     in_right_move: false,
 
+    
+
     startJump: function() {
 
 	if (this.in_jump === true) return;
@@ -227,20 +243,64 @@ Game.prototype = {
 	this.in_jump = true;
     },
 
+    startLeftMove: function() {
+
+	if (this.in_left_move === true) return;
+	this.left_count = -1;
+	this.left_started = false;
+	this.in_left_move = true;
+    },
+
+    startRightMove: function() {
+
+	if (this.in_right_move === true) return;
+	this.right_count = -1;
+	this.right_started = false;
+	this.in_right_move = true;
+    },
+
     updateMovement: function() {
 
 	// Handle left and right movement.
-	if (this.in_right_move) {
-	    this.movement[0] += this.grid;
-	    this.bg_movement[0] += this.grid / 30;
-	    this.in_right_move = false;
-	} 
+	if (this.in_right_move === true) {
+	    
+	    if(this.right_started === true) {
 
-	if (this.in_left_move) {
-	    this.movement[0] -= this.grid;
-	    this.bg_movement[0] -= this.grid / 30;
-	    this.in_left_move = false;
-	}   
+		var count = (++this.right_count);
+		if (count >= move_dist.length) { 
+		    this.in_right_move = false;
+		    if (this.right_key_down === true) this.startRightMove();
+		    return;
+		}
+		
+		this.movement[0] += move_dist[count] * this.grid;
+		this.bg_movement[0] += this.grid / 30;
+		
+	    } else if(Game.hi_hat == 10) {
+		this.right_started = true;
+		return;
+	    } 
+	}
+
+	if (this.in_left_move === true) {
+	    
+	    if(this.left_started === true) {
+
+		var count = (++this.left_count);
+		if (count >= move_dist.length) { 
+		    this.in_left_move = false;
+		    if (this.left_key_down === true) this.startLeftMove();
+		    return;
+		}
+		
+		this.movement[0] -= move_dist[count] * this.grid;
+		this.bg_movement[0] -= this.grid / 30;
+		
+	    } else if(Game.hi_hat == 10) {
+		this.left_started = true;
+		return;
+	    } 
+	}
 
 	// Handle jumps!
 	if (this.in_jump === true) 
@@ -294,8 +354,7 @@ Game.prototype = {
 		gl_audio.offset = 0;
 		gl_audio.playing = true;
 		gl_audio.source.start(0,0);
-		this.mapKeys();
-	    }.bind(this)
+		this.mapKeys(); }.bind(this)
 	);
     },
 

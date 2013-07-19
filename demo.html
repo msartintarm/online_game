@@ -83,7 +83,7 @@
 	    <div id="stadium_params" style="display:inline-block;">
 	      <div style="float:left; width:30%;">Name:</div>
 	      <input id="stadium_name" type="text" style="float:right; width:60%;"
-		     value="Professor K" class="button_add stadium_input"/>
+		     value="Hogarth" class="button_add stadium_input"/>
 	      <br/>
 	      <div style="float:left;">Balls:</div>
 	      <input id="stadium_balls" type="text" style="float:right; width:60%;"
@@ -254,8 +254,39 @@ onclick="theCanvas.changeShaders('shader-fs', 'vertex-shader-bad')"/>
 
     </div>
     <!-- Put this element one tag scope higher to hide it. -->
-      <div class="shaders" id="shader1" >
-	<textarea id="shader_decls" rows="20"></textarea>
+      <div class="shaders" id="shader1" style="display:none;">
+	<textarea id="shader_decls" rows="20">
+precision mediump float;  
+
+// Vector Attributes      
+attribute vec3 vPosA;
+attribute vec3 vNormA;
+attribute vec3 vColA;
+attribute vec2 textureA;
+
+// Matrixes
+uniform mat4 pMatU; // Position
+uniform mat4 mMatU; // Model
+uniform mat4 vMatU; // View
+uniform mat4 nMatU; // Normal
+uniform mat4 lMatU; // Lighting
+
+// Position attributes
+uniform vec3 lightPosU;
+uniform vec3 viewPosU;
+
+// Passed to the fragment shader
+varying vec3 distanceV;
+varying float diffuseV;
+varying vec3 colorV;
+varying vec2 textureV;
+
+varying vec3 viewPosV;
+varying vec3 vModel;
+varying vec4 lModel;
+varying vec3 lightNorm;
+varying vec3 vertNorm;
+</textarea>
 	<textarea id="frag_shader_1" rows="20"></textarea>
 	<textarea id="frag_shader_2" rows="20"></textarea>
 
