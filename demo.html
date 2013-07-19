@@ -83,7 +83,7 @@
 	    <div id="stadium_params" style="display:inline-block;">
 	      <div style="float:left; width:30%;">Name:</div>
 	      <input id="stadium_name" type="text" style="float:right; width:60%;"
-		     value="Hogarth" class="button_add stadium_input"/>
+		     class="button_add stadium_input"/>
 	      <br/>
 	      <div style="float:left;">Balls:</div>
 	      <input id="stadium_balls" type="text" style="float:right; width:60%;"
@@ -206,50 +206,14 @@
 	    </tr></tbody>
 	    </table>
           </div>
-          <div id="webgl_settings_button" class="content">
-	    <input type="button"
-		   onclick="expand('settings')" 
-		   value="Change settings!" 
-		   class="button_add" />
-          </div>       
-		  
-          <div id="settings" class="content">
-              Privledge Mode:<br/>
-              <input type="button" onclick="priveledgedMode.toggle()" value="toggle"/>
-              <br/>Debug Statistics:<br/>
-              <input type="button" 
-		     onclick="mazeDebug = !mazeDebug;" 
-		     value="Maze Bound Checking"/>
-              <br/>Zoom:<br/>
-              <input type="button" onclick="zoom.setIncZoom(-.2)" value="in"/>
-              <input type="button" onclick="zoom.setIncZoom(.2)" value="out"/>
-              <br/>Adjust Stool Height:<br/>
-              <input type="button" onclick="stoolHeight.setStoolHeight(0.1)" value="up"/>
-              <input type="button" onclick="stoolHeight.setStoolHeight(-0.1)" value="down"/>
-              <br/>Select Shading:<br/>
-              <input type="button" value="ADS model"
-onclick="theCanvas.changeShaders('shader-fs', 'shader-vs')"/>
-              <input type="button" value="Flat shading"
-onclick="FLATNORMS = !FLATNORMS; theCanvas.changeShaders('shader-fs', 'shader-vs');"/>
-              <input type="button" value="Depth shading"
-onclick="theCanvas.changeShaders('frag-shader-shadow', 'vertex-shader-shadow')"/>
-              <input type="button" value="Bad shader" 
-onclick="theCanvas.changeShaders('shader-fs', 'vertex-shader-bad')"/>
-
-          </div>        
 	</div>
       </div>
     </div>
       
     <div id="footer"> 
       <input type="button" 
-	     onclick="expand('content4')" 
 	     value="(c) 2013 Batman and Robin" 
 	     class="button_add" />
-      <div id="content4" class="content">
-	A noob
-	
-      </div>
       <div class="title" id="title4" > </div>            
 
     </div>

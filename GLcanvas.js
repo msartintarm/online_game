@@ -40,7 +40,7 @@ function GLcanvas() {
     this.resizeCounter = 0;
 
     document.getElementById("stadium_name").focus();
-    document.getElementById("stadium_name").value = "Professor K";
+    document.getElementById("stadium_name").value = "Hogarth";
 
     return this;
 }
@@ -145,9 +145,6 @@ GLcanvas.prototype.drawModels = function() {
  * Begins the canvas.
  */
 GLcanvas.prototype.start = function(theScene) {
-
-    // Instantiate the Div this canvas element is within.
-    expand("webgl_settings_button");
 
     if (this.gl === null) {
 	// One-time display methods

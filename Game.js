@@ -10,6 +10,9 @@ function Game() {
     this.floor_movement = vec3.create();
     this.bg_movement = vec3.create();
     this.total = null;
+    this.cam_left_count = 0;
+    this.cam_right_count = 0;
+
     
     this.hit_sound[0] = new Audio("drums_1.wav");
     this.hit_sound[1] = new Audio("drums_2.wav");
@@ -61,43 +64,15 @@ function Game() {
     
     theMatrix.vTranslate([0,0,1000]);
 
-    this.player.xPos = 0;
-    this.player.yPos = 0;
-
-    return this;
-}
-
-Game.hi_hat = 0;
-var log_music = false;
-
-var x;
-
-// Jump distance is a parabola from 0 to 900/4
-var jump_dist = [];
-for (x = 0; x <= 30; ++x) {
-    jump_dist.push ((900 / 4) - (x*x / 4));
-}
-
-// Move distance is a group of numbers, normalized so their sum is 1.0
-var move_dist = [];
-var move_total = 0;
-for (x = 0; x <= 8; ++x) {
-    var move_num = x*x;
-    move_dist.push (move_num);
-    move_total += move_num;
-}
-for (x = 0; x <= 8; ++x) {
-    move_dist[x] /= move_total;
-}
+    this.player.x_pos = 0;
+    this.player.y_pos = 0;
 
 
-Game.prototype = {
-
-    initBuffers: function(gl_) {
+    this.initBuffers = function(gl_) {
 
 	if(!this.web_audio) this.initWebAudio();
 	//    this.createAudio("music/elements.mp3");
-	this.createAudio("music/beats.mp3");
+	this.audio[0] = this.createAudio("music/beats.mp3");
 
 	this.player_string.initBuffers(gl_);
 	this.intro_string2.initBuffers(gl_);
@@ -107,11 +82,13 @@ Game.prototype = {
 	for(i = 0; i < this.floor.length; ++i){
 	    this.floor[i].initBuffers(gl_);
 	}
-    },
+    };
 
-    up_count: 0,
-    down_count: 0,
-    draw: function(gl_) {
+    this.up_count = 0;
+    this.down_count = 0;
+    this.draw = function(gl_) {
+
+	if(this.in_left_move === true) this.player_string.update(gl_, "Left");
 
 	this.updateMovement();
 
@@ -134,22 +111,25 @@ Game.prototype = {
 	
 	if (log_music) {
 
-	    var FFTData = new Uint8Array(this.analyser.frequencyBinCount);
-	    this.analyser.getByteFrequencyData(FFTData);
+	    if(Game.hi_hat < 5) {
+		
+		var FFTData = new Uint8Array(this.analyser.frequencyBinCount);
+		this.analyser.getByteFrequencyData(FFTData);
 
+		var sum = FFTData[0] + FFTData[1] + FFTData[2];
+		if(this.total === null) this.total = sum;
 
-	    var sum = FFTData[0] + FFTData[1] + FFTData[2];
-	    if(this.total === null) this.total = sum;
-
-	    if(sum/this.total > 16) { 
-		console.log("%.2f", sum / this.total); 
-		Game.hi_hat = 10;
+		if(sum/this.total > 5) { 
+		    console.log("%.2f", sum / this.total); 
+		    Game.hi_hat = 10;
+		} else {
+		    if (Game.hi_hat > 0) Game.hi_hat -= 1;
+		}
+		this.total *= 0.75;
+		this.total += (sum / 4);
 	    } else {
-		if (Game.hi_hat > 0) Game.hi_hat -= 1;
+		Game.hi_hat -= 1;
 	    }
-
-	    this.total *= 0.75;
-	    this.total += (sum / 4);
 
 	    /*
 	      for(i = 0; i < 25 && i < FFTData.length; ++i) {
@@ -166,7 +146,7 @@ Game.prototype = {
      * Binds keys to document object.
      * This should be done as part of initialization.
      */
-    mapKeys: function() {
+    this.mapKeys = function() {
 
 	document.onkeyup = function(the_event) {
 
@@ -226,15 +206,15 @@ Game.prototype = {
 		break;
 	    }
 	}.bind(this);
-    },
+    };
 
-    in_jump: false,
-    in_left_move: false,
-    in_right_move: false,
+    this.in_jump = false,
+    this.in_left_move = false,
+    this.in_right_move = false,
 
     
 
-    startJump: function() {
+    this.startJump = function() {
 
 	if (this.in_jump === true) return;
 	this.jumping_up = true;
@@ -243,7 +223,7 @@ Game.prototype = {
 	this.in_jump = true;
     },
 
-    startLeftMove: function() {
+    this.startLeftMove = function() {
 
 	if (this.in_left_move === true) return;
 	this.left_count = -1;
@@ -251,7 +231,7 @@ Game.prototype = {
 	this.in_left_move = true;
     },
 
-    startRightMove: function() {
+    this.startRightMove = function() {
 
 	if (this.in_right_move === true) return;
 	this.right_count = -1;
@@ -259,14 +239,51 @@ Game.prototype = {
 	this.in_right_move = true;
     },
 
-    updateMovement: function() {
+    this.startCameraLeftMove = function() {
+
+	if (this.cam_in_left_move) return;
+	this.player.x_pos += 7;
+	this.cam_left_count = 14;
+	this.cam_in_left_move = true;
+    },
+
+    this.startCameraRightMove = function() {
+
+	if (this.cam_in_right_move) return;
+
+	this.player.x_pos -= 7;
+	this.cam_right_count = 14;
+	this.cam_in_right_move = true;
+    },
+
+    this.startRightMove = function() {
+
+	if (this.in_right_move === true) return;
+	this.right_count = -1;
+	this.right_started = false;
+	this.in_right_move = true;
+    },
+
+    this.updateMovement = function() {
+
+	if(this.player.x_pos < -7) this.startCameraLeftMove();
+	else if(this.player.x_pos > 7) this.startCameraRightMove();
+	if (this.cam_in_left_move === true) {
+	    if ((--this.cam_left_count) < 0) { this.cam_in_left_move = false; return; }
+	    theMatrix.vTranslate([-this.grid * 0.5, 0, 0]);
+	}
+
+	if (this.cam_in_right_move === true) {
+	    if ((--this.cam_right_count) < 0) { this.cam_in_right_move = false; return; }
+	    theMatrix.vTranslate([this.grid * 0.5, 0, 0]);
+	}
 
 	// Handle left and right movement.
 	if (this.in_right_move === true) {
 	    
 	    if(this.right_started === true) {
 
-		var count = (++this.right_count);
+		var count = ++this.right_count;
 		if (count >= move_dist.length) { 
 		    this.in_right_move = false;
 		    if (this.right_key_down === true) this.startRightMove();
@@ -278,6 +295,7 @@ Game.prototype = {
 		
 	    } else if(Game.hi_hat == 10) {
 		this.right_started = true;
+		++this.player.x_pos;
 		return;
 	    } 
 	}
@@ -298,6 +316,7 @@ Game.prototype = {
 		
 	    } else if(Game.hi_hat == 10) {
 		this.left_started = true;
+		--this.player.x_pos;
 		return;
 	    } 
 	}
@@ -319,7 +338,7 @@ Game.prototype = {
 	    }
     },
 
-    initWebAudio: function() {
+    this.initWebAudio = function() {
 
 	if (typeof AudioContext !== "undefined") this.web_audio = new AudioContext();
 	else if (typeof webkitAudioContext !== "undefined") this.web_audio = new webkitAudioContext();
@@ -336,10 +355,10 @@ Game.prototype = {
 	this.low_pass.frequency = 100;
 	this.low_pass.connect(this.analyser);
 
-	this.audio = [{}];
+	this.audio = [];
     },
 
-    handleAudioRequest: function(gl_audio, request) {
+    this.handleAudioRequest = function(gl_audio, request) {
 
 	this.web_audio.decodeAudioData(
 	    request.response,
@@ -350,10 +369,17 @@ Game.prototype = {
 		gl_audio.source.connect(this.low_pass);
 		gl_audio.source.buffer = gl_audio.buffer;
 		gl_audio.source.loop = true;
+		gl_audio.source.loopEnd = 2.0;
+		// Duplicate this for another buffer.
+		gl_audio.buffer2 = the_buffer;
+		gl_audio.source2 = this.web_audio.createBufferSource();
+		gl_audio.source2.connect(this.low_pass);
+		gl_audio.source2.buffer = gl_audio.buffer2;
 		gl_audio.elapsed_time = this.web_audio.currentTime;
 		gl_audio.offset = 0;
 		gl_audio.playing = true;
 		gl_audio.source.start(0,0);
+//		gl_audio.source2.start(2,0);
 		this.mapKeys(); }.bind(this)
 	);
     },
@@ -364,13 +390,47 @@ Game.prototype = {
      * http://chromium.googlecode.com/svn/trunk/samples/audio/index.html
      */
 
-    createAudio: function(url) {
+    this.createAudio = function(url) {
 
+	var x = {};
 	var request = new XMLHttpRequest();
 	request.open("GET", url, true);
 	request.responseType = "arraybuffer"; // Does this work for any MIME request?
 	// Once request has loaded, load and start audio buffer
-	request.onload = this.handleAudioRequest.bind(this, this.audio[0], request);
+	request.onload = this.handleAudioRequest.bind(this, x, request);
 	request.send();
+	return x;
     }
+
+
+
+
+    return this;
+}
+
+Game.hi_hat = 0;
+var log_music = false;
+
+var x;
+
+// Jump distance is a parabola from 0 to 900/4
+var jump_dist = [];
+for (x = 0; x <= 30; ++x) {
+    jump_dist.push ((900 / 4) - (x*x / 4));
+}
+
+// Move distance is a group of numbers, normalized so their sum is 1.0
+var move_dist = [];
+var move_total = 0;
+for (x = 0; x <= 8; ++x) {
+    var move_num = 64 - (x*x);
+    move_dist.push (move_num);
+    move_total += move_num;
+}
+for (x = 0; x <= 8; ++x) {
+    move_dist[x] /= move_total;
+}
+
+
+Game.prototype = {
 };

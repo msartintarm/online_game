@@ -33,12 +33,10 @@ canvas#glcanvas {
 }
 
 body {
-    
-    margin-right: auto;
-    margin-left: auto;
+    width:99%;
+    height:99%;
     background-color: #111111;
     font-family: Verdana, sans-serif;
-    padding: 1% 5% 0% 5%;
 }
 
 div#banner{
@@ -71,10 +69,7 @@ div.space {
 }
 
 div.padDiv {
-    display: absolute;
-    width: 94%;
-    margin: 0px;
-    padding: 20px 3%;
+    width: 100%;
 }
 
 div.title { 
@@ -206,7 +201,6 @@ div.one_third{
 
 
 div#wrap {
-    margin-right: auto;
-    margin-left: auto;
+    width:100%;
     background-color: #000000;
 }
