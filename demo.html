@@ -42,13 +42,11 @@
     <!-- Complex objects lv.2 -->
     <script src="StoolPyramid.js" type="text/javascript" async="async"></script>
     <script src="MazePiece.js" type="text/javascript" async="async"></script>
-    <script src="StadiumPiece.js" type="text/javascript" async="async"></script>
     <script src="Jumbotron.js" type="text/javascript" async="async"></script>
 
     <!-- Environments -->
     <script src="Skybox.js" type="text/javascript" async="async"></script>
     <script src="Maze.js" type="text/javascript" async="async"></script>
-    <script src="Stadium.js" type="text/javascript" async="async"></script>
     <script src="Cagebox.js" type="text/javascript" async="async"></script>
     <script src="Game.js" type="text/javascript" async="async"></script>
 
@@ -84,35 +82,9 @@
 	    </div>
 
 	    <!-- Toggled on when stadium loads -->
-	    <div id="stadium_options" style="display:none;">
-	      <input type="button" class="button_add"
-		     onclick="toggle_element('debug_modes');"
-		     value="Debug Modes"/>
-	      <div id="debug_modes" style="display:none;">
-		<input type="button" class="button_add"
-		       onclick="stadium_check_position = !stadium_check_position;" 
-		       value="Stadium Position"/>
-	      </div>
-	    <input type="button" class="button_add"
-		   onclick="theCanvas.start('stadium');" 
-		   value="Restart"/>
-	      </div>
 
 	  </div>
 
-
-	  <div id="dashboard" style="padding: 20px; background-color: #000000;">
-	    <div id="positionXStats" style="display:none;"></div>
-	    <div id="positionYStats" style="display:none;"></div>
-	    <div id="rotateStats" style="display:none;"></div>
-	    <div id="rotateCamStats" style="display:none;"></div>
-	    <div id="priveledgedStats" 
-		 onclick="priveledgedMode.toggle()" 
-		 style="display:none;"></div>
-<!--	    <div id="priveledgedStats" style="display:none;"></div>-->
-	    <div id="positionCheckStats" style="display:none;"></div>
-	    <div id="frameDebug" style="display:none;"></div>
-	  </div>
 	</div>
 
 	  <div id="keyboard" style="position:absolute; bottom: 0px; left: 0px; color: #ffffff;"></div>
@@ -165,11 +137,6 @@
 		</td>
 		<td>
 		  <input type="button" 
-			 onclick="theCanvas.start('maze');" 
-			 value="Maze" 
-			 class="button_add"/>
-		  <br/>
-		  <input type="button" 
 			 onclick="theCanvas.start('shadow');" 
 			 value="Shadows" 
 			 class="button_add"/>
@@ -178,13 +145,11 @@
 			 value="Jumbotron" 
 			 class="button_add"/>
 		  <input type="button" 
-			 onclick="theCanvas.start('stadiumPiece');" 
-			 value="Stadium Piece" 
-			 class="button_add"/>
+			 value="Maze (disabled)" 
+			 class="button_add" style="color:#aa4455;font-size:22px;" disabled="disabled"/>
 		  <input type="button" 
-			 onclick="theCanvas.start('stadium');" 
-			 value="Stadium" 
-			 class="button_add"/>
+			 value="Stadium (disabled)" 
+			 class="button_add" style="color:#aa4455;font-size:22px;" disabled="disabled"/>
 		  <input type="button" 
 			 onclick="theCanvas.start('game');" 
 			 value="Game" 

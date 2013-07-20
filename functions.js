@@ -260,44 +260,6 @@ function resetModel() {
 
 }
 
-function drawDashboard() {
-
-
-    if(rotateCam.html.style.display === "inline-block") {
-	rotateCam.html.innerHTML = "Rotation - Cam: " + rotateCam.val + "&deg;";
-	rotateCam.inc();
-    }
-    if(rotateY.html.style.display === "inline-block") {
-	rotateY.inc();
-    }
-    if(!positionX.isZero()) {
-	positionX.html.innerHTML = "Position - X: " + positionX.val;
-    } else {
-	positionX.html.innerHTML = "";
-    }
-    if(!positionY.isZero()) {
-	positionY.html.innerHTML = "Position - Y: " + positionY.val;
-    } else {
-	positionY.html.innerHTML = "";
-    }
-    if(priveledgedMode.html.style.display == "inline-block") {
-	
-	priveledgedMode.html.innerHTML = 
-	    "<b>Player Controls</b> <br/>" +
-	    "Arrow keys to move <br/>" +
-	    "A and D to rotate";
-	if(priveledgedMode.val == 1) {
-	    priveledgedMode.html.innerHTML += 
-	    "<br/><b>God Controls</b> <br/>" +
-		"I and K to rotate up <br/>" +
-		"A and D to rotate";
-	    rotateY.html.innerHTML = "Rotation - Y: " + rotateY.val + "&deg;";
-	}
-    }
-
-    zoom.inc();
-}
-
 //
 // getShader
 //
@@ -392,8 +354,6 @@ function tick() {
     theCanvas.drawScene();
     // Update viewer's matrix
     theMatrix.update();
-    // Update side display as well
-    drawDashboard();
     if(theCanvas.resizeCounter > 0) {
 	theCanvas.resizeCounter -= 1;
 	if(theCanvas.resizeCounter === 0) {
@@ -407,8 +367,6 @@ function tick2() {
     theCanvas.drawScene();
     // Update viewer's matrix
     theMatrix.update();
-    // Update side display as well
-    drawDashboard();
     if(theCanvas.resizeCounter > 0) {
 	theCanvas.resizeCounter -= 1;
 	if(theCanvas.resizeCounter === 0) {

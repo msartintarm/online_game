@@ -203,7 +203,7 @@ GLcanvas.prototype.start = function(theScene) {
 	priveledgedMode.reset();
 	mazeMode = 0;
 
-    theMatrix.perspective(zoom.val,
+    theMatrix.perspective(45,
 			  this.canvas.clientWidth / 
 			  Math.max(1, this.canvas.clientHeight),
 			  0.1, 300000.0);
@@ -274,7 +274,7 @@ GLcanvas.prototype.resize = function() {
     this.canvas.height = window.innerHeight - 25;
     this.gl.viewport(0, 0, this.gl.drawingBufferWidth, 
 		     this.gl.drawingBufferHeight);
-    theMatrix.perspective(zoom.val,
+    theMatrix.perspective(45,
 			  this.gl.drawingBufferWidth / 
 			  this.gl.drawingBufferHeight,
 			  0.1, 30000.0);
