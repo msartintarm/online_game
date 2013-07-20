@@ -126,12 +126,12 @@ GLcanvas.prototype.start = function(theScene) {
 	this.gl.shader_color = this.gl.createProgram();
 	this.gl.shader_canvas = this.gl.createProgram();
 	this.gl.shader_player = this.gl.createProgram();
-	if(this.initShaders(this.gl.shader, "default", "default") !== 0 ||
-	   this.initShaders(this.gl.shader_frame, "frame", "default") !== 0 ||
-	   this.initShaders(this.gl.shader_ball, "ball", "default") !== 0 || 
-this.initShaders(this.gl.shader_canvas, "canvas", "default") !== 0 ||
-	   this.initShaders(this.gl.shader_player, "player", "default") !== 0 ||
-	   this.initShaders(this.gl.shader_color, "color", "color") !== 0) {
+	if(this.initShaders(this.gl.shader,        "default",  "default") !== 0 ||
+	   this.initShaders(this.gl.shader_frame,  "frame",    "default") !== 0 ||
+	   this.initShaders(this.gl.shader_ball,   "ball",     "default") !== 0 || 
+	   this.initShaders(this.gl.shader_canvas, "canvas",   "default") !== 0 ||
+	   this.initShaders(this.gl.shader_player, "player",   "player") !== 0 ||
+	   this.initShaders(this.gl.shader_color,  "color",    "color") !== 0) {
 	    var theWindow = window.open(
 		"GLerror_shader.php", 
 		"",

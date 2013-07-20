@@ -5,8 +5,8 @@
  */
 function GLobject() {
 
-    this.data = [];
-    this.buff = [];
+    this.data = {};
+    this.buff = {};
     this.shader = -1;
 
     // Data to load into buffers

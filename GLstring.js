@@ -26,8 +26,10 @@ GLstring.prototype.initBuffers = function(gl_) {
 	// Use logs to round the text width and height to the nearest power of 2
     this.canvas.width = Math.pow(2,
 	Math.ceil(Math.log(ctx.measureText(this.text).width) / Math.LN2));
-    this.canvas.height = Math.pow(2,
+    this.canvas.height = 2 * Math.pow(2,
 	Math.ceil(Math.log(textSize) / Math.LN2));
+    this.canvas.style.borderStyle = "solid";
+    this.canvas.style.borderWidth = "2px";
 
     ctx.font = textSize + "px Arial";
     ctx.fillStyle = "#000000";

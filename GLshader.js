@@ -219,31 +219,8 @@ lModel = vMatU * lMatU * vec4(lightPosU, 1.0);\n\
 }       \n\
 ";
 
-    this.vertex["default"] = "\
-void main(void) {\n\
-                  // -- Position -- //                    \n\
-  gl_Position = pMatU * vMatU * mMatU * vec4(vPosA, 1.0); \n\
-                                                          \n\
-// Viewing space coordinates of light / vertex            \n\
-  vModel = (vMatU * mMatU  * vec4(vPosA, 1.0)).xyz;       \n\
-  lModel = vMatU * lMatU * vec4(lightPosU, 1.0);          \n\
-\n\
-\n\
-                  // -- Lighting -- //                    \n\
-  distanceV = lModel.xyz - vModel.xyz;                    \n\
-  lightNorm = normalize(distanceV);                       \n\
-  vertNorm = (nMatU * vec4(vNormA,1.0)).xyz;              \n\
-\n\
-  // Ambient components we'll leave until frag shader     \n\
-  colorV = vColA;                                         \n\
-  textureV = textureA;                                    \n\
-  // Diffuse component                                    \n\
-  diffuseV = dot(vertNorm, lightNorm);                    \n\
-  if (diffuseV < 0.0) { diffuseV = 0.0; }                 \n\
-\n\
-}                                                         \n\
-\n\
-";
+    this.vertex["default"] = document.getElementById("shader_vert_default").value;
+    this.vertex["player"] = document.getElementById("shader_vert_player").value;
 }    
 
 

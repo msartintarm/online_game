@@ -1,19 +1,21 @@
-
 function Game() {  
 
-    moveDist = 100.1;
-    lookDist = 1/15;
+    // Env variable(s)
+    this.log_music = false;
 
+    // handles movement
     this.grid = 50;
-    this.hit_sound = [];
     this.movement = vec3.create();
-    this.floor_movement = vec3.create();
     this.bg_movement = vec3.create();
     this.total = null;
     this.cam_left_count = 0;
     this.cam_right_count = 0;
+    this.in_jump = false;
+    this.in_left_move = false;
+    this.in_right_move = false;
 
-    
+    // Music related stuff
+    this.hit_sound = [];
     this.hit_sound[0] = new Audio("drums_1.wav");
     this.hit_sound[1] = new Audio("drums_2.wav");
     this.hit_sound[2] = new Audio("drums_3.wav");
@@ -24,40 +26,42 @@ function Game() {
     this.hit_sound[2].load();
     this.hit_sound[3].load();
     this.hit_sound[4].load();
+
+    this.hi_hat = 0;
     
-    var name = document.getElementById("stadium_name").value;
+    this.player_name = document.getElementById("stadium_name").value;
 
-
-    this.player_string = new GLstring(name, 
+    this.player_string = new GLstring(this.player_name, 
 				      TEXT_TEXTURE, 
 				      theCanvas.gl.shader_player);
-    this.player_string.val = "Player";
 
     var player_width = this.grid;
-    this.player = new Quad(
-	[ player_width, 2 * player_width, -1],
-	[ player_width,                0, -1],
-	[-player_width, 2 * player_width, -1],
-	[-player_width,                0, -1]);
-    this.player.setTexture(TEXT_TEXTURE);
-    this.player.setShader(theCanvas.gl.shader_player);
-    this.player.x_pos = 0;
-    this.player.y_pos = 0;
-    this.player.name = name;
-
     var bg_width = 1200;
+    var floor_width = player_width;
+    this.floor = [];
+
+    theMatrix.vTranslate([0,0,1000]);
+
+    this.player = new Quad(
+	[ player_width / 2, player_width, -1],
+	[ player_width / 2,            0, -1],
+	[-player_width / 2, player_width, -1],
+	[-player_width / 2,            0, -1])
+	.setTexture(TEXT_TEXTURE)
+	.setShader(theCanvas.gl.shader_player);
+    this.player_x_pos = 0;
+    this.player_y_pos = 0;
+
+
     this.background = new Quad(
 	[-bg_width, bg_width, -20],
 	[-bg_width,-bg_width, -20],
 	[ bg_width, bg_width, -20],
-	[ bg_width,-bg_width, -20]);
-    this.background.setTexture(HEAVEN_TEXTURE);
-    this.background.setShader(theCanvas.gl.shader_canvas);
+	[ bg_width,-bg_width, -20])
+	.setTexture(HEAVEN_TEXTURE)
+	.setShader(theCanvas.gl.shader_canvas);
 
-    this.floor = [];
-    var floor_width = player_width;
-    var i;
-    for(i = -10; i <= 10; ++i) {
+    for(var i = -10; i <= 10; ++i) {
 	this.floor.push(new Quad(
 	    [-floor_width,                0, -1],
 	    [-floor_width, -2 * floor_width, -1],
@@ -67,10 +71,13 @@ function Game() {
 			.setTexture(RUG_TEXTURE));
     }
 
-    
-    theMatrix.vTranslate([0,0,1000]);
-
-
+    this.push_button = new Quad(
+	[-floor_width,                0, -1],
+	[-floor_width, -2 * floor_width, -1],
+	[ floor_width,                0, -1],
+	[ floor_width, -2 * floor_width, -1])
+	.translate([0, 4 * floor_width, 0])
+	.setTexture(BRICK_TEXTURE);
 
     this.initBuffers = function(gl_) {
 
@@ -81,37 +88,14 @@ function Game() {
 	this.player_string.initBuffers(gl_);
 	this.player.initBuffers(gl_);
 	this.background.initBuffers(gl_);
+	this.push_button.initBuffers(gl_);
 	var i;
 	for(i = 0; i < this.floor.length; ++i){
 	    this.floor[i].initBuffers(gl_);
 	}
     };
 
-    this.up_count = 0;
-    this.down_count = 0;
     this.draw = function(gl_) {
-/*
-	if(this.in_left_move === true) { 
-	    if (this.player_string.val !== "Left") {
-		this.player_string.update(gl_, "Left");
-		this.player_string.val = "Left";
-	    }
-	} else if (this.in_right_move === true) {
-	    if (this.player_string.val !== "Right") {
-		this.player_string.update(gl_, "Right");
-		this.player_string.val = "Right";
-	    }
-	} else if (this.in_jump === true) {
-	    if (this.player_string.val !== "Jump") {
-		this.player_string.update(gl_, "Jump");
-		this.player_string.val = "Jump";
-	    }
-	} else {
-*/	    if (this.player_string.val !== "Player") {
-		this.player_string.update(gl_, this.player.name);
-		this.player_string.val = "Player";
-	    }
-//	}
 
 	this.updateMovement();
 
@@ -123,18 +107,16 @@ function Game() {
 	theMatrix.translate(this.bg_movement);
 	this.background.draw(gl_);
 	theMatrix.pop();
+	this.push_button.draw(gl_);
 	var i;
-	theMatrix.push();
-	theMatrix.translate(this.floor_movement);
 	for(i = 0; i < this.floor.length; ++i){
 	    this.floor[i].draw(gl_);
 	}
-	theMatrix.pop();
 
 	
-	if (log_music) {
+	if (this.log_music) {
 
-	    if(Game.hi_hat < 5) {
+	    if(this.hi_hat < 5) {
 		
 		var FFTData = new Uint8Array(this.analyser.frequencyBinCount);
 		this.analyser.getByteFrequencyData(FFTData);
@@ -144,14 +126,14 @@ function Game() {
 
 		if(sum/this.total > 5) { 
 		    console.log("%.2f", sum / this.total); 
-		    Game.hi_hat = 10;
+		    this.hi_hat = 10;
 		} else {
-		    if (Game.hi_hat > 0) Game.hi_hat -= 1;
+		    if (this.hi_hat > 0) this.hi_hat -= 1;
 		}
 		this.total *= 0.75;
 		this.total += (sum / 4);
 	    } else {
-		Game.hi_hat -= 1;
+		this.hi_hat -= 1;
 	    }
 
 	    /*
@@ -163,7 +145,7 @@ function Game() {
 	      }
 	    */
 	}
-    },
+    };
 
     /**
      * Binds keys to document object.
@@ -204,7 +186,7 @@ function Game() {
 		this.startJump();
 		break;
 	    case 40: // down
-		log_music = !log_music;
+		this.log_music = !this.log_music;
 		break;
 	    case 32: // Spacebar
 		var audio = this.audio[0];
@@ -231,12 +213,6 @@ function Game() {
 	}.bind(this);
     };
 
-    this.in_jump = false,
-    this.in_left_move = false,
-    this.in_right_move = false,
-
-    
-
     this.startJump = function() {
 
 	if (this.in_jump === true) return;
@@ -244,7 +220,7 @@ function Game() {
 	this.jumping_down = false;
 	this.jump_count = jump_dist.length;
 	this.in_jump = true;
-    },
+    };
 
     this.startLeftMove = function() {
 
@@ -252,7 +228,7 @@ function Game() {
 	this.left_count = -1;
 	this.left_started = false;
 	this.in_left_move = true;
-    },
+    };
 
     this.startRightMove = function() {
 
@@ -260,24 +236,24 @@ function Game() {
 	this.right_count = -1;
 	this.right_started = false;
 	this.in_right_move = true;
-    },
+    };
 
     this.startCameraLeftMove = function() {
 
 	if (this.cam_in_left_move) return;
-	this.player.x_pos += 7;
+	this.player_x_pos += 7;
 	this.cam_left_count = 14;
 	this.cam_in_left_move = true;
-    },
+    };
 
     this.startCameraRightMove = function() {
 
 	if (this.cam_in_right_move) return;
 
-	this.player.x_pos -= 7;
+	this.player_x_pos -= 7;
 	this.cam_right_count = 14;
 	this.cam_in_right_move = true;
-    },
+    };
 
     this.startRightMove = function() {
 
@@ -285,12 +261,12 @@ function Game() {
 	this.right_count = -1;
 	this.right_started = false;
 	this.in_right_move = true;
-    },
+    };
 
     this.updateMovement = function() {
 
-	if(this.player.x_pos < -7) this.startCameraLeftMove();
-	else if(this.player.x_pos > 7) this.startCameraRightMove();
+	if(this.player_x_pos < -7) this.startCameraLeftMove();
+	else if(this.player_x_pos > 7) this.startCameraRightMove();
 	if (this.cam_in_left_move === true) {
 	    if ((--this.cam_left_count) < 0) { this.cam_in_left_move = false; return; }
 	    theMatrix.vTranslate([-this.grid * 0.5, 0, 0]);
@@ -316,9 +292,9 @@ function Game() {
 		this.movement[0] += move_dist[count] * this.grid;
 		this.bg_movement[0] += this.grid / 30;
 		
-	    } else if(Game.hi_hat == 10) {
+	    } else if(this.hi_hat == 10) {
 		this.right_started = true;
-		++this.player.x_pos;
+		++this.player_x_pos;
 		return;
 	    } 
 	}
@@ -337,9 +313,9 @@ function Game() {
 		this.movement[0] -= move_dist[count] * this.grid;
 		this.bg_movement[0] -= this.grid / 30;
 		
-	    } else if(Game.hi_hat == 10) {
+	    } else if(this.hi_hat == 10) {
 		this.left_started = true;
-		--this.player.x_pos;
+		--this.player_x_pos;
 		return;
 	    } 
 	}
@@ -359,7 +335,7 @@ function Game() {
 		this.movement[1] = jump_dist[count];
 		
 	    }
-    },
+    };
 
     this.initWebAudio = function() {
 
@@ -379,7 +355,7 @@ function Game() {
 	this.low_pass.connect(this.analyser);
 
 	this.audio = [];
-    },
+    };
 
     this.handleAudioRequest = function(gl_audio, request) {
 
@@ -405,7 +381,7 @@ function Game() {
 //		gl_audio.source2.start(2,0);
 		this.mapKeys(); }.bind(this)
 	);
-    },
+    };
 
     /**
      * Creates an audio element, sets it up, and starts it.
@@ -423,16 +399,10 @@ function Game() {
 	request.onload = this.handleAudioRequest.bind(this, x, request);
 	request.send();
 	return x;
-    }
-
-
-
+    };
 
     return this;
 }
-
-Game.hi_hat = 0;
-var log_music = false;
 
 var x;
 
@@ -454,6 +424,3 @@ for (x = 0; x <= 8; ++x) {
     move_dist[x] /= move_total;
 }
 
-
-Game.prototype = {
-};
