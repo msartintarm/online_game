@@ -15,5 +15,6 @@
       <a style="color:#abcdef;" href=msartintarm@gmail.com>Sartin-Tarm</a>
       if you think it's their fault.
     </p>
+    <p id="timer"></p>
   </body>
 </html>

@@ -47,6 +47,9 @@ function GLmatrix() {
     this.speedMode = 0;
 }
 
+var moveDist = 20.1; //default to maze
+var lookDist = 1/10; //default to maze
+
 /**
    Writes a perspective view into internal perspective matrix
 */
@@ -150,27 +153,21 @@ GLmatrix.prototype.vMul = function(v) {
 };
 
 GLmatrix.prototype.lookUp = function() {
-    if(!stadiumMode || (stadiumMode && StadiumInitSeqNum == 4 && !freeze)){
 	radiansToRotate = (lookDist * 2 * Math.PI)/10;
 	rotateCount = 10;
 	vectorRotation = [1,0,0];
-    }
 };
 
 GLmatrix.prototype.lookDown = function() {
-    if(!stadiumMode || (stadiumMode && StadiumInitSeqNum == 4 && !freeze)){
 	radiansToRotate = (lookDist * 2 * Math.PI)/10;
 	rotateCount = 10;
 	vectorRotation = [-1,0,0];
-    }
 };
 
 GLmatrix.prototype.lookRight = function(distance) {
-    if(!stadiumMode || (stadiumMode && StadiumInitSeqNum == 4 && !freeze)){
 	radiansToRotate = (lookDist * distance * Math.PI)/10;
 	rotateCount = 10;
 	vectorRotation = [0,-1,0];
-    }
 };
 
 GLmatrix.prototype.turnAround = function(rads){
@@ -180,29 +177,21 @@ GLmatrix.prototype.turnAround = function(rads){
 };
 
 GLmatrix.prototype.moveForward = function() {
-    if(!stadiumMode || (stadiumMode && StadiumInitSeqNum == 4 && !freeze)){
-        if(moveCount !== 0  && moveAccel <= 5){
-            moveAccel += 0.1;
-        }
-        else if(moveCount === 0){
-            moveAccel = 1;
-        }
-        this.distToMove = [0,0,(-moveDist/10)*moveAccel];
-
-
-//        console.log("Accelerating %d", moveAccel);
-        moveCount = 10;
+    if(moveCount !== 0  && moveAccel <= 5){
+        moveAccel += 0.1;
     }
+    else if(moveCount === 0){
+        moveAccel = 1;
+    }
+    this.distToMove = [0,0,(-moveDist/10)*moveAccel];
+
+    moveCount = 10;
 };
+
 GLmatrix.prototype.moveBack = function() {
-    if(!stadiumMode || (stadiumMode && StadiumInitSeqNum == 4) && !freeze){
-	this.distToMove = [0,0,moveDist/10];
-	moveCount = 10;
-    }
+    this.distToMove = [0,0,moveDist/10];
+    moveCount = 10;
 };
-
-var moveDist = 20.1; //default to maze
-var lookDist = 1/10; //default to maze
 
 GLmatrix.prototype.moveInToPlay = function() {
 	this.distToMove = [0,-1,-50/10];

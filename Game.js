@@ -108,11 +108,10 @@ function Game() {
 	this.background.draw(gl_);
 	theMatrix.pop();
 	this.push_button.draw(gl_);
-	var i;
+	theMatrix.push();
 	for(i = 0; i < this.floor.length; ++i){
 	    this.floor[i].draw(gl_);
 	}
-
 	
 	if (this.log_music) {
 
@@ -186,7 +185,7 @@ function Game() {
 		this.startJump();
 		break;
 	    case 40: // down
-		this.log_music = !this.log_music;
+		this.log_music = !(this.log_music);
 		break;
 	    case 32: // Spacebar
 		var audio = this.audio[0];

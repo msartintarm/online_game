@@ -71,7 +71,7 @@ GLcanvas.prototype.createScene = function(objToDraw) {
 	    [ 1.5, 2.4,-4.0],
 	    [ 1.5, 0.8,-4.0],
 	    [-1.5, 2.4,-4.0],
-	    [-1.5, 0.8,-4.0]).setTexture(TEXT_TEXTURE2).setShader(this.gl.shader_canvas));
+	    [-1.5, 0.8,-4.0]).setTexture(TEXT_TEXTURE2).setShader(this.gl.shader_player));
 
     } else if(objToDraw == "torus") {
 	this.objects.push(new Torus(0.2, 2));
@@ -98,11 +98,11 @@ GLcanvas.prototype.drawModels = function() {
 GLcanvas.prototype.start = function(theScene) {
 
     if (this.gl === null) {
-	// One-time display methods
 
-    document.getElementById("header").style.display = "none";
-    document.getElementById("title2").style.display = "none";
-    document.getElementById("footer").style.display = "none";
+	// One-time display methods
+	document.getElementById("header").style.display = "none";
+	document.getElementById("title2").style.display = "none";
+	document.getElementById("footer").style.display = "none";
 
 	this.canvas.style.display = "inline-block";
 	this.canvas.style.width = "100%";
@@ -132,10 +132,11 @@ GLcanvas.prototype.start = function(theScene) {
 	   this.initShaders(this.gl.shader_canvas, "canvas",   "default") !== 0 ||
 	   this.initShaders(this.gl.shader_player, "player",   "player") !== 0 ||
 	   this.initShaders(this.gl.shader_color,  "color",    "color") !== 0) {
+
 	    var theWindow = window.open(
 		"GLerror_shader.php", 
 		"",
-		"height=110,width=250,location=no,scrollbars=no");
+		"height=110,width=260,location=no,scrollbars=no");
 	    theWindow.focus();
 	    return;
 	}

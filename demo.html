@@ -46,7 +46,6 @@
 
     <!-- Environments -->
     <script src="Skybox.js" type="text/javascript" async="async"></script>
-    <script src="Maze.js" type="text/javascript" async="async"></script>
     <script src="Cagebox.js" type="text/javascript" async="async"></script>
     <script src="Game.js" type="text/javascript" async="async"></script>
 
@@ -254,7 +253,12 @@ void colorTexture(sampler2D theSampler) {
 }
 
 void main(void) { 
-  colorTexture(sampler0); 
+  if (textureNumU < 0.1) { colorTexture(sampler0);
+  } else if (textureNumU < 1.1) { colorTexture(sampler1);
+  } else if (textureNumU < 2.1) { colorTexture(sampler2);
+  } else if (textureNumU < 3.1) { colorTexture(sampler3);
+  } else { colorTexture(sampler4);
+  }
 }
 </textarea>
 	<textarea id="shader_vert_default" rows="20">
@@ -284,7 +288,8 @@ void main(void) {
 	<textarea id="shader_vert_player" rows="20">
 void main(void) {
                   // -- Position -- //
-  gl_Position = pMatU * vMatU * mMatU * vec4(vPosA * (1.0 + (hi_hat_u / 40.0)), 1.0);
+//  gl_Position = pMatU * vMatU * mMatU * vec4(vPosA * (1.0 + (hi_hat_u / 40.0)), 1.0);
+  gl_Position = pMatU * vMatU * mMatU * vec4(vPosA, 1.0);
 
 // Viewing space coordinates of light / vertex
   vModel = (vMatU * mMatU  * vec4(vPosA, 1.0)).xyz;
@@ -302,7 +307,6 @@ void main(void) {
   // Diffuse component
   diffuseV = dot(vertNorm, lightNorm);
   if (diffuseV < 0.0) { diffuseV = 0.0; }
-
 }
 </textarea>
 
