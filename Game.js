@@ -99,6 +99,12 @@ function Game() {
 
 	this.updateMovement();
 
+	var player_shader = this.player.o.shader;
+	if (!!player_shader && player_shader.unis["hi_hat_u"] !== -1) {
+	    theCanvas.changeShader(player_shader);
+	    gl_.uniform1f(player_shader.unis["hi_hat_u"], this.hi_hat);
+	}
+
 	theMatrix.push();
 	theMatrix.translate(this.movement);
 	this.player.draw(gl_);
@@ -108,7 +114,6 @@ function Game() {
 	this.background.draw(gl_);
 	theMatrix.pop();
 	this.push_button.draw(gl_);
-	theMatrix.push();
 	for(i = 0; i < this.floor.length; ++i){
 	    this.floor[i].draw(gl_);
 	}
