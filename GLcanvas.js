@@ -4,6 +4,11 @@
  */
 var theMatrix;
 
+/**
+ * This is basically a wrapper class for the GL context.
+ * It links together objects that are in scenes to things
+ * defined within the context, such as shaders.
+ */
 function GLcanvas() {
     this.objects = [];
     this.textures = [];
@@ -119,6 +124,7 @@ GLcanvas.prototype.start = function(theScene) {
 	}
 
 	this.shader_source = new GLshader;
+	this.shader_count = 0;
 
 	this.gl.shader = this.gl.createProgram();
 	this.gl.shader_ball = this.gl.createProgram();
@@ -140,8 +146,11 @@ GLcanvas.prototype.start = function(theScene) {
 	    theWindow.focus();
 	    return;
 	}
+
 	this.gl.useProgram(this.gl.shader);
-	    document.getElementById("glcanvas_status").innerHTML = 
+	this.active_shader = this.gl.shader;
+
+	document.getElementById("glcanvas_status").innerHTML = 
 	    "Shaders compiled.</br>";
 
 	// Get rid of unused JS  memory
@@ -272,6 +281,8 @@ GLcanvas.prototype.initShaders = function(gl_shader, frag, vert) {
 
     if(this.shader_source.init(this.gl, gl_shader, frag, vert) !== 0) return -1;
 
+    gl_shader.count = (++this.shader_count);
+
     gl_shader.sampler = 0;
     gl_shader.attribs = [];
     gl_shader.attrib_enabled = [];
@@ -324,17 +335,27 @@ GLcanvas.prototype.initAttribute = function(gl_shader, attr) {
     gl_shader.attrib_enabled[attr] = false;
 };
 
+/**
+ * This is basically a wrapper for GLSL's 'useProgram' function that
+ *  only disables an old program if it's not the same as the new one.
+ */
 GLcanvas.prototype.changeShader = function(new_shader) {
 
-    var old_shader = this.gl.getParameter(this.gl.CURRENT_PROGRAM);
+//    GLSL way of polling, it is costly
+
+//    var old_shader = this.gl.getParameter(this.gl.CURRENT_PROGRAM);
 //    if(old_shader === new_shader) return;
 
-    this.disableAttribute(old_shader, "vPosA");
-    this.disableAttribute(old_shader, "vNormA");
-    this.disableAttribute(old_shader, "vColA");
-    this.disableAttribute(old_shader, "textureA");
+    // Our way
+    if (new_shader.count === this.active_shader.count) return;
+
+    this.disableAttribute(this.active_shader, "vPosA");
+    this.disableAttribute(this.active_shader, "vNormA");
+    this.disableAttribute(this.active_shader, "vColA");
+    this.disableAttribute(this.active_shader, "textureA");
 
     this.gl.useProgram(new_shader);
+    this.active_shader = new_shader;
 };
 
 GLcanvas.prototype.initUniform = function(gl_shader, uni) {
