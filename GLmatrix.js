@@ -339,15 +339,11 @@ GLmatrix.prototype.update = function() {
     this.gradualMove();
     this.gradualRotate();
     if(this.vMatrixNewChanged === false) { return; }
-    if( priveledgedMode.val || this.newViewAllowed()){
-	// We only check the view if we are
-	//  not in 'god mode'
 
-	//Multiplies vMatrixNew * vMatrix
-	//therefore if vMatrixNew==identity we have no movement
-	this.vMul(this.vMatrixNew);
-	this.vMatrixChanged = true;
-    }
+    //Multiplies vMatrixNew * vMatrix
+    //therefore if vMatrixNew==identity we have no movement
+    this.vMul(this.vMatrixNew);
+    this.vMatrixChanged = true;
     mat4.identity(this.vMatrixNew);
     return; 
 };

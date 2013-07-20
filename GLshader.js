@@ -83,37 +83,8 @@ void main(void) {\n\
 }\n\
 ";
 
-    this.fragment["canvas"] = "\
-void colorTexture(sampler2D theSampler) {\n\
-\n\
-float delta = 1.0 / 512.0;\n\
-float sway = sin(frames_elapsed_u / 100.0) / 2.0;\n\
-float sway2 = cos(frames_elapsed_u / 110.0) / 2.0;\n\
-float the_beat = hi_hat_u;\n\
-\n\
-  vec3 textureColor = texture2D(theSampler, textureV).xyz;\n\
-  textureColor[0] *= sway;\n\
-  textureColor[1] *= -sway2;\n\
-  textureColor[2] *= abs((sway * sway2));\n\
-\n\
-  float background = clamp(length(textureColor) * 5.0, 0.8, 1.0);\n\
-\n\
-  gl_FragColor = vec4(textureColor * 1.6, background);\n\
-  if(the_beat > 0.9) gl_FragColor = \n\
-    (20. - the_beat) / 20. * vec4(textureColor * 1.6, background) +\n\
-    the_beat / 20. * texture2D(theSampler, textureV);\n\
-}\n\
-\n\
-void main(void) {\n\
-\n\
-  if (textureNumU < 0.1) { colorTexture(sampler0);\n\
-  } else if (textureNumU < 1.1) { colorTexture(sampler1);\n\
-  } else if (textureNumU < 2.1) { colorTexture(sampler2);\n\
-  } else if (textureNumU < 3.1) { colorTexture(sampler3);\n\
-  } else { colorTexture(sampler4);\n\
-  }\n\
-}\n\
-";
+    this.fragment["canvas"] = document.getElementById("shader_frag_canvas").value;
+    this.fragment["player"] = document.getElementById("shader_frag_player").value;
 
     this.fragment["default"] = "\
 void colorize() {\n\

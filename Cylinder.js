@@ -1,4 +1,7 @@
 function Cylinder(base_radius, top_radius, height, slices, stacks) { 
+
+    var colorVec = vec3.create();;
+
     this.o = new GLobject();
 
     this.base_radius = base_radius;

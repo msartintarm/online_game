@@ -62,10 +62,9 @@ Stool.prototype.Torus = _Torus;
 Stool.prototype.setShader = _objsSetShader;
 Stool.prototype.initBuffers = _objsInitBuffers;
 
-var seat_location;
 Stool.prototype.draw = function(gl_) {
-    seat_height = stoolHeight.val;
-    seat_location = min_stool_height + 12*(seat_height/60)+12*0.02;
+    seat_height = 2;
+    var seat_location = min_stool_height + 12*(seat_height/60)+12*0.02;
 
     //draws the legs of the stool
     for (var i = 0; i < 4; ++i) {

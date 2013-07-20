@@ -203,8 +203,59 @@ varying vec4 lModel;
 varying vec3 lightNorm;
 varying vec3 vertNorm;
 </textarea>
-	<textarea id="frag_shader_1" rows="20"></textarea>
-	<textarea id="frag_shader_2" rows="20"></textarea>
+	<textarea id="shader_frag_canvas" rows="20">
+void colorTexture(sampler2D theSampler) {
+
+float delta = 1.0 / 512.0;
+float sway = sin(frames_elapsed_u / 100.0) / 2.0;
+float sway2 = cos(frames_elapsed_u / 110.0) / 2.0;
+float the_beat = hi_hat_u;
+
+  vec3 textureColor = texture2D(theSampler, textureV).xyz;
+  textureColor[0] *= sway;
+  textureColor[1] *= -sway2;
+  textureColor[2] *= abs((sway * sway2));
+
+  float background = clamp(length(textureColor) * 5.0, 0.8, 1.0);
+
+  gl_FragColor = vec4(textureColor * 1.6, background);
+}
+
+void main(void) {
+
+  if (textureNumU < 0.1) { colorTexture(sampler0);
+  } else if (textureNumU < 1.1) { colorTexture(sampler1);
+  } else if (textureNumU < 2.1) { colorTexture(sampler2);
+  } else if (textureNumU < 3.1) { colorTexture(sampler3);
+  } else { colorTexture(sampler4);
+  }
+}
+</textarea>
+	<textarea id="shader_frag_player" rows="20">
+void colorTexture(sampler2D theSampler) {
+
+  float delta = 1.0 / 512.0;
+  float sway = sin((frames_elapsed_u + 60.0) / 100.0) / 2.0;
+  float sway2 = cos((frames_elapsed_u + 60.0) / 110.0) / 2.0;
+  float the_beat = hi_hat_u;
+
+  vec3 textureColor = texture2D(theSampler, textureV).xyz;
+  textureColor[0] *= sway;
+  textureColor[1] *= -sway2;
+  textureColor[2] *= abs((sway * sway2));
+
+  float background = clamp(length(textureColor) * 5.0, 0.8, 1.0);
+
+  gl_FragColor = vec4(textureColor * 1.6, background);
+  if(background < 0.95 && the_beat > 0.9) gl_FragColor = 
+    (20. - the_beat) / 20. * vec4(textureColor * 1.6, background) +
+    the_beat / 20. * texture2D(theSampler, textureV);
+}
+
+void main(void) { 
+  colorTexture(sampler0); 
+}
+</textarea>
 
       </div>            
   </body>

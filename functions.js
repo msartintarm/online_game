@@ -8,11 +8,6 @@ var freezeOff = 0;
 // Default lighting and viewer positions
 var lightPos =  [0,0,0];
 
-function MatrixData(htmlID) { 
-    this.val = 0; 
-    this.inc_ = 0; 
-    this.html = document.getElementById(htmlID); 
-}
 
 // Quad constructor that pushes
 // it to an internal 'objs' array,
@@ -178,86 +173,6 @@ function _oInvertNorms() {
 	this.o.data["norm"][i] = -this.o.data["norm"][i];
     }
     return this;
-}
-
-MatrixData.prototype.pause = function() { this.inc_ = 0; };
-MatrixData.prototype.set = function(num) { this.val = num; };
-MatrixData.prototype.setInc = function(num) {     
-    this.inc_ = num; 
-    this.inc();
-    this.html.style.display = "inline-block"; 
-};
-MatrixData.prototype.inc = function() {
-    this.val = (this.val + this.inc_) % 360; 
-};
-
-MatrixData.prototype.incBy = function(val) {
-    this.val = (this.val + val) % 360; 
-};
-
-MatrixData.prototype.setIncZoom = function(num) { 
-    this.val = this.val + num; 
-    if(this.val > 180) this.val = 180;
-    if(this.val < 0) this.val = 0;
-};
-
-MatrixData.prototype.setStoolHeight = function(num) { 
-    this.val = this.val + num; 
-    if(this.val > 4.375) this.val = 4.375;
-    if(this.val < 0) this.val = 0;
-};
-
-MatrixData.prototype.dec = function() { 
-    this.val = (this.val - this.inc_) % 360; };
-
-MatrixData.prototype.reset = function() {
-    this.val = 0;
-    this.inc_ = 0; 
-    this.html.style.display = "none"; };
-
-MatrixData.prototype.isZero = function() {
-    return(this.val === 0); };
-
-function booleanData(htmlID){
-    this.val = 1;
-    this.html = document.getElementById(htmlID); 
-}
-
-booleanData.prototype.reset = function(){
-    this.val = 1;
-};
-
-function toggle_element(element_name){
-    var this_style = document.getElementById(element_name).style;
-    this_style.display = 
-	(this_style.display === "inline-block")? "none": "inline-block";
-};
-
-booleanData.prototype.toggle = function(){
-    if(this.val === 0) this.val = 1;
-    else this.val = 0;
-    this.html.style.display = "inline-block";
-};
-
-var stoolHeight;
-var rotateY;
-var rotateCam;
-var positionX;
-var positionY;
-var zoom;
-var pause;
-var priveledgedMode;
-
-function resetModel() { 
-    rotateY.reset(); 
-    positionX.reset(); 
-    positionY.reset(); 
-    rotateCam.reset();
-    zoom.set(45);
-    pause.reset();
-    stoolHeight.reset();
-    priveledgedMode.reset();
-
 }
 
 //

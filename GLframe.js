@@ -16,6 +16,8 @@ function GLframe(texture_num) {
     this.playa = new Sphere(playa_radius).translate([0, 0, playa_radius - this.height]);
 }
 
+GLframe.frame_draw = false;
+
 GLframe.prototype.init = function(gl_) {
 
 //    this.playa.setShader(gl_.shader);
@@ -93,7 +95,7 @@ GLframe.prototype.init = function(gl_) {
 var every_other = 0;
 GLframe.prototype.drawScene = function(gl_) {
 
-    if(frame_draw === true || (++every_other) % 5 !== 0) return;
+    if(GLframe.frame_draw === true || (++every_other) % 5 !== 0) return;
 
     gl_.activeTexture(gl_.TEXTURE0 + this.active);
     gl_.viewport(0, 0, this.frameBuff.width, this.frameBuff.height);
@@ -103,7 +105,7 @@ GLframe.prototype.drawScene = function(gl_) {
     gl_.clear(gl_.COLOR_BUFFER_BIT | 
 	      gl_.DEPTH_BUFFER_BIT);
 
-    frame_draw = true;
+    GLframe.frame_draw = true;
     theMatrix.lightTranslate([0,-400,0]); 
     
     var tempMatrix = mat4.clone(theMatrix.vMatrix);
@@ -122,7 +124,7 @@ GLframe.prototype.drawScene = function(gl_) {
     theMatrix.lightTranslate([0, 400,0]); 
     theMatrix.vMatrixChanged = true;
     this.playa.draw(gl_);
-    frame_draw = false;
+    GLframe.frame_draw = false;
 
     mat4.copy(theMatrix.vMatrix, tempMatrix);
     theMatrix.vMatrixChanged = true;

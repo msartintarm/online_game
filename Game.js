@@ -30,7 +30,7 @@ function Game() {
 
     this.player_string = new GLstring(name, 
 				      TEXT_TEXTURE, 
-				      theCanvas.gl.shader_canvas);
+				      theCanvas.gl.shader_player);
     this.player_string.val = "Player";
 
     var player_width = this.grid;
@@ -40,7 +40,7 @@ function Game() {
 	[-player_width, 2 * player_width, -1],
 	[-player_width,                0, -1]);
     this.player.setTexture(TEXT_TEXTURE);
-    this.player.setShader(theCanvas.gl.shader_canvas);
+    this.player.setShader(theCanvas.gl.shader_player);
     this.player.x_pos = 0;
     this.player.y_pos = 0;
     this.player.name = name;
@@ -90,7 +90,7 @@ function Game() {
     this.up_count = 0;
     this.down_count = 0;
     this.draw = function(gl_) {
-
+/*
 	if(this.in_left_move === true) { 
 	    if (this.player_string.val !== "Left") {
 		this.player_string.update(gl_, "Left");
@@ -107,11 +107,11 @@ function Game() {
 		this.player_string.val = "Jump";
 	    }
 	} else {
-	    if (this.player_string.val !== "Player") {
+*/	    if (this.player_string.val !== "Player") {
 		this.player_string.update(gl_, this.player.name);
 		this.player_string.val = "Player";
 	    }
-	}
+//	}
 
 	this.updateMovement();
 

@@ -1,6 +1,6 @@
-var colorVec;
-
 function Disk(inner_radius, outer_radius, slices, loops) {
+
+    var colorVec = vec3.create();;
 
     this.o = new GLobject();
  

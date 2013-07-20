@@ -111,12 +111,12 @@ Jumbotron.prototype.setShader = function(shader) {
 Jumbotron.prototype.draw = function(gl_) {
 
     // check to see if ball cound has changed
-    if(this.balls_hit !== Stadium.total_balls_hit) {
-	this.balls_hit = Stadium.total_balls_hit;
-	this.display.update(gl_, "Balls left: " + 
-			    (this.total_balls - this.balls_hit) + "/" + 
-			    this.total_balls);
-    }
+//    if(this.balls_hit !== Stadium.total_balls_hit) {
+//	this.balls_hit = Stadium.total_balls_hit;
+//	this.display.update(gl_, "Balls left: " + 
+//			    (this.total_balls - this.balls_hit) + "/" + 
+//			    this.total_balls);
+//    }
 
 
     this.frame.drawScene(gl_);
