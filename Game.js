@@ -13,6 +13,9 @@ function Game() {
     this.in_jump = false;
     this.in_left_move = false;
     this.in_right_move = false;
+    this.in_change = false;
+
+    this.change_x = [];
 
     // Music related stuff
     this.hit_sound = [];
@@ -97,6 +100,28 @@ function Game() {
 
     this.draw = function(gl_) {
 
+
+	if(this.hi_hat < 5) {
+	    
+	    var FFTData = new Uint8Array(this.analyser.frequencyBinCount);
+	    this.analyser.getByteFrequencyData(FFTData);
+
+	    var sum = FFTData[0] + FFTData[1] + FFTData[2];
+	    if(this.total === null) this.total = sum;
+
+	    if(sum/this.total > 2) { 
+		this.hi_hat = 11;
+		if (this.log_music) {
+		    console.log("%.2f", sum / this.total); 
+		}
+	    }
+
+	    this.total *= 0.80;
+	    this.total += (sum / 5);
+	}
+	this.hi_hat -= 1;
+	if (this.hi_hat < 0) this.hi_hat = 0;
+
 	this.updateMovement();
 
 	var player_shader = this.player.o.shader;
@@ -118,37 +143,6 @@ function Game() {
 	    this.floor[i].draw(gl_);
 	}
 	
-	if (this.log_music) {
-
-	    if(this.hi_hat < 5) {
-		
-		var FFTData = new Uint8Array(this.analyser.frequencyBinCount);
-		this.analyser.getByteFrequencyData(FFTData);
-
-		var sum = FFTData[0] + FFTData[1] + FFTData[2];
-		if(this.total === null) this.total = sum;
-
-		if(sum/this.total > 5) { 
-		    console.log("%.2f", sum / this.total); 
-		    this.hi_hat = 10;
-		} else {
-		    if (this.hi_hat > 0) this.hi_hat -= 1;
-		}
-		this.total *= 0.75;
-		this.total += (sum / 4);
-	    } else {
-		this.hi_hat -= 1;
-	    }
-
-	    /*
-	      for(i = 0; i < 25 && i < FFTData.length; ++i) {
-	      if(FFTData[i] < 100) music_data += " "; 
-	      if(FFTData[i] < 10) music_data += " "; 
-	      if(FFTData[i] === 0) music_data += "  ";
-	      else music_data += FFTData[i] + ",";
-	      }
-	    */
-	}
     };
 
     /**
@@ -220,6 +214,7 @@ function Game() {
     this.startJump = function() {
 
 	if (this.in_jump === true) return;
+	this.jump_started = false;
 	this.jumping_up = true;
 	this.jumping_down = false;
 	this.jump_count = jump_dist.length;
@@ -267,65 +262,118 @@ function Game() {
 	this.in_right_move = true;
     };
 
+    this.changeMovement = function() {
+	var count = ++this.change_count;
+	if (count >= this.change_x.length) { 
+	    this.in_change = false;
+	    return;
+	}
+
+	console.log("movement frame " + count + ": " + this.change_x[count]);
+	
+	this.movement[0] += this.change_x[count] * this.grid;
+	this.bg_movement[0] += this.grid / 30;
+
+    };
+
+    this.moveRight = function() {
+	if (this.right_started === false) return;
+	var count = ++this.right_count;
+	if (count >= move_dist.length) { 
+	    this.in_right_move = false;
+	    if (this.right_key_down === true) { this.startRightMove(); this.moveRight(); }
+	    return;
+	}
+	
+	this.movement[0] += move_dist[count] * this.grid;
+	this.bg_movement[0] += this.grid / 30;
+
+    };
+
+    this.moveLeft = function () {
+	var count = (++this.left_count);
+	    if (count >= move_dist.length) { 
+		this.in_left_move = false;
+		if (this.left_key_down === true) this.startLeftMove();
+		return;
+	    }
+	
+	this.movement[0] -= move_dist[count] * this.grid;
+	this.bg_movement[0] -= this.grid / 30;
+
+	if ((this.movement[1] + player_width) > (4 * floor_width) &&
+	    this.movement[1] < (4 * floor_width)) {
+	    // Within horizontal range.
+	    if((this.movement[0] - player_width / 2) < (floor_width / 2) || 
+	       (this.movement[0] + player_width / 2) > (floor_width / 2)) {
+
+		// Collision detected.
+		console.log("yo, barrier.");
+
+		// See how far we've travelled. Create correction parabola.
+		this.change_x = [];
+		var movement_total = 0;
+		var correction_total = 0;
+		var dist_remaining;
+		var x;
+
+
+		for (x = count; x <= 8; ++x) {
+		    movement_total += move_dist[x];
+		    var correction_num = 64 - (x*x);
+		    this.change_x.push(correction_num);
+		    correction_total += correction_num;
+		}
+		// Normalize.
+		for (x = 0; x < this.change_x.length; ++x) {
+		    this.change_x[x] *= (movement_total / correction_total);
+		}
+
+		// Initialize new move to replace the rest of left movement.
+		this.in_left_move = false;
+
+		// No need for 'change_started' as it execs immediately
+		this.in_change = true;
+		this.change_count = 0;
+	    }
+	}
+
+    };
+
     this.updateMovement = function() {
 
 	if(this.player_x_pos < -7) this.startCameraLeftMove();
 	else if(this.player_x_pos > 7) this.startCameraRightMove();
-	if (this.cam_in_left_move === true) {
-	    if ((--this.cam_left_count) < 0) { this.cam_in_left_move = false; return; }
-	    theMatrix.vTranslate([-this.grid * 0.5, 0, 0]);
-	}
+
+	// Mark whether queued actions can be performed.
+        if (this.in_right_move === true && 
+	    this.hi_hat == 10) { this.right_started = true; } 
+        if (this.in_left_move === true && 
+	    this.left_started === false && 
+	    this.hi_hat == 10) { this.left_started = true; } 
+	if (this.in_jump === true && 
+	    this.jump_started === false && 
+	    this.hi_hat == 10) { this.jump_started = true; } 
+
+	// Handle movement.
 
 	if (this.cam_in_right_move === true) {
 	    if ((--this.cam_right_count) < 0) { this.cam_in_right_move = false; return; }
 	    theMatrix.vTranslate([this.grid * 0.5, 0, 0]);
 	}
 
-	// Handle left and right movement.
-	if (this.in_right_move === true) {
-	    
-	    if(this.right_started === true) {
-
-		var count = ++this.right_count;
-		if (count >= move_dist.length) { 
-		    this.in_right_move = false;
-		    if (this.right_key_down === true) this.startRightMove();
-		    return;
-		}
-		
-		this.movement[0] += move_dist[count] * this.grid;
-		this.bg_movement[0] += this.grid / 30;
-		
-	    } else if(this.hi_hat == 10) {
-		this.right_started = true;
-		++this.player_x_pos;
-		return;
-	    } 
+	if (this.cam_in_left_move === true) {
+	    if ((--this.cam_left_count) < 0) { this.cam_in_left_move = false; return; }
+	    theMatrix.vTranslate([-this.grid * 0.5, 0, 0]);
 	}
 
-	if (this.in_left_move === true) {
-	    
-	    if(this.left_started === true) {
-
-		var count = (++this.left_count);
-		if (count >= move_dist.length) { 
-		    this.in_left_move = false;
-		    if (this.left_key_down === true) this.startLeftMove();
-		    return;
-		}
-		
-		this.movement[0] -= move_dist[count] * this.grid;
-		this.bg_movement[0] -= this.grid / 30;
-		
-	    } else if(this.hi_hat == 10) {
-		this.left_started = true;
-		--this.player_x_pos;
-		return;
-	    } 
-	}
+	if (this.in_change === true) this.changeMovement();
+	if (this.in_right_move === true && this.right_started === true) this.moveRight();
+	if (this.in_left_move === true && this.left_started === true) this.moveLeft();
 
 	// Handle jumps!
-	if (this.in_jump === true) 
+	if (this.in_jump === true && this.jump_started === true) {
+
 	    if (this.jumping_up === true) {
 		var count = (--this.jump_count);
 		if (count <= 0) { this.jumping_up = false; this.jumping_down = true; return; }
@@ -339,6 +387,7 @@ function Game() {
 		this.movement[1] = jump_dist[count];
 		
 	    }
+	}
     };
 
     this.initWebAudio = function() {
