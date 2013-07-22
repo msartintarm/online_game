@@ -1,3 +1,10 @@
+// Used in collision detection.
+const WALL_NONE = 0;
+const WALL_N = 1;
+const WALL_S = 2;
+const WALL_W = 3;
+const WALL_E = 4;
+
 function Game() {  
 
     // Env variable(s)
@@ -106,7 +113,7 @@ function Game() {
 
     this.draw = function(gl_) {
 
-
+	// Analyse sound, which influences movement.
 	if(this.hi_hat < 5) {
 	    
 	    var FFTData = new Uint8Array(this.analyser.frequencyBinCount);
@@ -128,6 +135,7 @@ function Game() {
 	this.hi_hat -= 1;
 	if (this.hi_hat < 0) this.hi_hat = 0;
 
+	// Analyse movement, which draws upon sound, and activated moves.
 	this.updateMovement();
 
 	var player_shader = this.player.o.shader;
@@ -312,10 +320,20 @@ function Game() {
     this.detectCollision = function() {
 
 	// First, check vertical indexes. Next, check horizontal indexes.
-	return (this.movement[1] + this.player_height > this.push_button.y_min &&
-		this.movement[1] < this.push_button.y_max &&
-		this.movement[0] - this.player_width < this.push_button.x_max && 
-		this.movement[0] + this.player_width > this.push_button.x_min);
+	if (this.movement[1] + this.player_height > this.push_button.y_min &&
+	    this.movement[1] < this.push_button.y_max &&
+	    this.movement[0] - this.player_width < this.push_button.x_max && 
+	    this.movement[0] + this.player_width > this.push_button.x_min) {
+
+	    // Collision detected. Which side of the box did we cross? Look at old
+	    // movement to determine this.
+//	    console.log(this.movement_old[1] + " " +  this.push_button.y_max);
+	    if (this.movement_old[1] >= this.push_button.y_max) return WALL_N;
+	    if (this.movement_old[1] + this.player_height <= this.push_button.y_min) return WALL_S;
+	    if (this.movement_old[0] - this.player_width >= this.push_button.x_max) return WALL_E;
+	    if (this.movement_old[0] + this.player_width <= this.push_button.x_min) return WALL_W;
+	} 
+	return WALL_NONE;
 		
 /*
 		// See how far we've travelled. Create correction parabola.
@@ -394,7 +412,8 @@ function Game() {
 	}
 
 	// Can we move here, or would a collision prevent it?
-	if (this.detectCollision()) console.log("yo, collision.");
+	var wall_hit = this.detectCollision();
+	if (wall_hit !== WALL_NONE) console.log("yo, collision. " + wall_hit);
     };
 
     this.initWebAudio = function() {
