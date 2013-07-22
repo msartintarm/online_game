@@ -6,6 +6,7 @@ function Game() {
     // handles movement
     this.grid = 50;
     this.movement = vec3.create();
+    this.movement_old = vec3.create();
     this.bg_movement = vec3.create();
     this.total = null;
     this.cam_left_count = 0;
@@ -54,7 +55,8 @@ function Game() {
 	.setShader(theCanvas.gl.shader_player);
     this.player_x_pos = 0;
     this.player_y_pos = 0;
-
+    this.player_width = player_width / 2;
+    this.player_height = player_width;
 
     this.background = new Quad(
 	[-bg_width, bg_width, -20],
@@ -75,12 +77,16 @@ function Game() {
     }
 
     this.push_button = new Quad(
-	[-floor_width,                0, -1],
-	[-floor_width, -2 * floor_width, -1],
-	[ floor_width,                0, -1],
-	[ floor_width, -2 * floor_width, -1])
-	.translate([0, 4 * floor_width, 0])
+	[-floor_width, 4 * floor_width, -1],
+	[-floor_width, 2 * floor_width, -1],
+	[ floor_width, 4 * floor_width, -1],
+	[ floor_width, 2 * floor_width, -1])
 	.setTexture(BRICK_TEXTURE);
+    this.push_button.x_min =    -floor_width;
+    this.push_button.x_max =     floor_width;
+    this.push_button.y_min = 2 * floor_width;
+    this.push_button.y_max = 4 * floor_width;
+    
 
     this.initBuffers = function(gl_) {
 
@@ -292,24 +298,26 @@ function Game() {
 
     this.moveLeft = function () {
 	var count = (++this.left_count);
-	    if (count >= move_dist.length) { 
-		this.in_left_move = false;
-		if (this.left_key_down === true) this.startLeftMove();
-		return;
-	    }
-	
+	if (count >= move_dist.length) { 
+	    this.in_left_move = false;
+	    if (this.left_key_down === true) this.startLeftMove();
+	    return;
+	}
+
 	this.movement[0] -= move_dist[count] * this.grid;
 	this.bg_movement[0] -= this.grid / 30;
 
-	if ((this.movement[1] + player_width) > (4 * floor_width) &&
-	    this.movement[1] < (4 * floor_width)) {
-	    // Within horizontal range.
-	    if((this.movement[0] - player_width / 2) < (floor_width / 2) || 
-	       (this.movement[0] + player_width / 2) > (floor_width / 2)) {
+    };
 
-		// Collision detected.
-		console.log("yo, barrier.");
+    this.detectCollision = function() {
 
+	// First, check vertical indexes. Next, check horizontal indexes.
+	return (this.movement[1] + this.player_height > this.push_button.y_min &&
+		this.movement[1] < this.push_button.y_max &&
+		this.movement[0] - this.player_width < this.push_button.x_max && 
+		this.movement[0] + this.player_width > this.push_button.x_min);
+		
+/*
 		// See how far we've travelled. Create correction parabola.
 		this.change_x = [];
 		var movement_total = 0;
@@ -335,43 +343,39 @@ function Game() {
 		// No need for 'change_started' as it execs immediately
 		this.in_change = true;
 		this.change_count = 0;
-	    }
-	}
-
+*/
     };
 
     this.updateMovement = function() {
 
+	vec3.copy(this.movement_old, this.movement);
+
 	if(this.player_x_pos < -7) this.startCameraLeftMove();
 	else if(this.player_x_pos > 7) this.startCameraRightMove();
 
-	// Mark whether queued actions can be performed.
-        if (this.in_right_move === true && 
-	    this.hi_hat == 10) { this.right_started = true; } 
-        if (this.in_left_move === true && 
-	    this.left_started === false && 
-	    this.hi_hat == 10) { this.left_started = true; } 
-	if (this.in_jump === true && 
-	    this.jump_started === false && 
-	    this.hi_hat == 10) { this.jump_started = true; } 
+	// Check whether it's time to initiate a move that's been triggered.
+        if (this.in_right_move === true && this.hi_hat == 10) { 
+	    this.right_started = true; } 
+        if (this.in_left_move === true && this.left_started === false && this.hi_hat == 10) { 
+	    this.left_started = true; } 
+	if (this.in_jump === true && this.jump_started === false && this.hi_hat == 10) { 
+	    this.jump_started = true; } 
 
-	// Handle movement.
-
+	// Handle camera natively as it doesn't need much logic.
 	if (this.cam_in_right_move === true) {
-	    if ((--this.cam_right_count) < 0) { this.cam_in_right_move = false; return; }
-	    theMatrix.vTranslate([this.grid * 0.5, 0, 0]);
+	    if ((--this.cam_right_count) < 0) this.cam_in_right_move = false;
+	    else theMatrix.vTranslate([this.grid * 0.5, 0, 0]);
 	}
-
 	if (this.cam_in_left_move === true) {
-	    if ((--this.cam_left_count) < 0) { this.cam_in_left_move = false; return; }
-	    theMatrix.vTranslate([-this.grid * 0.5, 0, 0]);
+	    if ((--this.cam_left_count) < 0) this.cam_in_left_move = false;
+	    else theMatrix.vTranslate([-this.grid * 0.5, 0, 0]);
 	}
 
+	// We may be 'changing a move' due to collision constraints.
+	// Otherwise, all other moves are valid and there's no particular priority.
 	if (this.in_change === true) this.changeMovement();
 	if (this.in_right_move === true && this.right_started === true) this.moveRight();
 	if (this.in_left_move === true && this.left_started === true) this.moveLeft();
-
-	// Handle jumps!
 	if (this.in_jump === true && this.jump_started === true) {
 
 	    if (this.jumping_up === true) {
@@ -388,6 +392,9 @@ function Game() {
 		
 	    }
 	}
+
+	// Can we move here, or would a collision prevent it?
+	if (this.detectCollision()) console.log("yo, collision.");
     };
 
     this.initWebAudio = function() {
