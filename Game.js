@@ -5,9 +5,14 @@ const WALL_S = 2;
 const WALL_W = 3;
 const WALL_E = 4;
 
+/**
+ * Creates and initializes a game.
+ */
 function Game() {  
 
-    // Env variable(s)
+    var i; // for init loop
+
+    // Env variable(s) - do not change during execution.
     this.log_music = false;
 
     // handles movement
@@ -22,8 +27,26 @@ function Game() {
     this.in_left_move = false;
     this.in_right_move = false;
     this.in_change = false;
-
     this.change_x = [];
+
+    // Jump distance is a vector of linear X values
+    // When we increment y-pos by these array values, the effect is a parabolic jump
+    this.jump_dist = [];
+    for (i = 0; i <= 30; ++i) {
+	this.jump_dist.push (15 - (i / 2));
+    }
+
+    // Move distance is a group of numbers, normalized so their sum is 1.0
+    this.move_dist = [];
+    move_total = 0;
+    for (i = 0; i <= 8; ++i) {
+	var move_num = 64 - (i*i);
+	this.move_dist.push (move_num);
+	move_total += move_num;
+    }
+    for (i = 0; i <= 8; ++i) {
+	this.move_dist[i] /= move_total;
+    }
 
     // Music related stuff
     this.hit_sound = [];
@@ -105,7 +128,7 @@ function Game() {
 	this.player.initBuffers(gl_);
 	this.background.initBuffers(gl_);
 	this.push_button.initBuffers(gl_);
-	var i;
+
 	for(i = 0; i < this.floor.length; ++i){
 	    this.floor[i].initBuffers(gl_);
 	}
@@ -231,7 +254,7 @@ function Game() {
 	this.jump_started = false;
 	this.jumping_up = true;
 	this.jumping_down = false;
-	this.jump_count = jump_dist.length;
+	this.jump_count = -1;
 	this.in_jump = true;
     };
 
@@ -293,26 +316,26 @@ function Game() {
     this.moveRight = function() {
 	if (this.right_started === false) return;
 	var count = ++this.right_count;
-	if (count >= move_dist.length) { 
+	if (count >= this.move_dist.length) { 
 	    this.in_right_move = false;
 	    if (this.right_key_down === true) { this.startRightMove(); this.moveRight(); }
 	    return;
 	}
 	
-	this.movement[0] += move_dist[count] * this.grid;
+	this.movement[0] += this.move_dist[count] * this.grid;
 	this.bg_movement[0] += this.grid / 30;
 
     };
 
     this.moveLeft = function () {
 	var count = (++this.left_count);
-	if (count >= move_dist.length) { 
+	if (count >= this.move_dist.length) { 
 	    this.in_left_move = false;
 	    if (this.left_key_down === true) this.startLeftMove();
 	    return;
 	}
 
-	this.movement[0] -= move_dist[count] * this.grid;
+	this.movement[0] -= this.move_dist[count] * this.grid;
 	this.bg_movement[0] -= this.grid / 30;
 
     };
@@ -397,23 +420,53 @@ function Game() {
 	if (this.in_jump === true && this.jump_started === true) {
 
 	    if (this.jumping_up === true) {
-		var count = (--this.jump_count);
-		if (count <= 0) { this.jumping_up = false; this.jumping_down = true; return; }
-		//	console.log(jump_dist[count] + ", " + count);
-		this.movement[1] = jump_dist[count];
+		var count = (++this.jump_count);
+		if (count >= this.jump_dist.length) { 
+		    this.jumping_up = false; 
+		    this.jumping_down = true; 
+		} else {
+		    this.movement[1] += 15 - (count / 2);
+		}
 
 	    } else {
-		var count = (++this.jump_count);
-		if (count >= jump_dist.length) { this.in_jump = false; return; }
-		//	console.log(jump_dist[count] + ", " + count);
-		this.movement[1] = jump_dist[count];
-		
+		var count = (--this.jump_count);
+		if (count < 0) { 
+		    this.in_jump = false; 
+		} else {
+		    this.movement[1] -= 15 - (count / 2);
+		}
 	    }
 	}
 
 	// Can we move here, or would a collision prevent it?
 	var wall_hit = this.detectCollision();
-	if (wall_hit !== WALL_NONE) console.log("yo, collision. " + wall_hit);
+	if (wall_hit !== WALL_NONE) {
+
+	    // Collision. How far are we from the grid? Let's determine on a scale of 0-1.
+	    var grid_dist;
+	    switch (wall_hit) {
+	    case WALL_W:
+		grid_dist = this.movement[0] / this.grid;
+		grid_dist -= Math.floor(grid_dist);
+		this.movement[0] -= grid_dist * this.grid;
+		this.in_right_move = false;
+		break;
+	    case WALL_E:
+		grid_dist = this.movement[0] / this.grid;
+		grid_dist -= Math.ceil(grid_dist);
+		this.movement[0] -= grid_dist * this.grid;
+		this.in_left_move = false;
+		break;
+	    } 
+
+	    var active_moves = "";
+	    if (this.in_left_move === true) active_moves += "l";
+	    if (this.in_right_move === true) active_moves += "r";
+	    if (this.in_jump === true) active_moves += "j";
+	    console.log("yo, collision. " + wall_hit + ", " + active_moves);
+
+	}
+
     };
 
     this.initWebAudio = function() {
@@ -481,25 +534,5 @@ function Game() {
     };
 
     return this;
-}
-
-var x;
-
-// Jump distance is a parabola from 0 to 900/4
-var jump_dist = [];
-for (x = 0; x <= 30; ++x) {
-    jump_dist.push ((900 / 4) - (x*x / 4));
-}
-
-// Move distance is a group of numbers, normalized so their sum is 1.0
-var move_dist = [];
-var move_total = 0;
-for (x = 0; x <= 8; ++x) {
-    var move_num = 64 - (x*x);
-    move_dist.push (move_num);
-    move_total += move_num;
-}
-for (x = 0; x <= 8; ++x) {
-    move_dist[x] /= move_total;
 }
 
