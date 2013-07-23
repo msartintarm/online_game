@@ -36,9 +36,6 @@ void colorTexture(sampler2D theSampler) {\n\
   vec3 textureColor = texture2D(theSampler, vec2(textureV.s, textureV.t)).xyz;\n\
   \n\
 \n\
-  if(has_collided_u > 0.0) {\n\
-    textureColor = textureColor * has_collided_u * textureColor * textureColor;\n\
-  }\n\
   vec3 ambColor = textureColor / 3.0 * ambient_coeff_u;\n\
   vec3 diffColor = textureColor * diffuseV * diffuse_coeff_u;\n\
   vec3 specColor = textureColor * specular();\n\
@@ -51,11 +48,7 @@ void colorTexture(sampler2D theSampler) {\n\
 void main(void) {\n\
 //  if(dot(normalize(vertNorm), vec3(0.0, 0.0,-1.0)) < 0.0) {  \n\
 //    discard; \n\
-  if (textureNumU < 0.1) { colorTexture(sampler0);\n\
-  } else if (textureNumU < 1.1) { colorTexture(sampler1);\n\
-  } else if (textureNumU < 2.1) { colorTexture(sampler2);\n\
-  } else { colorize();\n\
-  }\n\
+colorTexture(sampler0);\n\
 }\n\
 ";
 
@@ -63,72 +56,6 @@ void main(void) {\n\
 void main(void) {\n\
 \n\
   gl_FragColor = vec4(colorV * vec3(2.0, 0.0, 0.5) * specular(), 1.0);\n\
-}\n\
-";
-
-    this.fragment["ball"] = "\
-vec4 getFilterEffect(sampler2D theSampler) {\n\
-   vec2 onePixel = vec2(1.0,1.0)/ u_textureSize;\n\
-   vec4 blurColor =\n\
-       texture2D(theSampler, textureV + onePixel * vec2(-1, -1)) * u_kernel[0] +\n\
-       texture2D(theSampler, textureV + onePixel * vec2( 0, -1)) * u_kernel[1] +\n\
-       texture2D(theSampler, textureV + onePixel * vec2( 1, -1)) * u_kernel[2] +\n\
-       texture2D(theSampler, textureV + onePixel * vec2(-1,  0)) * u_kernel[3] +\n\
-       texture2D(theSampler, textureV + onePixel * vec2( 0,  0)) * u_kernel[4] +\n\
-       texture2D(theSampler, textureV + onePixel * vec2( 1,  0)) * u_kernel[5] +\n\
-       texture2D(theSampler, textureV + onePixel * vec2(-1,  1)) * u_kernel[6] +\n\
-       texture2D(theSampler, textureV + onePixel * vec2( 0,  1)) * u_kernel[7] +\n\
-       texture2D(theSampler, textureV + onePixel * vec2( 1,  1)) * u_kernel[8];\n\
-   \n\
-       float kernelWeight =\n\
-          u_kernel[0] +\n\
-          u_kernel[1] +\n\
-          u_kernel[2] +\n\
-          u_kernel[3] +\n\
-          u_kernel[4] +\n\
-          u_kernel[5] +\n\
-          u_kernel[6] +\n\
-          u_kernel[7] +\n\
-          u_kernel[8] ;\n\
-\n\
-       if (kernelWeight <= 0.0) {\n\
-          kernelWeight = 1.0;\n\
-       }\n\
-       vec3 new_vec = (blurColor / kernelWeight).rgb;\n\
-       vec3 specularVec = new_vec * 4.0 * specular();\n\
-       return vec4(new_vec + specularVec, 1.0);\n\
-}\n\
-\n\
-\n\
-void colorize() {\n\
-  vec3 ambColor = colorV / 3.0 * ambient_coeff_u;\n\
-  vec3 diffColor = colorV / 3.0 * diffuseV * diffuse_coeff_u;\n\
-  vec3 specColor = specular_color_u * specular();\n\
-  gl_FragColor = vec4(ambColor + diffColor + specColor, 1.0);\n\
-}\n\
-\n\
-void colorTexture(sampler2D theSampler) {\n\
-  vec4 textureColor;\n\
-  if(ballHitu == 1.0){\n\
- 	textureColor = getFilterEffect(theSampler); \n\
- }\n\
-  else{\n\
-	textureColor.xyz = colorV.xyz;\n\
-	textureColor.a = 0.635;\n\
-  }\n\
-  vec3 ambColor = textureColor.xyz / 3.0 * ambient_coeff_u;\n\
-  vec3 diffColor = textureColor.xyz * diffuseV * diffuse_coeff_u;\n\
-  vec3 specColor = textureColor.xyz * specular();\n\
-\n\
-  gl_FragColor = vec4(ambColor + diffColor + specColor, textureColor.a);\n\
-}\n\
-\n\
-void main(void) {\n\
-\n\
-  if (textureNumU < 0.1) { colorTexture(sampler0);\n\
-  } else if (textureNumU < 1.1) { colorTexture(sampler0);\n\
-  } else { colorTexture(sampler0);\n\
-  }\n\
 }\n\
 ";
 

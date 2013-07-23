@@ -14,7 +14,6 @@ function Game() {
 
     // Env variable(s) - do not change during execution.
     this.log_music = false;
-    GLobject.draw_optimized = true;
 
     // handles movement
     this.grid = 50;
@@ -121,7 +120,10 @@ function Game() {
 
     this.initBuffers = function(gl_) {
 
-	// Basically we're optimizing a call ourselves.
+	GLobject.draw_optimized = true;
+
+	// Basically in our game, we know this stuff only
+	// ever gets called in certain patterns.
 	theCanvas.changeShader(theCanvas.gl.shader);
 	theMatrix.setViewUniforms(theCanvas.gl, theCanvas.gl.shader);
 	gl_.uniformMatrix4fv(theCanvas.gl.shader.unis["pMatU"], false, theMatrix.pMatrix);

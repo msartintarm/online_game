@@ -127,14 +127,12 @@ GLcanvas.prototype.start = function(theScene) {
 	this.shader_count = 0;
 
 	this.gl.shader = this.gl.createProgram();
-	this.gl.shader_ball = this.gl.createProgram();
 	this.gl.shader_frame = this.gl.createProgram();
 	this.gl.shader_color = this.gl.createProgram();
 	this.gl.shader_canvas = this.gl.createProgram();
 	this.gl.shader_player = this.gl.createProgram();
 	if(this.initShaders(this.gl.shader,        "default",  "default") !== 0 ||
 	   this.initShaders(this.gl.shader_frame,  "frame",    "default") !== 0 ||
-	   this.initShaders(this.gl.shader_ball,   "ball",     "default") !== 0 || 
 	   this.initShaders(this.gl.shader_canvas, "canvas",   "default") !== 0 ||
 	   this.initShaders(this.gl.shader_player, "player",   "player") !== 0 ||
 	   this.initShaders(this.gl.shader_color,  "color",    "color") !== 0) {
@@ -295,12 +293,8 @@ GLcanvas.prototype.initShaders = function(gl_shader, frag, vert) {
     this.initAttribute(gl_shader, "vColA");
     this.initAttribute(gl_shader, "textureA");
 
-    this.initUniform(gl_shader, "ballHitu")
     this.initUniform(gl_shader, "frames_elapsed_u")
     this.initUniform(gl_shader, "hi_hat_u")
-    this.initUniform(gl_shader, "has_collided_u")
-    this.initUniform(gl_shader, "u_kernel")
-    this.initUniform(gl_shader, "u_textureSize")
     this.initUniform(gl_shader, "ambient_coeff_u");
     this.initUniform(gl_shader, "diffuse_coeff_u");
     this.initUniform(gl_shader, "specular_coeff_u");
@@ -319,8 +313,7 @@ GLcanvas.prototype.initShaders = function(gl_shader, frag, vert) {
 //    this.initUniform(gl_shader, "nMatU"); // Model's normal matrix
     this.initUniform(gl_shader, "lMatU"); // Lighting matrix
     this.initUniform(gl_shader, "lightPosU"); // Initial light's position
-    this.initUniform(gl_shader, "textureNumU");
-
+    
     for(var i_ = 0; i_ < 11; ++i_) {
 	this.initUniform(gl_shader, "sampler" + i_);
     }

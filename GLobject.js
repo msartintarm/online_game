@@ -353,17 +353,6 @@ GLobject.prototype.linkAttribs = function(gl_, shader_) {
     if(shader_.unis["frames_elapsed_u"] !== null)
     gl_.uniform1f(shader_.unis["frames_elapsed_u"], theCanvas.frame_count);
 
-    if(shader_.unis["u_textureSize"] !== null)
-    gl_.uniform2f(shader_.unis["u_textureSize"], 1024, 1024);
-
-    if(ball_shader_selectG  >= kNameG.length)
-	ball_shader_selectG = 0;
-
-    if(shader_.unis["u_kernel"] !== null)
-	gl_.uniform1fv(shader_.unis["u_kernel"], kernelsG[kNameG[ball_shader_selectG]]);
-    if(shader_.unis["u_textureSize"] !== null)
-    gl_.uniform2f(shader_.unis["u_textureSize"], 1024, 1024);
-
     if(shader_.unis["ambient_coeff_u"] !== null)
 	gl_.uniform1f(shader_.unis["ambient_coeff_u"], this.ambient_coeff);
     if(shader_.unis["diffuse_coeff_u"] !== null)
@@ -372,9 +361,6 @@ GLobject.prototype.linkAttribs = function(gl_, shader_) {
     // check to see if texture is used in shader
     gl_.uniform1i(shader_.unis["sampler0"], 
 		  gl_.tex_enum[this.textureNum]);
-
-    // check to see if texture is used in shader
-    gl_.uniform1f(shader_.unis["textureNumU"], 0);
 
     if(shader_.unis["specular_color_u"] !== null) { 
 	gl_.uniform3fv(shader_.unis["specular_color_u"], this.specular_color); }

@@ -184,11 +184,6 @@ varying float diffuseV;
 varying float specularV;
 varying vec3 colorV;
 
-uniform vec2 gaussFilter[7];
-uniform float ballHitu;
-uniform float has_collided_u;
-uniform vec2 u_Scale;
-
 varying vec3 reflectionV;
 varying vec3 viewPosV;
 varying vec3 vModel;
@@ -198,22 +193,7 @@ varying vec3 vertNorm;
 
 varying vec2 textureV;
 
-uniform float textureNumU;
-
-uniform float u_kernel[9];
-uniform vec2 u_textureSize;
-
 uniform sampler2D sampler0;
-uniform sampler2D sampler1;
-uniform sampler2D sampler2;
-uniform sampler2D sampler3;
-uniform sampler2D sampler4;
-uniform sampler2D sampler5;
-uniform sampler2D sampler6;
-uniform sampler2D sampler7;
-uniform sampler2D sampler8;
-uniform sampler2D sampler9;
-uniform sampler2D sampler10;
 
 //Specular function
 float specular() {
@@ -281,13 +261,7 @@ float the_beat = hi_hat_u;
 }
 
 void main(void) {
-
-  if (textureNumU < 0.1) { colorTexture(sampler0);
-  } else if (textureNumU < 1.1) { colorTexture(sampler1);
-  } else if (textureNumU < 2.1) { colorTexture(sampler2);
-  } else if (textureNumU < 3.1) { colorTexture(sampler3);
-  } else { colorTexture(sampler4);
-  }
+colorTexture(sampler0);
 }
 </textarea>
 	<textarea id="shader_frag_player" rows="20">
@@ -311,14 +285,7 @@ void colorTexture(sampler2D theSampler) {
     the_beat / 20. * texture2D(theSampler, textureV);
 }
 
-void main(void) { 
-  if (textureNumU < 0.1) { colorTexture(sampler0);
-  } else if (textureNumU < 1.1) { colorTexture(sampler1);
-  } else if (textureNumU < 2.1) { colorTexture(sampler2);
-  } else if (textureNumU < 3.1) { colorTexture(sampler3);
-  } else { colorTexture(sampler4);
-  }
-}
+void main(void) { colorTexture(sampler0); }
 </textarea>
 	<textarea id="shader_vert_default" rows="20">
 void main(void) {
