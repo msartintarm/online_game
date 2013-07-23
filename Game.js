@@ -1,14 +1,15 @@
+
+/**
+ * Creates and initializes a game.
+ */
+function Game() {  
+
 // Used in collision detection.
 const WALL_NONE = 0;
 const WALL_N = 1;
 const WALL_S = 2;
 const WALL_W = 3;
 const WALL_E = 4;
-
-/**
- * Creates and initializes a game.
- */
-function Game() {  
 
     var i; // for init loop
 
@@ -119,6 +120,8 @@ function Game() {
     
 
     this.initBuffers = function(gl_) {
+	
+	this.mapKeys(); 
 
 	GLobject.draw_optimized = true;
 
@@ -136,7 +139,8 @@ function Game() {
 
 	if(!this.web_audio) this.initWebAudio();
 	//    this.createAudio("music/elements.mp3");
-	this.audio[0] = this.createAudio("music/beats.mp3");
+	this.audio[0] = this.createAudio("music/beats.mp3", true);
+	this.audio[1] = this.createAudio("music/movin.wav", false);
 
 	this.player_string.initBuffers(gl_);
 	this.player.initBuffers(gl_);
@@ -360,7 +364,8 @@ function Game() {
 	var count = ++this.right_count;
 	if (count >= this.move_dist.length) { 
 	    this.in_right_move = false;
-	    if (this.right_key_down === true) { this.startRightMove(); this.moveRight(); }
+	    if (this.right_key_down === true) this.startRightMove();
+	    this.playSound();
 	    return;
 	}
 	
@@ -374,6 +379,7 @@ function Game() {
 	if (count >= this.move_dist.length) { 
 	    this.in_left_move = false;
 	    if (this.left_key_down === true) this.startLeftMove();
+	    this.playSound();
 	    return;
 	}
 
@@ -401,20 +407,39 @@ function Game() {
 		
     };
 
+    this.playSound = function() {
+	var audio = this.audio[1];
+	if(audio.playing) {
+	    audio.source.stop(0);
+	    audio.playing = false;
+	} else {
+	    // Load start time from offset.
+	    audio.source = this.web_audio.createBufferSource();
+	    audio.source.buffer = audio.buffer;
+	    audio.source.loop = true;
+	    audio.source.connect(this.web_audio.destination);
+	    audio.source.start(0,0);
+	    audio.playing = true;
+	}
+    };
+
     this.updateMovement = function() {
 
 	vec3.copy(this.movement_old, this.movement);
 
+	// TODO: restore functionality to these functions
 	if(this.player_x_pos < -7) this.startCameraLeftMove();
 	else if(this.player_x_pos > 7) this.startCameraRightMove();
 
 	// Check whether it's time to initiate a move that's been triggered.
         if (this.in_right_move === true && this.hi_hat == 10) { 
-	    this.right_started = true; } 
+	    this.right_started = true; this.playSound(); } 
         if (this.in_left_move === true && this.left_started === false && this.hi_hat == 10) { 
-	    this.left_started = true; } 
+	    this.left_started = true; this.playSound(); } 
 	if (this.in_jump === true && this.jump_started === false && this.hi_hat == 10) { 
 	    this.jump_started = true; } 
+
+
 
 	// Handle camera natively as it doesn't need much logic.
 	if (this.cam_in_right_move === true) {
@@ -453,33 +478,33 @@ function Game() {
 	}
 
 	// Can we move here, or would a collision prevent it?
-	var wall_hit = this.detectCollision();
-	if (wall_hit !== WALL_NONE) {
-
-	    // Collision. How far are we from the grid? Let's determine on a scale of 0-1.
-	    var grid_dist;
-	    switch (wall_hit) {
-	    case WALL_W:
-		grid_dist = this.movement[0] / this.grid;
-		grid_dist -= Math.floor(grid_dist);
-		this.movement[0] -= grid_dist * this.grid;
-		this.in_right_move = false;
-		break;
-	    case WALL_E:
-		grid_dist = this.movement[0] / this.grid;
-		grid_dist -= Math.ceil(grid_dist);
-		this.movement[0] -= grid_dist * this.grid;
-		this.in_left_move = false;
-		break;
-	    } 
+//	var wall_hit = this.detectCollision();
+//	if (wall_hit !== WALL_NONE) {
 
 	    var active_moves = "";
 	    if (this.in_left_move === true) active_moves += "l";
 	    if (this.in_right_move === true) active_moves += "r";
 	    if (this.in_jump === true) active_moves += "j";
-	    console.log("yo, collision. " + wall_hit + ", " + active_moves);
 
-	}
+	    // Collision. How far should we go to be on grid?
+	    var grid_dist;
+	    switch (this.detectCollision()) {
+	    case WALL_W:
+		// Convert to 1.0 scale, round to integer, convert back
+		this.movement[0] = this.grid * Math.floor(this.movement[0] / this.grid);
+		this.in_right_move = false;
+		this.playSound();
+		break;
+	    case WALL_E:
+		this.movement[0] = this.grid * Math.ceil(this.movement[0] / this.grid);
+		this.in_left_move = false;
+		this.playSound();
+		break;
+	    default: break; // WALL_NONE 
+	    } 
+
+
+//	}
 
     };
 
@@ -503,29 +528,34 @@ function Game() {
 	this.audio = [];
     };
 
-    this.handleAudioRequest = function(gl_audio, request) {
+    this.handleAudioRequest = function(gl_audio, request, play) {
 
 	this.web_audio.decodeAudioData(
 	    request.response,
 	    function(the_buffer) {
 		gl_audio.buffer = the_buffer;
-		// Save initial time we start audio, so we can pause / play.
-		gl_audio.source = this.web_audio.createBufferSource();
-		gl_audio.source.connect(this.low_pass);
-		gl_audio.source.buffer = gl_audio.buffer;
-		gl_audio.source.loop = true;
-		gl_audio.source.loopEnd = 2.0;
-		// Duplicate this for another buffer.
-		gl_audio.buffer2 = the_buffer;
-		gl_audio.source2 = this.web_audio.createBufferSource();
-		gl_audio.source2.connect(this.low_pass);
-		gl_audio.source2.buffer = gl_audio.buffer2;
-		gl_audio.elapsed_time = this.web_audio.currentTime;
-		gl_audio.offset = 0;
-		gl_audio.playing = true;
-		gl_audio.source.start(0,0);
-//		gl_audio.source2.start(2,0);
-		this.mapKeys(); }.bind(this)
+
+		if (play === true) {
+		    // Save initial time we start audio, so we can pause / play.
+		    gl_audio.source = this.web_audio.createBufferSource();
+		    gl_audio.source.connect(this.low_pass);
+		    gl_audio.source.buffer = gl_audio.buffer;
+		    gl_audio.source.loop = true;
+		    gl_audio.source.loopEnd = 2.0;
+		    // Duplicate this for another buffer.
+		    gl_audio.buffer2 = the_buffer;
+		    gl_audio.source2 = this.web_audio.createBufferSource();
+		    gl_audio.source2.connect(this.low_pass);
+		    gl_audio.source2.buffer = gl_audio.buffer2;
+		    gl_audio.elapsed_time = this.web_audio.currentTime;
+		    gl_audio.offset = 0;
+
+		    gl_audio.playing = true;
+		    gl_audio.source.start(0,0);
+		    gl_audio.source2.start(2,0);
+		}
+
+		}.bind(this)
 	);
     };
 
@@ -535,14 +565,14 @@ function Game() {
      * http://chromium.googlecode.com/svn/trunk/samples/audio/index.html
      */
 
-    this.createAudio = function(url) {
+    this.createAudio = function(url, to_play) {
 
 	var x = {};
 	var request = new XMLHttpRequest();
 	request.open("GET", url, true);
 	request.responseType = "arraybuffer"; // Does this work for any MIME request?
 	// Once request has loaded, load and start audio buffer
-	request.onload = this.handleAudioRequest.bind(this, x, request);
+	request.onload = this.handleAudioRequest.bind(this, x, request, to_play);
 	request.send();
 	return x;
     };
