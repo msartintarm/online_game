@@ -357,7 +357,7 @@ GLmatrix.prototype.setViewUniforms = function(gl_, shader_) {
     gl_.uniformMatrix4fv(shader_.unis["pMatU"], false, this.pMatrix);
     gl_.uniformMatrix4fv(shader_.unis["vMatU"], false, this.ivMatrix);
     gl_.uniformMatrix4fv(shader_.unis["lMatU"], false, this.ilMatrix);
-    gl_.uniform3fv(shader_.unis["lightPosU"], lightPos);
+//    gl_.uniform3fv(shader_.unis["lightPosU"], lightPos);
 };
 
 

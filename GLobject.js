@@ -350,9 +350,6 @@ GLobject.has_collided = 0;
 */
 GLobject.prototype.linkAttribs = function(gl_, shader_) {
 
-    if(shader_.unis["has_collided_u"] !== null)
-    gl_.uniform1f(shader_.unis["has_collided_u"], GLobject.has_collided);
-
     if(shader_.unis["frames_elapsed_u"] !== null)
     gl_.uniform1f(shader_.unis["frames_elapsed_u"], theCanvas.frame_count);
 
@@ -447,3 +444,5 @@ GLobject.prototype.draw = function(gl_) {
 };
 
 var FLATNORMS = false;
+
+GLobject.draw_optimized = false;

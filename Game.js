@@ -14,6 +14,7 @@ function Game() {
 
     // Env variable(s) - do not change during execution.
     this.log_music = false;
+    GLobject.draw_optimized = true;
 
     // handles movement
     this.grid = 50;
@@ -21,6 +22,7 @@ function Game() {
     this.movement_old = vec3.create();
     this.bg_movement = vec3.create();
     this.total = null;
+    this.total2 = null;
     this.cam_left_count = 0;
     this.cam_right_count = 0;
     this.in_jump = false;
@@ -68,7 +70,6 @@ function Game() {
     this.player_string = new GLstring(this.player_name, 
 				      TEXT_TEXTURE, 
 				      theCanvas.gl.shader_player);
-
     var player_width = this.grid;
     var bg_width = 1200;
     var floor_width = player_width;
@@ -142,21 +143,26 @@ function Game() {
 	    var FFTData = new Uint8Array(this.analyser.frequencyBinCount);
 	    this.analyser.getByteFrequencyData(FFTData);
 
+//	    console.log("%2.f %.2f %.2f ", FFTData[0], FFTData[1], FFTData[2]);
 	    var sum = FFTData[0] + FFTData[1] + FFTData[2];
-	    if(this.total === null) this.total = sum;
 
-	    if(sum/this.total > 2) { 
+	    if(this.total === null) this.total = sum;
+	    if(this.total < 0.1) this.total = 0.1;
+	    if(this.total2 === null) this.total2 = sum;
+
+	    // Rough ratio of this sound to previous sounds
+	    if(sum > 2 * this.total && sum > 1.5 * this.total2 ) { 
 		this.hi_hat = 11;
 		if (this.log_music) {
 		    console.log("%.2f", sum / this.total); 
 		}
 	    }
 
-	    this.total *= 0.80;
-	    this.total += (sum / 5);
+	    // I'm going to call this the 'rolling average' filter.
+	    this.total = this.total * 2/3 + sum/3;
+	    this.total2 = sum;
 	}
-	this.hi_hat -= 1;
-	if (this.hi_hat < 0) this.hi_hat = 0;
+	this.hi_hat = (this.hi_hat > 1) ? this.hi_hat - 1: 0;
 
 	// Analyse movement, which draws upon sound, and activated moves.
 	this.updateMovement();
@@ -167,14 +173,38 @@ function Game() {
 	    gl_.uniform1f(player_shader.unis["hi_hat_u"], this.hi_hat);
 	}
 
+	// The draw calls themself. Heavily optimize here by manually loading
+	// matrices and setting shaders. This reduces redundant calls
+	// to shader progs.
+
+	//    this.player : theCanvas.gl.shader_player
+	//    this.background : theCanvas.gl.shader_canvas
+	//    this.push_button : theCanvas.gl.shader
+
+
 	theMatrix.push();
 	theMatrix.translate(this.movement);
+
+	theCanvas.changeShader(theCanvas.gl.shader_player);
+
+    gl_.uniform3fv(theCanvas.gl.shader_player.unis["lightPosU"], [0,1,2]);
+
+
+
 	this.player.draw(gl_);
 	theMatrix.pop();
+
+	theCanvas.changeShader(theCanvas.gl.shader_canvas);
+    gl_.uniform3fv(theCanvas.gl.shader_canvas.unis["lightPosU"], [2,1,0]);
+
 	theMatrix.push();
 	theMatrix.translate(this.bg_movement);
 	this.background.draw(gl_);
 	theMatrix.pop();
+
+	theCanvas.changeShader(theCanvas.gl.shader);
+    gl_.uniform3fv(theCanvas.gl.shader.unis["lightPosU"], [0,1,2]);
+
 	this.push_button.draw(gl_);
 	for(i = 0; i < this.floor.length; ++i){
 	    this.floor[i].draw(gl_);
@@ -350,7 +380,6 @@ function Game() {
 
 	    // Collision detected. Which side of the box did we cross? Look at old
 	    // movement to determine this.
-//	    console.log(this.movement_old[1] + " " +  this.push_button.y_max);
 	    if (this.movement_old[1] >= this.push_button.y_max) return WALL_N;
 	    if (this.movement_old[1] + this.player_height <= this.push_button.y_min) return WALL_S;
 	    if (this.movement_old[0] - this.player_width >= this.push_button.x_max) return WALL_E;
@@ -358,33 +387,6 @@ function Game() {
 	} 
 	return WALL_NONE;
 		
-/*
-		// See how far we've travelled. Create correction parabola.
-		this.change_x = [];
-		var movement_total = 0;
-		var correction_total = 0;
-		var dist_remaining;
-		var x;
-
-
-		for (x = count; x <= 8; ++x) {
-		    movement_total += move_dist[x];
-		    var correction_num = 64 - (x*x);
-		    this.change_x.push(correction_num);
-		    correction_total += correction_num;
-		}
-		// Normalize.
-		for (x = 0; x < this.change_x.length; ++x) {
-		    this.change_x[x] *= (movement_total / correction_total);
-		}
-
-		// Initialize new move to replace the rest of left movement.
-		this.in_left_move = false;
-
-		// No need for 'change_started' as it execs immediately
-		this.in_change = true;
-		this.change_count = 0;
-*/
     };
 
     this.updateMovement = function() {
