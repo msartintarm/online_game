@@ -4,69 +4,7 @@ function GLshader() {
     this.fragment = [];
     this.vertex = [];
 
-    this.f_decls = "\
-precision mediump float;\n\
-\n\
-uniform float ambient_coeff_u;\n\
-uniform float frames_elapsed_u;\n\
-uniform float hi_hat_u;\n\
-uniform float diffuse_coeff_u;\n\
-uniform float specular_coeff_u;\n\
-uniform vec3 specular_color_u;\n\
-\n\
-varying vec3 distanceV;\n\
-varying float diffuseV;\n\
-varying float specularV;\n\
-varying vec3 colorV;\n\
-\n\
-uniform vec2 gaussFilter[7];\n\
-uniform float ballHitu;\n\
-uniform float has_collided_u;\n\
-uniform vec2 u_Scale;\n\
-\n\
-varying vec3 reflectionV;\n\
-varying vec3 viewPosV;\n\
-varying vec3 vModel;\n\
-varying vec4 lModel;\n\
-varying vec3 lightNorm;\n\
-varying vec3 vertNorm;\n\
-\n\
-varying vec2 textureV;\n\
-\n\
-uniform float textureNumU;\n\
-\n\
-uniform float u_kernel[9];\n\
-uniform vec2 u_textureSize;\n\
-\n\
-uniform sampler2D sampler0;\n\
-uniform sampler2D sampler1;\n\
-uniform sampler2D sampler2;\n\
-uniform sampler2D sampler3;\n\
-uniform sampler2D sampler4;\n\
-uniform sampler2D sampler5;\n\
-uniform sampler2D sampler6;\n\
-uniform sampler2D sampler7;\n\
-uniform sampler2D sampler8;\n\
-uniform sampler2D sampler9;\n\
-uniform sampler2D sampler10;\n\
-\n\
-//Specular function\n\
-float specular() {\n\
-\n\
-    vec3 reflectionV2 = reflect(normalize(lightNorm), normalize(vertNorm));\n\
-\n\
-\n\
-float specularV2 = dot(normalize(reflectionV2), \n\
-                    normalize(vModel.xyz));\n\
-    if (specularV2 <= 0.) { specularV2 = 0.0; }\n\
-    specularV2 = specularV2 * specularV2;\n\
-    specularV2 = specularV2 * specularV2;\n\
-    specularV2 = specularV2 * specularV2;\n\
-    specularV2 = specularV2 * specularV2;\n\
-    return specularV2;\n\
-}\n\
-";
-
+    this.f_decls = document.getElementById("shader_frag_decls").value;
     this.v_decls = document.getElementById("shader_decls").value;
 
 
@@ -198,12 +136,12 @@ void main(void) {\n\
 void main(void) {\n\
 \n\
 // Viewing space coordinates of light / vertex\n\
-vModel = (vMatU * mMatU  * vec4(vPosA, 1.0)).xyz;\n\
-lModel = vMatU * lMatU * vec4(lightPosU, 1.0);\n\
+vModel = (mvnMatU[1] * mvnMatU[0]  * vec4(vPosA, 1.0)).xyz;\n\
+lModel = mvnMatU[1] * lMatU * vec4(lightPosU, 1.0);\n\
 \n\
   // -- Position -- //\n\
 \n\
-  gl_Position = pMatU * vMatU * mMatU * vec4(vPosA, 1.0);\n\
+  gl_Position = pMatU * mvnMatU[1] * mvnMatU[0] * vec4(vPosA, 1.0);\n\
 \n\
   // -- Lighting -- //\n\
 \n\
@@ -213,7 +151,7 @@ lModel = vMatU * lMatU * vec4(lightPosU, 1.0);\n\
   // Diffuse component\n\
   lightNorm = normalize(lModel.xyz - vModel.xyz);\n\
 \n\
-  vertNorm = normalize((nMatU * vec4(vNormA,1.0)).xyz);\n\
+  vertNorm = normalize((mvnMatU[2] * vec4(vNormA,1.0)).xyz);\n\
   diffuseV = dot(vertNorm, lightNorm);\n\
   if (diffuseV < 0.0) { diffuseV = 0.0; }\n\
 }       \n\

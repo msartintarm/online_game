@@ -34,7 +34,6 @@
 
     <!-- Complex objects lv.1 -->
     <script src="Stool.js" type="text/javascript" async="async"></script>
-    <script src="Light.js" type="text/javascript" async="async"></script>
     <script src="SixSidedPrism.js" type="text/javascript" async="async"></script>
     <script src="Ball.js" type="text/javascript" async="async"></script>
     <script src="ThickCyl.js" type="text/javascript" async="async"></script>
@@ -170,6 +169,68 @@
     </div>
     <!-- Put this element one tag scope higher to hide it. -->
       <div class="shaders" id="shader1" style="display:none;">
+	<textarea id="shader_frag_decls" rows="20">
+precision mediump float;
+
+uniform float ambient_coeff_u;
+uniform float frames_elapsed_u;
+uniform float hi_hat_u;
+uniform float diffuse_coeff_u;
+uniform float specular_coeff_u;
+uniform vec3 specular_color_u;
+
+varying vec3 distanceV;
+varying float diffuseV;
+varying float specularV;
+varying vec3 colorV;
+
+uniform vec2 gaussFilter[7];
+uniform float ballHitu;
+uniform float has_collided_u;
+uniform vec2 u_Scale;
+
+varying vec3 reflectionV;
+varying vec3 viewPosV;
+varying vec3 vModel;
+varying vec4 lModel;
+varying vec3 lightNorm;
+varying vec3 vertNorm;
+
+varying vec2 textureV;
+
+uniform float textureNumU;
+
+uniform float u_kernel[9];
+uniform vec2 u_textureSize;
+
+uniform sampler2D sampler0;
+uniform sampler2D sampler1;
+uniform sampler2D sampler2;
+uniform sampler2D sampler3;
+uniform sampler2D sampler4;
+uniform sampler2D sampler5;
+uniform sampler2D sampler6;
+uniform sampler2D sampler7;
+uniform sampler2D sampler8;
+uniform sampler2D sampler9;
+uniform sampler2D sampler10;
+
+//Specular function
+float specular() {
+
+    vec3 reflectionV2 = reflect(normalize(lightNorm), normalize(vertNorm));
+
+
+float specularV2 = dot(normalize(reflectionV2), 
+                    normalize(vModel.xyz));
+    if (specularV2 <= 0.) { specularV2 = 0.0; }
+    specularV2 = specularV2 * specularV2;
+    specularV2 = specularV2 * specularV2;
+    specularV2 = specularV2 * specularV2;
+    specularV2 = specularV2 * specularV2;
+    return specularV2;
+}
+</textarea>
 	<textarea id="shader_decls" rows="20">
 precision mediump float;  
 
@@ -181,9 +242,7 @@ attribute vec2 textureA;
 
 // Matrixes
 uniform mat4 pMatU; // Position
-uniform mat4 mMatU; // Model
-uniform mat4 vMatU; // View
-uniform mat4 nMatU; // Normal
+uniform mat4 mvnMatU[3]; // Model, View, Normal
 uniform mat4 lMatU; // Lighting
 
 // Position attributes
@@ -264,17 +323,17 @@ void main(void) {
 	<textarea id="shader_vert_default" rows="20">
 void main(void) {
                   // -- Position -- //
-  gl_Position = pMatU * vMatU * mMatU * vec4(vPosA, 1.0);
+  gl_Position = pMatU * mvnMatU[1] * mvnMatU[0] * vec4(vPosA, 1.0);
 
 // Viewing space coordinates of light / vertex
-  vModel = (vMatU * mMatU  * vec4(vPosA, 1.0)).xyz;
-  lModel = vMatU * lMatU * vec4(lightPosU, 1.0);
+  vModel = (mvnMatU[1] * mvnMatU[0]  * vec4(vPosA, 1.0)).xyz;
+  lModel = mvnMatU[1] * lMatU * vec4(lightPosU, 1.0);
 
 
                   // -- Lighting -- //
   distanceV = lModel.xyz - vModel.xyz;
   lightNorm = normalize(distanceV);
-  vertNorm = (nMatU * vec4(vNormA,1.0)).xyz;
+  vertNorm = (mvnMatU[2] * vec4(vNormA,1.0)).xyz;
 
   // Ambient components we'll leave until frag shader
   colorV = vColA;
@@ -288,18 +347,18 @@ void main(void) {
 	<textarea id="shader_vert_player" rows="20">
 void main(void) {
                   // -- Position -- //
-//  gl_Position = pMatU * vMatU * mMatU * vec4(vPosA * (1.0 + (hi_hat_u / 40.0)), 1.0);
-  gl_Position = pMatU * vMatU * mMatU * vec4(vPosA, 1.0);
+//  gl_Position = pMatU * mvnMatU[1] * mvnMatU[0] * vec4(vPosA * (1.0 + (hi_hat_u / 40.0)), 1.0);
+  gl_Position = pMatU * mvnMatU[1] * mvnMatU[0] * vec4(vPosA, 1.0);
 
 // Viewing space coordinates of light / vertex
-  vModel = (vMatU * mMatU  * vec4(vPosA, 1.0)).xyz;
-  lModel = vMatU * lMatU * vec4(lightPosU, 1.0);
+  vModel = (mvnMatU[1] * mvnMatU[0]  * vec4(vPosA, 1.0)).xyz;
+  lModel = mvnMatU[1] * lMatU * vec4(lightPosU, 1.0);
 
 
                   // -- Lighting -- //
   distanceV = lModel.xyz - vModel.xyz;
   lightNorm = normalize(distanceV);
-  vertNorm = (nMatU * vec4(vNormA,1.0)).xyz;
+  vertNorm = (mvnMatU[2] * vec4(vNormA,1.0)).xyz;
 
   // Ambient components we'll leave until frag shader
   colorV = vColA;

@@ -121,6 +121,17 @@ function Game() {
 
     this.initBuffers = function(gl_) {
 
+	// Basically we're optimizing a call ourselves.
+	theCanvas.changeShader(theCanvas.gl.shader);
+	theMatrix.setViewUniforms(theCanvas.gl, theCanvas.gl.shader);
+	gl_.uniformMatrix4fv(theCanvas.gl.shader.unis["pMatU"], false, theMatrix.pMatrix);
+	theCanvas.changeShader(theCanvas.gl.shader_player);
+	theMatrix.setViewUniforms(theCanvas.gl, theCanvas.gl.shader_player);
+	gl_.uniformMatrix4fv(theCanvas.gl.shader_player.unis["pMatU"], false, theMatrix.pMatrix);
+	theCanvas.changeShader(theCanvas.gl.shader_canvas);
+	theMatrix.setViewUniforms(theCanvas.gl, theCanvas.gl.shader_canvas);
+	gl_.uniformMatrix4fv(theCanvas.gl.shader_canvas.unis["pMatU"], false, theMatrix.pMatrix);
+
 	if(!this.web_audio) this.initWebAudio();
 	//    this.createAudio("music/elements.mp3");
 	this.audio[0] = this.createAudio("music/beats.mp3");
@@ -143,7 +154,6 @@ function Game() {
 	    var FFTData = new Uint8Array(this.analyser.frequencyBinCount);
 	    this.analyser.getByteFrequencyData(FFTData);
 
-//	    console.log("%2.f %.2f %.2f ", FFTData[0], FFTData[1], FFTData[2]);
 	    var sum = FFTData[0] + FFTData[1] + FFTData[2];
 
 	    if(this.total === null) this.total = sum;
@@ -167,7 +177,6 @@ function Game() {
 	// Analyse movement, which draws upon sound, and activated moves.
 	this.updateMovement();
 
-	var player_shader = this.player.o.shader;
 	if (!!player_shader && player_shader.unis["hi_hat_u"] !== -1) {
 	    theCanvas.changeShader(player_shader);
 	    gl_.uniform1f(player_shader.unis["hi_hat_u"], this.hi_hat);
@@ -181,34 +190,35 @@ function Game() {
 	//    this.background : theCanvas.gl.shader_canvas
 	//    this.push_button : theCanvas.gl.shader
 
+	theCanvas.changeShader(theCanvas.gl.shader);
+	theMatrix.setViewUniforms(theCanvas.gl, theCanvas.gl.shader);
+
+	for(i = 0; i < this.floor.length; ++i){
+	    this.floor[i].draw(gl_);
+	}
+
+	this.push_button.draw(gl_);
 
 	theMatrix.push();
 	theMatrix.translate(this.movement);
 
-	theCanvas.changeShader(theCanvas.gl.shader_player);
-
-    gl_.uniform3fv(theCanvas.gl.shader_player.unis["lightPosU"], [0,1,2]);
-
-
+	var player_shader = this.player.o.shader;
+	theCanvas.changeShader(player_shader);
+	theMatrix.setVertexUniforms(theCanvas.gl, player_shader);
+	gl_.uniform1f(player_shader.unis["hi_hat_u"], this.hi_hat);
 
 	this.player.draw(gl_);
 	theMatrix.pop();
 
-	theCanvas.changeShader(theCanvas.gl.shader_canvas);
-    gl_.uniform3fv(theCanvas.gl.shader_canvas.unis["lightPosU"], [2,1,0]);
-
 	theMatrix.push();
 	theMatrix.translate(this.bg_movement);
+
+	theCanvas.changeShader(theCanvas.gl.shader_canvas);
+	theMatrix.setVertexUniforms(theCanvas.gl, theCanvas.gl.shader_canvas);
+
 	this.background.draw(gl_);
 	theMatrix.pop();
 
-	theCanvas.changeShader(theCanvas.gl.shader);
-    gl_.uniform3fv(theCanvas.gl.shader.unis["lightPosU"], [0,1,2]);
-
-	this.push_button.draw(gl_);
-	for(i = 0; i < this.floor.length; ++i){
-	    this.floor[i].draw(gl_);
-	}
 	
     };
 

@@ -435,10 +435,14 @@ GLobject.prototype.draw = function(gl_) {
     else
 	shader_ = gl_.shader;
 
-    theCanvas.changeShader(shader_);
-
-    theMatrix.setViewUniforms(gl_, shader_);
-    theMatrix.setVertexUniforms(gl_, shader_);
+    // The high level object is expected to handle these things itself
+    // if this is off (it'll set the shaders itself).
+    if (GLobject.draw_optimized === false) {
+	theCanvas.changeShader(shader_);
+	theMatrix.setViewUniforms(gl_, shader_);
+	theMatrix.setVertexUniforms(gl_, shader_);
+    }
+    
     this.linkAttribs(gl_, shader_);
     this.drawElements(gl_);
 };

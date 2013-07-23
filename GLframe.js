@@ -106,28 +106,14 @@ GLframe.prototype.drawScene = function(gl_) {
 	      gl_.DEPTH_BUFFER_BIT);
 
     GLframe.frame_draw = true;
-    theMatrix.lightTranslate([0,-400,0]); 
     
-    var tempMatrix = mat4.clone(theMatrix.vMatrix);
-
-    mat4.translate(theMatrix.vMatrix, 
-		   theMatrix.vMatrix, 
-		   [0, this.height, 0]);
-    mat4.rotate(theMatrix.vMatrix, 
-		theMatrix.vMatrix, 
-		-Math.PI/2, [1,0,0]);
-    theMatrix.vMatrixChanged = true;
+    // edit vMatrix here
+    // theMatrix.vMatrixChanged = true;
 
     theCanvas.drawScene();
 
-    mat4.identity(theMatrix.vMatrix);
-    theMatrix.lightTranslate([0, 400,0]); 
-    theMatrix.vMatrixChanged = true;
     this.playa.draw(gl_);
     GLframe.frame_draw = false;
-
-    mat4.copy(theMatrix.vMatrix, tempMatrix);
-    theMatrix.vMatrixChanged = true;
 
     gl_.bindFramebuffer(gl_.FRAMEBUFFER, null);
     gl_.bindTexture(gl_.TEXTURE_2D, this.texture);

@@ -305,10 +305,18 @@ GLcanvas.prototype.initShaders = function(gl_shader, frag, vert) {
     this.initUniform(gl_shader, "diffuse_coeff_u");
     this.initUniform(gl_shader, "specular_coeff_u");
     this.initUniform(gl_shader, "specular_color_u");
+
+    // 3 matrixes packed into a size 3 array.
+    // [0] is model, [1] is view, [2] is normal.
+    // Perspective never changes, so is left out.
+    // Another reason it makes sense to pack these is if one
+    // changes, they all do.
+    this.initUniform(gl_shader, "mvnMatU"); 
+
     this.initUniform(gl_shader, "pMatU"); // Perspecctive matrix
-    this.initUniform(gl_shader, "mMatU"); // Model matrix
-    this.initUniform(gl_shader, "vMatU"); // Viewing matrix
-    this.initUniform(gl_shader, "nMatU"); // Model's normal matrix
+//    this.initUniform(gl_shader, "mMatU"); // Model matrix
+//    this.initUniform(gl_shader, "vMatU"); // Viewing matrix
+//    this.initUniform(gl_shader, "nMatU"); // Model's normal matrix
     this.initUniform(gl_shader, "lMatU"); // Lighting matrix
     this.initUniform(gl_shader, "lightPosU"); // Initial light's position
     this.initUniform(gl_shader, "textureNumU");

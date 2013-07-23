@@ -6,8 +6,16 @@
  */
 function GLmatrix() {
 
+    this.matrices = new Float32Array(48);
+
     // Model, viewing, and light matrix
-    this.mMatrix = mat4.create();
+    this.mMatrix = this.matrices.subarray(0, 16);
+    this.ivMatrix = this.matrices.subarray(16,32);
+    this.nMatrix = this.matrices.subarray(32,48);
+
+    mat4.identity(this.mMatrix);
+    mat4.identity(this.ivMatrix);
+    mat4.identity(this.nMatrix);
     this.vMatrix = mat4.create();
     this.pMatrix = mat4.create();
     this.lightMatrix = mat4.create();
@@ -21,14 +29,14 @@ function GLmatrix() {
     
     // Inverted viewing matrix, must be recomputed each
     // time the viewing matrix changes
-    this.ivMatrix = mat4.create();
+//    this.ivMatrix = mat4.create();
 
     // Ditto wit hinverted lighting matrix
     this.ilMatrix = mat4.create();
 
     // Normal and modelview matrices, which need to be
     // recomputed each time the model matrix changes
-    this.nMatrix = mat4.create();   // normal
+//    this.nMatrix = mat4.create();   // normal
     this.mvMatrix = mat4.create();  // modelview
 
     // These flags tell us whether to update the matrixes above
@@ -92,31 +100,6 @@ GLmatrix.prototype.vTranslate = function(vector) {
 		   this.vMatrixNew, 
 		   vector); 
     this.vMatrixNewChanged = true;
-};
-
-GLmatrix.prototype.lightTranslate = function(vector) {
-    mat4.translate(this.lightMatrix,
-		   this.lightMatrix, 
-		   vector); 
-    this.lightMatrixChanged = true;
-};
-
-GLmatrix.prototype.lightRotate = function(x_change, y_change) {
-
-    var transLightMatrix = mat4.create();
-    mat4.rotate(
-	transLightMatrix,
-	transLightMatrix,
-	y_change,
-	[0, 1, 0]);
-    mat4.rotate(transLightMatrix,
-		transLightMatrix,
-		x_change,
-		[1, 0, 0]);
-    mat4.multiply(this.lightMatrix, 
-		  transLightMatrix,
-		  this.lightMatrix);
-    this.lightMatrixChanged = true;
 };
 
 GLmatrix.prototype.translateN = function(vector) {
@@ -344,6 +327,7 @@ GLmatrix.prototype.update = function() {
 GLmatrix.prototype.setViewUniforms = function(gl_, shader_) {
 
     if (this.pMatrixChanged === true) {
+	gl_.uniformMatrix4fv(shader_.unis["pMatU"], false, this.pMatrix);
 	this.pMatrixChanged = false;
     }
     if (this.vMatrixChanged === true) {
@@ -354,10 +338,8 @@ GLmatrix.prototype.setViewUniforms = function(gl_, shader_) {
 	this.vMatrixChanged = false;
     }
 
-    gl_.uniformMatrix4fv(shader_.unis["pMatU"], false, this.pMatrix);
-    gl_.uniformMatrix4fv(shader_.unis["vMatU"], false, this.ivMatrix);
+    gl_.uniformMatrix4fv(shader_.unis["mvnMatU"], false, this.matrices);
     gl_.uniformMatrix4fv(shader_.unis["lMatU"], false, this.ilMatrix);
-//    gl_.uniform3fv(shader_.unis["lightPosU"], lightPos);
 };
 
 
@@ -375,8 +357,8 @@ GLmatrix.prototype.setVertexUniforms = function(gl_, shader_) {
 	mat4.transpose(this.nMatrix, this.nMatrix);
 	this.mMatrixChanged = false;
     }
-    gl_.uniformMatrix4fv(shader_.unis["mMatU"], false, this.mMatrix);
-    gl_.uniformMatrix4fv(shader_.unis["nMatU"], false, this.nMatrix);
+
+    gl_.uniformMatrix4fv(shader_.unis["mvnMatU"], false, this.matrices);
 };
 
 GLmatrix.prototype.push = function() {
