@@ -12,10 +12,6 @@ function GLstring(text_to_write, string_num, shader_) {
     this.canvas = document.getElementById('textureCanvas');
     this.sampler = (++ this.shader.sampler);
     this.texture = -1;
-    return this;
-}
-
-GLstring.prototype.initBuffers = function(gl_) {
 
     var ctx = this.canvas.getContext("2d");
     if(!ctx) { alert("Error initializing text."); }
@@ -45,6 +41,11 @@ GLstring.prototype.initBuffers = function(gl_) {
     ctx.fillText(this.text, this.canvas.width/2 + 2, this.canvas.height/2 + 2);
     ctx.fillStyle = "#556677";
     ctx.fillText(this.text, this.canvas.width/2 + 3, this.canvas.height/2 + 3);
+
+    return this;
+}
+
+GLstring.prototype.initBuffers = function(gl_) {
 
   if(this.texture === -1) this.texture = gl_.createTexture();
     gl_.activeTexture(gl_.TEXTURE0 + this.active);

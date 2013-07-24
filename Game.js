@@ -70,6 +70,19 @@ const WALL_E = 4;
     this.player_string = new GLstring(this.player_name, 
 				      TEXT_TEXTURE, 
 				      theCanvas.gl.shader_player);
+    this.left_string = new GLstring(this.player_name, 
+				      TEXT_TEXTURE, 
+				      theCanvas.gl.shader_player);
+    this.right_string = new GLstring(this.player_name, 
+				      TEXT_TEXTURE, 
+				      theCanvas.gl.shader_player);
+    this.jump_string = new GLstring(this.player_name, 
+				      TEXT_TEXTURE, 
+				      theCanvas.gl.shader_player);
+    this.collision_string = new GLstring(this.player_name, 
+				      TEXT_TEXTURE, 
+				      theCanvas.gl.shader_player);
+
     var player_width = this.grid;
     var bg_width = 1200;
     var floor_width = player_width;
@@ -139,8 +152,18 @@ const WALL_E = 4;
 
 	if(!this.web_audio) this.initWebAudio();
 	//    this.createAudio("music/elements.mp3");
-	this.audio[0] = this.createAudio("music/beats.mp3", true);
-	this.audio[1] = this.createAudio("music/movin.wav", false);
+
+	// createAudio(URL, destination node, loop[, loop offset, loop time])
+	// These are at 120 BPM: 1 sec = 2 beats
+	// Low-pass input detects movement, occuring on the half-beat; slightly below 0.25s
+	this.audio[0] = this.createAudio("music/beats.mp3", 
+					 this.low_pass, true, 0.22, 2.0);
+	// Non-looping sound, which will be triggered by the above sample
+	this.audio[1] = this.createAudio("music/electro_hat.wav", 
+					 this.web_audio.destination, false);
+	// Rest of the song.
+	this.audio[2] = this.createAudio("music/backing_beat.wav", 
+					 this.web_audio.destination, true, 0.0, 4.0);
 
 	this.player_string.initBuffers(gl_);
 	this.player.initBuffers(gl_);
@@ -337,14 +360,6 @@ const WALL_E = 4;
 	this.cam_in_right_move = true;
     };
 
-    this.startRightMove = function() {
-
-	if (this.in_right_move === true) return;
-	this.right_count = -1;
-	this.right_started = false;
-	this.in_right_move = true;
-    };
-
     this.changeMovement = function() {
 	var count = ++this.change_count;
 	if (count >= this.change_x.length) { 
@@ -365,7 +380,7 @@ const WALL_E = 4;
 	if (count >= this.move_dist.length) { 
 	    this.in_right_move = false;
 	    if (this.right_key_down === true) this.startRightMove();
-	    this.playSound();
+//	    this.playSound();
 	    return;
 	}
 	
@@ -379,7 +394,7 @@ const WALL_E = 4;
 	if (count >= this.move_dist.length) { 
 	    this.in_left_move = false;
 	    if (this.left_key_down === true) this.startLeftMove();
-	    this.playSound();
+//	    this.playSound();
 	    return;
 	}
 
@@ -388,20 +403,20 @@ const WALL_E = 4;
 
     };
 
-    this.detectCollision = function() {
+    this.detectCollision = function(object) {
 
 	// First, check vertical indexes. Next, check horizontal indexes.
-	if (this.movement[1] + this.player_height > this.push_button.y_min &&
-	    this.movement[1] < this.push_button.y_max &&
-	    this.movement[0] - this.player_width < this.push_button.x_max && 
-	    this.movement[0] + this.player_width > this.push_button.x_min) {
+	if (this.movement[1] + this.player_height > object.y_min &&
+	    this.movement[1] < object.y_max &&
+	    this.movement[0] - this.player_width < object.x_max && 
+	    this.movement[0] + this.player_width > object.x_min) {
 
 	    // Collision detected. Which side of the box did we cross? Look at old
 	    // movement to determine this.
-	    if (this.movement_old[1] >= this.push_button.y_max) return WALL_N;
-	    if (this.movement_old[1] + this.player_height <= this.push_button.y_min) return WALL_S;
-	    if (this.movement_old[0] - this.player_width >= this.push_button.x_max) return WALL_E;
-	    if (this.movement_old[0] + this.player_width <= this.push_button.x_min) return WALL_W;
+	    if (this.movement_old[1] >= object.y_max) return WALL_N;
+	    if (this.movement_old[1] + this.player_height <= object.y_min) return WALL_S;
+	    if (this.movement_old[0] - this.player_width >= object.x_max) return WALL_E;
+	    if (this.movement_old[0] + this.player_width <= object.x_min) return WALL_W;
 	} 
 	return WALL_NONE;
 		
@@ -409,18 +424,11 @@ const WALL_E = 4;
 
     this.playSound = function() {
 	var audio = this.audio[1];
-	if(audio.playing) {
-	    audio.source.stop(0);
-	    audio.playing = false;
-	} else {
-	    // Load start time from offset.
-	    audio.source = this.web_audio.createBufferSource();
-	    audio.source.buffer = audio.buffer;
-	    audio.source.loop = true;
-	    audio.source.connect(this.web_audio.destination);
-	    audio.source.start(0,0);
-	    audio.playing = true;
-	}
+	// Load start time from offset.
+	this.audio[1].source = this.web_audio.createBufferSource();
+	this.audio[1].source.buffer = this.audio[1].buffer;
+	this.audio[1].source.connect(this.web_audio.destination);
+	this.audio[1].source.start(0,0);
     };
 
     this.updateMovement = function() {
@@ -488,17 +496,23 @@ const WALL_E = 4;
 
 	    // Collision. How far should we go to be on grid?
 	    var grid_dist;
-	    switch (this.detectCollision()) {
+	    switch (this.detectCollision(this.push_button)) {
 	    case WALL_W:
 		// Convert to 1.0 scale, round to integer, convert back
 		this.movement[0] = this.grid * Math.floor(this.movement[0] / this.grid);
 		this.in_right_move = false;
-		this.playSound();
 		break;
 	    case WALL_E:
 		this.movement[0] = this.grid * Math.ceil(this.movement[0] / this.grid);
 		this.in_left_move = false;
-		this.playSound();
+		break;
+	    case WALL_N: // Here, just move to the top of the wall.
+		this.movement[1] = this.push_button.y_max;
+		this.in_jump = false;
+		break;
+	    case WALL_S:
+		this.movement[1] = 0;
+		this.in_jump = false;
 		break;
 	    default: break; // WALL_NONE 
 	    } 
@@ -528,53 +542,77 @@ const WALL_E = 4;
 	this.audio = [];
     };
 
-    this.handleAudioRequest = function(gl_audio, request, play) {
+    this.handleAudioRequest = function(gl_audio, request) {
 
 	this.web_audio.decodeAudioData(
 	    request.response,
 	    function(the_buffer) {
 		gl_audio.buffer = the_buffer;
-
-		if (play === true) {
-		    // Save initial time we start audio, so we can pause / play.
-		    gl_audio.source = this.web_audio.createBufferSource();
-		    gl_audio.source.connect(this.low_pass);
-		    gl_audio.source.buffer = gl_audio.buffer;
-		    gl_audio.source.loop = true;
-		    gl_audio.source.loopEnd = 2.0;
-		    // Duplicate this for another buffer.
-		    gl_audio.buffer2 = the_buffer;
-		    gl_audio.source2 = this.web_audio.createBufferSource();
-		    gl_audio.source2.connect(this.low_pass);
-		    gl_audio.source2.buffer = gl_audio.buffer2;
-		    gl_audio.elapsed_time = this.web_audio.currentTime;
-		    gl_audio.offset = 0;
-
-		    gl_audio.playing = true;
-		    gl_audio.source.start(0,0);
-		    gl_audio.source2.start(2,0);
-		}
-
-		}.bind(this)
+		if((--this.audio_to_load) === 0) this.playMusic();
+	    }.bind(this)
 	);
     };
 
+    this.audio_to_load = 0;
+
     /**
-     * Creates an audio element, sets it up, and starts it.
+     * Makes an audio object, sets it up, and starts it.
      * Uses the following as a ref:
      * http://chromium.googlecode.com/svn/trunk/samples/audio/index.html
      */
+    this.createAudio = function(url, destination, auto_start, loop_delay, loop_length) {
 
-    this.createAudio = function(url, to_play) {
-
-	var x = {};
+	// Will be decremented once it's loaded
+	this.audio_to_load ++;
+	var new_audio = {};
+	new_audio.auto_play = auto_start;
+	new_audio.dest = destination;
+	if (auto_start === true) {
+	    new_audio.delay = loop_delay;
+	    new_audio.length = loop_length;
+	}
 	var request = new XMLHttpRequest();
 	request.open("GET", url, true);
 	request.responseType = "arraybuffer"; // Does this work for any MIME request?
 	// Once request has loaded, load and start audio buffer
-	request.onload = this.handleAudioRequest.bind(this, x, request, to_play);
+	request.onload = this.handleAudioRequest.bind(this, new_audio, request);
 	request.send();
-	return x;
+	return new_audio;
+    };
+
+    /**
+     * Once all audio elements are loaded, call them with specific start intervals.
+     */
+    this.playMusic = function() {
+
+	// Asynchronously set up each audio element
+	this.audio.forEach(
+	    function(gl_audio) {
+
+		if (gl_audio.auto_play === true) {
+		    // Save initial time we start audio, so we can pause / play.
+		    gl_audio.source = this.web_audio.createBufferSource();
+		    gl_audio.source.connect(gl_audio.dest);
+		    gl_audio.source.buffer = gl_audio.buffer;
+		    gl_audio.source.loop = true;
+		    gl_audio.source.loopEnd = gl_audio.length;
+		    gl_audio.elapsed_time = this.web_audio.currentTime;
+		    gl_audio.offset = 0;
+
+		    gl_audio.playing = true;
+		    gl_audio.source.start(gl_audio.delay,0);
+		}
+	    }, this);
+
+	// Done setting up. They will play one second after the start of the loop.
+	var time = this.web_audio.currentTime + 1;
+	for (var i = 0; i < this.audio.length; ++i) {
+	    if (this.audio[i].auto_play === true) {
+		this.audio[i].source.start(time - this.web_audio.currentTime
+					    + this.audio[i].delay, 0);
+	    }
+	}
+
     };
 
     return this;
