@@ -3,7 +3,7 @@
 **Title:** Brother Beat
 
 **Author:** Michael Vello Sartin-Tarm (credit goes to Christopher Aberger for 
- helping create [the predecessor](https://github.com/msartintarm/online_game)
+ helping create [the predecessor](https://github.com/msartintarm/online_game))
 
 **Description:** A combination 2D-3D game that's synced to audio! Work-in-progress.. this is ~ version 0.05.
 
