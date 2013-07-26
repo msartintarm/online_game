@@ -43,7 +43,7 @@ const WALL_E = 4;
 
     // Move distance is a group of numbers, normalized so their sum is 1.0
     this.move_dist = [];
-    move_total = 0;
+    var move_total = 0;
     for (i = 0; i <= 8; ++i) {
 	var move_num = 64 - (i*i);
 	this.move_dist.push (move_num);
@@ -527,8 +527,6 @@ const WALL_E = 4;
 	if (typeof AudioContext !== "undefined") this.web_audio = new AudioContext();
 	else if (typeof webkitAudioContext !== "undefined") this.web_audio = new webkitAudioContext();
 	else throw new Error('Use a browser that supports AudioContext for music.');
-
-	this.web_audio.sampleRate = 22050;
 
 	this.analyser = this.web_audio.createAnalyser();
 	this.analyser.fftSize = 32;

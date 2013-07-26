@@ -43,9 +43,6 @@ GLcanvas.prototype.init = function() {
 
 GLcanvas.prototype.createScene = function(objToDraw) {
 
-    mazeMode = 0;
-    stadiumMode = 0;
-
     if(objToDraw == "cylinder") {
 	this.objects.push(new Cylinder(1, 4, 5, 8, 3));
     } else if(objToDraw == "sphere") {
@@ -107,12 +104,13 @@ GLcanvas.prototype.start = function(theScene) {
 
 	// One-time display methods
 	document.getElementById("header").style.display = "none";
-	document.getElementById("title2").style.display = "none";
+	document.getElementById("button_table").style.display = "none";
 	document.getElementById("footer").style.display = "none";
 
-	this.canvas.style.display = "inline-block";
-	this.canvas.style.width = "100%";
-	this.canvas.width = this.canvas.offsetWidth - 16;
+	this.canvas.style.display = "block";
+//	this.canvas.style.width = "100%";
+//	this.canvas.width = this.canvas.offsetWidth - 16;
+	this.canvas.width = window.innerWidth * .75 - 5;
 	this.canvas.height = window.innerHeight - 25;
 
 	if(this.initGL() !== 0) {
@@ -230,7 +228,7 @@ GLcanvas.prototype.initGL = function() {
 };
 
 GLcanvas.prototype.resize = function() {
-    this.canvas.width = this.canvas.offsetWidth - 16;
+    this.canvas.width = window.innerWidth * .75 - 5;
     this.canvas.height = window.innerHeight - 25;
     this.gl.viewport(0, 0, this.gl.drawingBufferWidth, 
 		     this.gl.drawingBufferHeight);

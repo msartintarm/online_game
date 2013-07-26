@@ -48,11 +48,24 @@ function _Torus(a,b) {
     return newTorus;
 }
 
+function _obj_function(f_in) {
+
+    var f = function() {
+	for(var i = 0; i < this.objs.length; ++i) {
+	    this.objs[i].f_in;
+	}
+    };
+    return f;
+}
+
+//    _objsInitBuffers = _obj_function(initBuffers(gl_));
 /**
  *  Functions for high-level objects
  *  that contain arrays of shapes
  */
 function _objsInitBuffers(gl_) {
+
+
     for(var i = 0; i < this.objs.length; ++i) {
 	this.objs[i].initBuffers(gl_);
     }
@@ -240,12 +253,9 @@ var mouse_movement = false;
 
 function handleMouseDown(event) {
     GLobject.has_collided += 3;
-    if(!stadiumMode || (stadiumMode && StadiumInitSeqNum == 4 && !freeze)){
-
-	mouse_movement = !mouse_movement;
-	click_x = event.clientX;
-	click_y = event.clientY;
-    }
+    mouse_movement = !mouse_movement;
+    click_x = event.clientX;
+    click_y = event.clientY;
 }
 
 function handleMouseUp(event) {}
