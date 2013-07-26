@@ -32,18 +32,32 @@ canvas#glcanvas {
     display: none;
 }
 
+body:before, body:after {
+    content: "";
+    position: fixed;
+    left: 0;
+    right: 0;
+    height: 10px;
+}
+body:before {
+    top: 0;
+    background-color: #696969;
+}
+body:after {
+    bottom: 0;
+    background-color: #696969;
+}
+
 body {
-    width:99%;
-    height:99%;
     background-color: #111111;
     font-family: Verdana, sans-serif;
 }
 
 div#banner{
-    position: absolute;
     background: url(graphics/banner.gif);
 /*    height: 200px;    */
-    width:18%;
+    width:25%;
+    float:left;
     text-align:center;
     color: #FF0000;
     line-height:200%;
@@ -52,12 +66,13 @@ div#banner{
 }
 
 div.main {
-    display: inline-block;
-    position: relative;
+    float:right;
     width:75%;
     text-align: justify;
-    margin: 0% 0% 0% 25%;
-        background-color: #cccccc;
+    background-color: #cccccc;
+    color: #111144;
+    font-size: 23px;
+    text-align: center; 
 }
  
 div.space {
@@ -75,12 +90,7 @@ div.padDiv {
 div.title { 
     position: relative;
     width:90%;
-    display: block;
-    float: left;
     margin: 17px 17px;
-    font-size: 23px;
-    text-align: center; 
-    color: #111144;
 }
 
 div.content { 
@@ -104,7 +114,7 @@ input.stadium_input {
     font-variant: small-caps;
 }
 
-input.button_add {
+input.start_button {
     width:100%;
     background-color: transparent; /* make the button transparent */
     border: none;           /* assuming we don't want any borders */
@@ -115,46 +125,24 @@ input.button_add {
     color: inherit;
 }
 
-div.topLeft {     
+input.start_button:hover {
+    color: #6677CC;
+}
+
+div.topLeft, div.topRight, div.topAcross, div.lowAcross, 
+div.leftSide, div.rightSide, div.lowLeft, div.lowRight {     
     position: absolute;
     height: 100%;
     width: 100%;
-    background: url(graphics/cornerTopLeftNew.gif) top left no-repeat; }
-div.topRight {     
-    position: absolute;
-    height: 100%;
-    width: 100%;
-    background: url(graphics/cornerTopRightNew.gif) top right no-repeat; }
-div.topAcross {     
-    position: absolute; 
-    height: 100%;
-    width: 100%;
-    background: url(graphics/topAcrossNew.gif) top repeat-x; }
-div.lowAcross {     
-    position: absolute; 
-    height: 100%;
-    width: 100%;
-    background: url(graphics/lowAcrossNew.gif) bottom repeat-x; }
-div.leftSide {     
-    position: absolute; 
-    height: 100%;
-    width: 100%;
-    background: url(graphics/leftSideNew.gif) left repeat-y; }
-div.rightSide {     
-    position: absolute; 
-    height: 100%;
-    width: 100%;
-    background: url(graphics/rightSideNew.gif) right repeat-y; }
-div.lowLeft {     
-    position: absolute;
-    height: 100%;
-    width: 100%;
-    background: url(graphics/cornerLowLeftNew.gif) bottom left no-repeat; }
-div.lowRight { 
-    position: absolute;
-    height: 100%;
-    width: 100%;
-    background: url(graphics/cornerLowRightNew.gif) bottom right no-repeat; }
+}
+div.topLeft { background: url(graphics/cornerTopLeftNew.gif) top left no-repeat; }
+div.topRight { background: url(graphics/cornerTopRightNew.gif) top right no-repeat; }
+div.topAcross { background: url(graphics/topAcrossNew.gif) top repeat-x; }
+div.lowAcross { background: url(graphics/lowAcrossNew.gif) bottom repeat-x; }
+div.leftSide { background: url(graphics/leftSideNew.gif) left repeat-y; }
+div.rightSide { background: url(graphics/rightSideNew.gif) right repeat-y; }
+div.lowLeft { background: url(graphics/cornerLowLeftNew.gif) bottom left no-repeat; }
+div.lowRight { background: url(graphics/cornerLowRightNew.gif) bottom right no-repeat; }
 
 
 
@@ -197,10 +185,4 @@ div.one_third{
     -moz-user-select: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
-}
-
-
-div#wrap {
-    width:100%;
-    background-color: #000000;
 }

@@ -38,6 +38,7 @@ GLcanvas.prototype.init = function() {
     // Any command line params specified?
     var params = window.location.search;
     if(params.length > 1) this.start(params.substring(1));
+    return this;
 }
 
 GLcanvas.prototype.createScene = function(objToDraw) {
@@ -131,12 +132,13 @@ GLcanvas.prototype.start = function(theScene) {
 	this.gl.shader_color = this.gl.createProgram();
 	this.gl.shader_canvas = this.gl.createProgram();
 	this.gl.shader_player = this.gl.createProgram();
+
 	if(this.initShaders(this.gl.shader,        "default",  "default") !== 0 ||
 	   this.initShaders(this.gl.shader_frame,  "frame",    "default") !== 0 ||
 	   this.initShaders(this.gl.shader_canvas, "canvas",   "default") !== 0 ||
 	   this.initShaders(this.gl.shader_player, "player",   "player") !== 0 ||
 	   this.initShaders(this.gl.shader_color,  "color",    "color") !== 0) {
-
+	    
 	    var theWindow = window.open(
 		"GLerror_shader.php", 
 		"",
@@ -144,6 +146,11 @@ GLcanvas.prototype.start = function(theScene) {
 	    theWindow.focus();
 	    return;
 	}
+	   
+	this.objects = [];
+	   
+	// Instantiate models
+	this.createScene(theScene);
 
 	this.gl.useProgram(this.gl.shader);
 	this.active_shader = this.gl.shader;
@@ -159,15 +166,10 @@ GLcanvas.prototype.start = function(theScene) {
 	document.onmouseup = handleMouseUp;
 	document.onmousemove = handleMouseMove;
 
-	this.objects = [];
-
-    theMatrix.perspective(45,
-			  this.canvas.clientWidth / 
-			  Math.max(1, this.canvas.clientHeight),
-			  0.1, 300000.0);
-
-	// Instantiate models
-	this.createScene(theScene);
+	theMatrix.perspective(45,
+			      this.canvas.clientWidth / 
+			      Math.max(1, this.canvas.clientHeight),
+			      0.1, 300000.0);
 
 	if(textures_loading !== 0) 
 	    document.getElementById("glcanvas_status").innerHTML += 
@@ -279,13 +281,13 @@ GLcanvas.prototype.initShaders = function(gl_shader, frag, vert) {
 
     if(this.shader_source.init(this.gl, gl_shader, frag, vert) !== 0) return -1;
 
+    // This is so the two can be compared
     gl_shader.count = (++this.shader_count);
 
     gl_shader.sampler = 0;
     gl_shader.attribs = [];
     gl_shader.attrib_enabled = [];
     gl_shader.unis = [];
-
 
     this.initAttribute(gl_shader, "vPosA");
 
@@ -295,6 +297,7 @@ GLcanvas.prototype.initShaders = function(gl_shader, frag, vert) {
 
     this.initUniform(gl_shader, "frames_elapsed_u")
     this.initUniform(gl_shader, "hi_hat_u")
+    this.initUniform(gl_shader, "wall_hit_u")
     this.initUniform(gl_shader, "ambient_coeff_u");
     this.initUniform(gl_shader, "diffuse_coeff_u");
     this.initUniform(gl_shader, "specular_coeff_u");

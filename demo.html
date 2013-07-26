@@ -53,55 +53,55 @@
     </canvas>
   </head>
 
-  <body onload="theCanvas = new GLcanvas(); theCanvas.init();">
-    <div id='wrap'>
-      <div id='header'>
-        <div class='one_third'>WebGL:</div>
-        <div class='one_third'>A</div>
-        <div class='one_third'>Demo</div>
-      </div>
+  <body onload="theCanvas = new GLcanvas().init();">
+    <div id='header'>
+      <div class='one_third'>WebGL:</div>
+      <div class='one_third'>A</div>
+      <div class='one_third'>Demo</div>
+    </div>
 
-      <div class="padDiv"> 
-	<div id="banner">       
+    <div class="padDiv"> 
+      <div id="banner">       
 
-	  <div id="display" style="padding-top:8px; width:100%;">
+	<div id="display" style="padding-top:8px; width:100%;">
 
-	    <!-- Toggled off when stadium loads -->
-	    <div id="stadium_params" style="display:inline-block;">
-	      <div style="float:left; width:30%;">Name:</div>
-	      <input id="stadium_name" type="text" style="float:right; width:60%;"
-		     class="button_add stadium_input"/>
-	      <br/>
-	      <div style="float:left;">Balls:</div>
-	      <input id="stadium_balls" type="text" style="float:right; width:60%;"
-		     value="20" class="button_add stadium_input"/>
-	      <input id="stadium_balls" type="button" style="float:left;"
-		     value="Play" class="button_add stadium_input" />
-	    </div>
-
-	    <!-- Toggled on when stadium loads -->
-
+	  <!-- Toggled off when stadium loads -->
+	  <div id="stadium_params" style="display:inline-block;">
+	    <div style="float:left; width:30%;">Name:</div>
+	    <input id="stadium_name" type="text" style="float:right; width:60%;"
+		   class="start_button stadium_input"/>
+	    <br/>
+	    <div style="float:left;">Balls:</div>
+	    <input id="stadium_balls" type="text" style="float:right; width:60%;"
+		   value="20" class="start_button stadium_input"/>
+	    <input id="stadium_balls" type="button" style="float:left;"
+		   value="Play" class="start_button stadium_input" />
 	  </div>
+
+	  <!-- Toggled on when stadium loads -->
 
 	</div>
 
-	  <div id="keyboard" style="position:absolute; bottom: 0px; left: 0px; color: #ffffff;"></div>
-        <div class='main'>
-          <div class="border lowAcross" ></div>
-          <div class="border topAcross" ></div>
-          <div class="border leftSide" ></div>
-          <div class="border rightSide" ></div>
-          <div class="border topLeft" ></div>
-          <div class="border topRight" ></div>
-	  <div class="border lowLeft" ></div>
-          <div class="border lowRight" ></div>
-            <canvas id="glcanvas" width="1100"></canvas>
-          <div class="title" id="title2">            
-	    <!-- 
-		 We use a table with 2x2 cells, 
-		 lumping all the links into their own cells..
-	      -->
-	    <table style="width:100%;">
+      </div>
+
+      <div id="keyboard" style="position:absolute; bottom: 0px; left: 0px; color: #ffffff;"></div>
+      <div class='main'>
+        <div class="border lowAcross" ></div>
+        <div class="border topAcross" ></div>
+        <div class="border leftSide" ></div>
+        <div class="border rightSide" ></div>
+        <div class="border topLeft" ></div>
+        <div class="border topRight" ></div>
+	<div class="border lowLeft" ></div>
+        <div class="border lowRight" ></div>
+        <canvas id="glcanvas" width="1100"></canvas>
+        <div class="title" id="title2">            
+	  <!-- 
+	       We use a table with 2x2 cells, 
+	       lumping all the links into their own cells..
+	    -->
+	  <br/>
+	  <table style="width:100%;">
 	    <thead><tr>
 		<th><u>Shapes</u></th>
 		<th><u>Environments</u></th>
@@ -111,231 +111,238 @@
 		  <input type="button" 
 			 onclick="theCanvas.start('cylinder');" 
 			 value="Cylinder" 
-			 class="button_add"/>
+			 class="start_button"/>
 		  <input type="button" 
 			 onclick="theCanvas.start('skybox');" 
 			 value="Skybox" 
-			 class="button_add"/>
+			 class="start_button"/>
 		  <input type="button" 
 			 onclick="theCanvas.start('sphere');" 
 			 value="Sphere" 
-			 class="button_add"/>
+			 class="start_button"/>
 		  <input type="button" 
 			 onclick="theCanvas.start('stool');" 
 			 value="Stool" 
-			 class="button_add"/>
+			 class="start_button"/>
 		  <input type="button" 
 			 onclick="theCanvas.start('text');" 
 			 value="Text" 
-			 class="button_add"/>
+			 class="start_button"/>
 		  <input type="button" 
 			 onclick="theCanvas.start('torus');" 
 			 value="Torus" 
-			 class="button_add"/>
+			 class="start_button"/>
 		</td>
 		<td>
 		  <input type="button" 
 			 onclick="theCanvas.start('shadow');" 
 			 value="Shadows" 
-			 class="button_add"/>
+			 class="start_button"/>
 		  <input type="button" 
 			 onclick="theCanvas.start('jumbotron');" 
 			 value="Jumbotron" 
-			 class="button_add"/>
+			 class="start_button"/>
 		  <input type="button" 
 			 value="Maze (disabled)" 
-			 class="button_add" style="color:#aa4455;font-size:22px;" disabled="disabled"/>
+			 class="start_button" style="color:#aa4455;font-size:22px;" disabled="disabled"/>
 		  <input type="button" 
 			 value="Stadium (disabled)" 
-			 class="button_add" style="color:#aa4455;font-size:22px;" disabled="disabled"/>
+			 class="start_button" style="color:#aa4455;font-size:22px;" disabled="disabled"/>
 		  <input type="button" 
 			 onclick="theCanvas.start('game');" 
 			 value="Game" 
-			 class="button_add"/>
+			 class="start_button"/>
 		</td>
 	    </tr></tbody>
-	    </table>
-          </div>
-	</div>
+	  </table>
+        </div>
       </div>
     </div>
-      
-    <div id="footer"> 
-      <input type="button" 
-	     value="(c) 2013 Batman and Robin" 
-	     class="button_add" />
-      <div class="title" id="title4" > </div>            
+</div>
 
-    </div>
-    <!-- Put this element one tag scope higher to hide it. -->
-      <div class="shaders" id="shader1" style="display:none;">
-	<textarea id="shader_frag_decls" rows="20">
-precision mediump float;
+<div id="footer"> 
+  <input type="button" 
+	 value="(c) 2013 Batman and Robin" 
+	 class="start_button" />
+  <div class="title" id="title4" > </div>            
 
-uniform float ambient_coeff_u;
-uniform float frames_elapsed_u;
-uniform float hi_hat_u;
-uniform float diffuse_coeff_u;
-uniform float specular_coeff_u;
-uniform vec3 specular_color_u;
+</div>
+<!-- Put this element one tag scope higher to hide it. -->
+<div class="shaders" id="shader1" style="display:none;">
+  <textarea id="shader_frag_decls" rows="20">
+    precision mediump float;
 
-varying vec3 distanceV;
-varying float diffuseV;
-varying float specularV;
-varying vec3 colorV;
+    uniform float ambient_coeff_u;
+    uniform float frames_elapsed_u;
+    uniform float hi_hat_u;
+    uniform float diffuse_coeff_u;
+    uniform float specular_coeff_u;
+    uniform vec3 specular_color_u;
 
-varying vec3 reflectionV;
-varying vec3 viewPosV;
-varying vec3 vModel;
-varying vec4 lModel;
-varying vec3 lightNorm;
-varying vec3 vertNorm;
+    varying vec3 distanceV;
+    varying float diffuseV;
+    varying float specularV;
+    varying vec3 colorV;
 
-varying vec2 textureV;
+    varying vec3 reflectionV;
+    varying vec3 viewPosV;
+    varying vec3 vModel;
+    varying vec4 lModel;
+    varying vec3 lightNorm;
+    varying vec3 vertNorm;
 
-uniform sampler2D sampler0;
+    varying vec2 textureV;
 
-//Specular function
-float specular() {
+    uniform sampler2D sampler0;
+    uniform sampler2D sampler1;
+
+    //Specular function
+    float specular() {
 
     vec3 reflectionV2 = reflect(normalize(lightNorm), normalize(vertNorm));
 
 
-float specularV2 = dot(normalize(reflectionV2), 
-                    normalize(vModel.xyz));
+    float specularV2 = dot(normalize(reflectionV2), 
+    normalize(vModel.xyz));
     if (specularV2 <= 0.) { specularV2 = 0.0; }
-    specularV2 = specularV2 * specularV2;
-    specularV2 = specularV2 * specularV2;
-    specularV2 = specularV2 * specularV2;
-    specularV2 = specularV2 * specularV2;
-    return specularV2;
-}
-</textarea>
-	<textarea id="shader_decls" rows="20">
-precision mediump float;  
+		      specularV2 = specularV2 * specularV2;
+		      specularV2 = specularV2 * specularV2;
+		      specularV2 = specularV2 * specularV2;
+		      specularV2 = specularV2 * specularV2;
+		      return specularV2;
+		      }
+		      </textarea>
+  <textarea id="shader_decls" rows="20">
+    precision mediump float;  
 
-// Vector Attributes      
-attribute vec3 vPosA;
-attribute vec3 vNormA;
-attribute vec3 vColA;
-attribute vec2 textureA;
+    // Vector Attributes      
+    attribute vec3 vPosA;
+    attribute vec3 vNormA;
+    attribute vec3 vColA;
+    attribute vec2 textureA;
 
-// Matrixes
-uniform mat4 pMatU; // Position
-uniform mat4 mvnMatU[3]; // Model, View, Normal
-uniform mat4 lMatU; // Lighting
+    // Matrixes
+    uniform mat4 pMatU; // Position
+    uniform mat4 mvnMatU[3]; // Model, View, Normal
+    uniform mat4 lMatU; // Lighting
 
-// Position attributes
-uniform vec3 lightPosU;
-uniform vec3 viewPosU;
-uniform float hi_hat_u;
+    // Position attributes
+    uniform vec3 lightPosU;
+    uniform vec3 viewPosU;
+    uniform float hi_hat_u;
 
-// Passed to the fragment shader
-varying vec3 distanceV;
-varying float diffuseV;
-varying vec3 colorV;
-varying vec2 textureV;
+    // Passed to the fragment shader
+    varying vec3 distanceV;
+    varying float diffuseV;
+    varying vec3 colorV;
+    varying vec2 textureV;
 
-varying vec3 viewPosV;
-varying vec3 vModel;
-varying vec4 lModel;
-varying vec3 lightNorm;
-varying vec3 vertNorm;
-</textarea>
-	<textarea id="shader_frag_canvas" rows="20">
-void colorTexture(sampler2D theSampler) {
+    varying vec3 viewPosV;
+    varying vec3 vModel;
+    varying vec4 lModel;
+    varying vec3 lightNorm;
+    varying vec3 vertNorm;
+  </textarea>
+  <textarea id="shader_frag_canvas" rows="20">
+    void colorTexture(sampler2D theSampler) {
 
-float delta = 1.0 / 512.0;
-float sway = sin(frames_elapsed_u / 100.0) / 2.0;
-float sway2 = cos(frames_elapsed_u / 110.0) / 2.0;
-float the_beat = hi_hat_u;
+    float delta = 1.0 / 512.0;
+    float sway = sin(frames_elapsed_u / 100.0) / 2.0;
+    float sway2 = cos(frames_elapsed_u / 110.0) / 2.0;
+    float the_beat = hi_hat_u;
 
-  vec3 textureColor = texture2D(theSampler, textureV).xyz;
-  textureColor[0] *= sway;
-  textureColor[1] *= -sway2;
-  textureColor[2] *= abs((sway * sway2));
+    vec3 textureColor = texture2D(theSampler, textureV).xyz;
+    textureColor[0] *= sway;
+    textureColor[1] *= -sway2;
+    textureColor[2] *= abs((sway * sway2));
 
-  float background = clamp(length(textureColor) * 5.0, 0.8, 1.0);
+    float background = clamp(length(textureColor) * 5.0, 0.8, 1.0);
 
-  gl_FragColor = vec4(textureColor * 1.6, background);
-}
+    vec3 actual_color = textureColor * 1.6;
+    
+    float yellow =  (actual_color.r + actual_color.g) / 2.0;
 
-void main(void) {
-colorTexture(sampler0);
-}
-</textarea>
-	<textarea id="shader_frag_player" rows="20">
-void colorTexture(sampler2D theSampler) {
+    gl_FragColor = vec4(yellow, yellow, actual_color.b, background);
+    }
 
-  float delta = 1.0 / 512.0;
-  float sway = sin((frames_elapsed_u + 60.0) / 100.0) / 2.0;
-  float sway2 = cos((frames_elapsed_u + 60.0) / 110.0) / 2.0;
-  float the_beat = hi_hat_u;
+    void main(void) {
+    colorTexture(sampler0);
+    }
+  </textarea>
+  <textarea id="shader_frag_player" rows="20">
+    void colorTexture(sampler2D theSampler) {
 
-  vec3 textureColor = texture2D(theSampler, textureV).xyz;
-  textureColor[0] *= sway;
-  textureColor[1] *= -sway2;
-  textureColor[2] *= abs((sway * sway2));
+    float delta = 1.0 / 512.0;
+    float sway = sin((frames_elapsed_u + 60.0) / 100.0) / 2.0;
+    float sway2 = cos((frames_elapsed_u + 60.0) / 110.0) / 2.0;
+    float the_beat = hi_hat_u;
 
-  float background = clamp(length(textureColor) * 5.0, 0.8, 1.0);
+    vec3 textureColor = texture2D(theSampler, textureV).xyz;
+    textureColor[0] *= sway;
+    textureColor[1] *= -sway2;
+    textureColor[2] *= abs((sway * sway2));
 
-  gl_FragColor = vec4(textureColor * 1.6, background);
-  if(background < 0.95 && the_beat > 0.9) gl_FragColor = 
-    (20. - the_beat) / 20. * vec4(textureColor * 1.6, background) +
-    the_beat / 20. * texture2D(theSampler, textureV);
-}
+    float background = clamp(length(textureColor) * 5.0, 0.8, 1.0);
 
-void main(void) { colorTexture(sampler0); }
-</textarea>
-	<textarea id="shader_vert_default" rows="20">
-void main(void) {
-                  // -- Position -- //
-  gl_Position = pMatU * mvnMatU[1] * mvnMatU[0] * vec4(vPosA, 1.0);
+    gl_FragColor = vec4(textureColor * 1.6, background);
+    if(background < 0.95 && the_beat > 0.9) gl_FragColor = 
+      (20. - the_beat) / 20. * vec4(textureColor * 1.6, background) +
+      the_beat / 20. * texture2D(theSampler, textureV);
+      }
 
-// Viewing space coordinates of light / vertex
-  vModel = (mvnMatU[1] * mvnMatU[0]  * vec4(vPosA, 1.0)).xyz;
-  lModel = mvnMatU[1] * lMatU * vec4(lightPosU, 1.0);
+      void main(void) { colorTexture(sampler0); 
 
+      }
+  </textarea>
+  <textarea id="shader_vert_default" rows="20">
+    void main(void) {
+    // -- Position -- //
+    gl_Position = pMatU * mvnMatU[1] * mvnMatU[0] * vec4(vPosA, 1.0);
 
-                  // -- Lighting -- //
-  distanceV = lModel.xyz - vModel.xyz;
-  lightNorm = normalize(distanceV);
-  vertNorm = (mvnMatU[2] * vec4(vNormA,1.0)).xyz;
-
-  // Ambient components we'll leave until frag shader
-  colorV = vColA;
-  textureV = textureA;
-  // Diffuse component
-  diffuseV = dot(vertNorm, lightNorm);
-  if (diffuseV < 0.0) { diffuseV = 0.0; }
-
-}
-</textarea>
-	<textarea id="shader_vert_player" rows="20">
-void main(void) {
-                  // -- Position -- //
-//  gl_Position = pMatU * mvnMatU[1] * mvnMatU[0] * vec4(vPosA * (1.0 + (hi_hat_u / 40.0)), 1.0);
-  gl_Position = pMatU * mvnMatU[1] * mvnMatU[0] * vec4(vPosA, 1.0);
-
-// Viewing space coordinates of light / vertex
-  vModel = (mvnMatU[1] * mvnMatU[0]  * vec4(vPosA, 1.0)).xyz;
-  lModel = mvnMatU[1] * lMatU * vec4(lightPosU, 1.0);
+    // Viewing space coordinates of light / vertex
+    vModel = (mvnMatU[1] * mvnMatU[0]  * vec4(vPosA, 1.0)).xyz;
+    lModel = mvnMatU[1] * lMatU * vec4(lightPosU, 1.0);
 
 
-                  // -- Lighting -- //
-  distanceV = lModel.xyz - vModel.xyz;
-  lightNorm = normalize(distanceV);
-  vertNorm = (mvnMatU[2] * vec4(vNormA,1.0)).xyz;
+    // -- Lighting -- //
+    distanceV = lModel.xyz - vModel.xyz;
+    lightNorm = normalize(distanceV);
+    vertNorm = (mvnMatU[2] * vec4(vNormA,1.0)).xyz;
 
-  // Ambient components we'll leave until frag shader
-  colorV = vColA;
-  textureV = textureA;
-  // Diffuse component
-  diffuseV = dot(vertNorm, lightNorm);
-  if (diffuseV < 0.0) { diffuseV = 0.0; }
-}
-</textarea>
+    // Ambient components we'll leave until frag shader
+    colorV = vColA;
+    textureV = textureA;
+    // Diffuse component
+    diffuseV = dot(vertNorm, lightNorm);
+    if (diffuseV < 0.0) { diffuseV = 0.0; }
 
-      </div>            
-  </body>
+		   }
+		   </textarea>
+  <textarea id="shader_vert_player" rows="20">
+    void main(void) {
+
+    // -- Position -- //
+    gl_Position = pMatU * mvnMatU[1] * mvnMatU[0] * vec4(vPosA * (1.0 + (hi_hat_u / 120.0)), 1.0);
+    //  gl_Position = pMatU * mvnMatU[1] * mvnMatU[0] * vec4(vPosA, 1.0);
+
+    // Viewing space coordinates of light / vertex
+    vModel = (mvnMatU[1] * mvnMatU[0]  * vec4(vPosA, 1.0)).xyz;
+    lModel = mvnMatU[1] * lMatU * vec4(lightPosU, 1.0);
+
+
+    // -- Lighting -- //
+    distanceV = lModel.xyz - vModel.xyz;
+    lightNorm = normalize(distanceV);
+    vertNorm = (mvnMatU[2] * vec4(vNormA,1.0)).xyz;
+
+    // Ambient components we'll leave until frag shader
+    colorV = vColA;
+    textureV = textureA;
+    // Diffuse component
+    diffuseV = dot(vertNorm, lightNorm);
+    if (diffuseV < 0.0) { diffuseV = 0.0; }
+		   }
+		   </textarea>
+
+</body>
 </html>

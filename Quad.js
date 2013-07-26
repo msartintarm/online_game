@@ -25,14 +25,40 @@ function Quad(a, b, c, d) {
     return this;
 }
 
+/**
+ * Finds min and max x-and-y coordinates.
+ */
+Quad.prototype.add2DCoords = function() {
 
-Quad.prototype.invertNorms = _oInvertNorms;
+    var data_array = this.o.data["pos"];
+    this.x_min = Math.min(data_array[0], 
+			  data_array[3], 
+			  data_array[6], 
+			  data_array[9]);
+
+    this.x_max = Math.max(data_array[0], 
+			  data_array[3], 
+			  data_array[6], 
+			  data_array[9]);
+
+    this.y_min = Math.min(data_array[1], 
+			  data_array[4], 
+			  data_array[7], 
+			  data_array[10]);
+
+    this.y_max = Math.max(data_array[1], 
+			  data_array[4], 
+			  data_array[7], 
+			  data_array[10]);
+    return this;
+};
+
 
 Quad.prototype.setTexture = function(texture) { 
     this.o.setTexture(texture);
     this.o.initTextures([1,0], [1,1], [0,0], [0,1]);
     return this;
-}
+};
 
 /*
  * Invert the Y-coords of the texture within
@@ -43,12 +69,12 @@ Quad.prototype.flipTexture = function(texture) {
 	this.o.data["tex"][i+1] %= 2;
     }
     return this;
-}
+};
 
 Quad.prototype.setActive = function(active) { 
     this.o.setActive(active);
     return this;
-}
+};
 
 Quad.prototype.setSkyTexture = function(texture, val) { 
     this.o.setTexture(texture);
@@ -122,7 +148,7 @@ Quad.prototype.setStringTexture = function(texture, val) {
     return this;
 };
 
-
+Quad.prototype.invertNorms = _oInvertNorms;
 Quad.prototype.initBuffers = _oInitBuffers;
 Quad.prototype.scale = _oScale;
 Quad.prototype.rotatePos = _oRotatePos;

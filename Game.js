@@ -11,6 +11,9 @@ const WALL_S = 2;
 const WALL_W = 3;
 const WALL_E = 4;
 
+
+    var theTexture2 = new GLtexture(theCanvas.gl, BRICK_NORMAL_TEXTURE);
+
     var i; // for init loop
 
     // Env variable(s) - do not change during execution.
@@ -67,20 +70,15 @@ const WALL_E = 4;
     
     this.player_name = document.getElementById("stadium_name").value;
 
-    this.player_string = new GLstring(this.player_name, 
-				      TEXT_TEXTURE, 
+    this.player_string = new GLstring(this.player_name, TEXT_TEXTURE, 
 				      theCanvas.gl.shader_player);
-    this.left_string = new GLstring(this.player_name, 
-				      TEXT_TEXTURE, 
+    this.left_string = new GLstring("left", TEXT_TEXTURE, 
 				      theCanvas.gl.shader_player);
-    this.right_string = new GLstring(this.player_name, 
-				      TEXT_TEXTURE, 
+    this.right_string = new GLstring("right", TEXT_TEXTURE, 
 				      theCanvas.gl.shader_player);
-    this.jump_string = new GLstring(this.player_name, 
-				      TEXT_TEXTURE, 
+    this.jump_string = new GLstring("jump", TEXT_TEXTURE, 
 				      theCanvas.gl.shader_player);
-    this.collision_string = new GLstring(this.player_name, 
-				      TEXT_TEXTURE, 
+    this.collision_string = new GLstring("Ouch!", TEXT_TEXTURE, 
 				      theCanvas.gl.shader_player);
 
     var player_width = this.grid;
@@ -88,7 +86,7 @@ const WALL_E = 4;
     var floor_width = player_width;
     this.floor = [];
 
-    theMatrix.vTranslate([0,0,1000]);
+    theMatrix.vTranslate([0,0,750]);
 
     this.player = new Quad(
 	[ player_width / 2, player_width, -1],
@@ -117,7 +115,10 @@ const WALL_E = 4;
 	    [ floor_width,                0, -1],
 	    [ floor_width, -2 * floor_width, -1])
 			.translate([i * floor_width * 2, 0, 0])
-			.setTexture(RUG_TEXTURE));
+			.setTexture(RUG_TEXTURE)
+			.add2DCoords());
+	// todo: turn into a '
+//	this.floor[i + 10].x_
     }
 
     this.push_button = new Quad(
@@ -125,12 +126,10 @@ const WALL_E = 4;
 	[-floor_width, 2 * floor_width, -1],
 	[ floor_width, 4 * floor_width, -1],
 	[ floor_width, 2 * floor_width, -1])
-	.setTexture(BRICK_TEXTURE);
-    this.push_button.x_min =    -floor_width;
-    this.push_button.x_max =     floor_width;
-    this.push_button.y_min = 2 * floor_width;
-    this.push_button.y_max = 4 * floor_width;
-    
+	.setTexture(BRICK_TEXTURE)
+	.add2DCoords();
+
+    this.floor.push(this.push_button);
 
     this.initBuffers = function(gl_) {
 	
@@ -140,15 +139,20 @@ const WALL_E = 4;
 
 	// Basically in our game, we know this stuff only
 	// ever gets called in certain patterns.
-	theCanvas.changeShader(theCanvas.gl.shader);
-	theMatrix.setViewUniforms(theCanvas.gl, theCanvas.gl.shader);
-	gl_.uniformMatrix4fv(theCanvas.gl.shader.unis["pMatU"], false, theMatrix.pMatrix);
-	theCanvas.changeShader(theCanvas.gl.shader_player);
-	theMatrix.setViewUniforms(theCanvas.gl, theCanvas.gl.shader_player);
-	gl_.uniformMatrix4fv(theCanvas.gl.shader_player.unis["pMatU"], false, theMatrix.pMatrix);
-	theCanvas.changeShader(theCanvas.gl.shader_canvas);
-	theMatrix.setViewUniforms(theCanvas.gl, theCanvas.gl.shader_canvas);
-	gl_.uniformMatrix4fv(theCanvas.gl.shader_canvas.unis["pMatU"], false, theMatrix.pMatrix);
+	theCanvas.changeShader(gl_.shader);
+	theMatrix.setViewUniforms(gl_, gl_.shader);
+	gl_.uniformMatrix4fv(gl_.shader.unis["pMatU"], false, theMatrix.pMatrix);
+	gl_.uniform1i(gl_.shader.unis["sampler1"], gl_.tex_enum[BRICK_NORMAL_TEXTURE]);
+	theCanvas.changeShader(gl_.shader_player);
+	theMatrix.setViewUniforms(gl_, gl_.shader_player);
+	gl_.uniformMatrix4fv(gl_.shader_player.unis["pMatU"], false, theMatrix.pMatrix);
+	theCanvas.changeShader(gl_.shader_canvas);
+	theMatrix.setViewUniforms(gl_, gl_.shader_canvas);
+	gl_.uniformMatrix4fv(gl_.shader_canvas.unis["pMatU"], false, theMatrix.pMatrix);
+
+//	gl_.uniform1f(player_shader.unis["hi_hat_u"], this.hi_hat);
+
+
 
 	if(!this.web_audio) this.initWebAudio();
 	//    this.createAudio("music/elements.mp3");
@@ -168,7 +172,6 @@ const WALL_E = 4;
 	this.player_string.initBuffers(gl_);
 	this.player.initBuffers(gl_);
 	this.background.initBuffers(gl_);
-	this.push_button.initBuffers(gl_);
 
 	for(i = 0; i < this.floor.length; ++i){
 	    this.floor[i].initBuffers(gl_);
@@ -203,38 +206,37 @@ const WALL_E = 4;
 	}
 	this.hi_hat = (this.hi_hat > 1) ? this.hi_hat - 1: 0;
 
-	// Analyse movement, which draws upon sound, and activated moves.
-	this.updateMovement();
-
+	var player_shader = this.player.o.shader;
 	if (!!player_shader && player_shader.unis["hi_hat_u"] !== -1) {
 	    theCanvas.changeShader(player_shader);
 	    gl_.uniform1f(player_shader.unis["hi_hat_u"], this.hi_hat);
 	}
 
+	// Analyse movement, which draws upon sound, and activated moves.
+	this.updateMovement();
+
 	// The draw calls themself. Heavily optimize here by manually loading
 	// matrices and setting shaders. This reduces redundant calls
 	// to shader progs.
 
-	//    this.player : theCanvas.gl.shader_player
-	//    this.background : theCanvas.gl.shader_canvas
-	//    this.push_button : theCanvas.gl.shader
+	//    this.player : gl_.shader_player
+	//    this.background : gl_.shader_canvas
+	//    this.floor : gl_.shader
 
-	theCanvas.changeShader(theCanvas.gl.shader);
-	theMatrix.setViewUniforms(theCanvas.gl, theCanvas.gl.shader);
+	theCanvas.changeShader(gl_.shader);
+	theMatrix.setViewUniforms(gl_, gl_.shader);
+
+	gl_.uniform3fv(gl_.shader.unis["lightPosU"], this.movement);
 
 	for(i = 0; i < this.floor.length; ++i){
 	    this.floor[i].draw(gl_);
 	}
 
-	this.push_button.draw(gl_);
-
 	theMatrix.push();
 	theMatrix.translate(this.movement);
 
-	var player_shader = this.player.o.shader;
 	theCanvas.changeShader(player_shader);
-	theMatrix.setVertexUniforms(theCanvas.gl, player_shader);
-	gl_.uniform1f(player_shader.unis["hi_hat_u"], this.hi_hat);
+	theMatrix.setVertexUniforms(gl_, player_shader);
 
 	this.player.draw(gl_);
 	theMatrix.pop();
@@ -242,8 +244,8 @@ const WALL_E = 4;
 	theMatrix.push();
 	theMatrix.translate(this.bg_movement);
 
-	theCanvas.changeShader(theCanvas.gl.shader_canvas);
-	theMatrix.setVertexUniforms(theCanvas.gl, theCanvas.gl.shader_canvas);
+	theCanvas.changeShader(gl_.shader_canvas);
+	theMatrix.setVertexUniforms(gl_, gl_.shader_canvas);
 
 	this.background.draw(gl_);
 	theMatrix.pop();
@@ -477,26 +479,22 @@ const WALL_E = 4;
 
 	    } else {
 		var count = (--this.jump_count);
-		if (count < 0) { 
-		    this.in_jump = false; 
-		} else {
+//		if (count < 0) { 
+//		    this.in_jump = false; 
+//		} else {
 		    this.movement[1] -= 15 - (count / 2);
-		}
+//		}
 	    }
 	}
 
 	// Can we move here, or would a collision prevent it?
-//	var wall_hit = this.detectCollision();
-//	if (wall_hit !== WALL_NONE) {
 
-	    var active_moves = "";
-	    if (this.in_left_move === true) active_moves += "l";
-	    if (this.in_right_move === true) active_moves += "r";
-	    if (this.in_jump === true) active_moves += "j";
+	// Collision. How far should we go to be on grid?
+	var grid_dist;
+	var i;
+	for(i = this.floor.length - 1; i >= 0; --i) { 
 
-	    // Collision. How far should we go to be on grid?
-	    var grid_dist;
-	    switch (this.detectCollision(this.push_button)) {
+	    switch (this.detectCollision(this.floor[i])) {
 	    case WALL_W:
 		// Convert to 1.0 scale, round to integer, convert back
 		this.movement[0] = this.grid * Math.floor(this.movement[0] / this.grid);
@@ -507,18 +505,20 @@ const WALL_E = 4;
 		this.in_left_move = false;
 		break;
 	    case WALL_N: // Here, just move to the top of the wall.
-		this.movement[1] = this.push_button.y_max;
+		this.movement[1] = this.floor[i].y_max;
 		this.in_jump = false;
 		break;
 	    case WALL_S:
-		this.movement[1] = 0;
-		this.in_jump = false;
+		this.jump_count = this.jump_dist.length;
+		this.jumping_up = false; 
+		this.jumping_down = true; 
 		break;
-	    default: break; // WALL_NONE 
+	    default: // WALL_NONE
+		break;
 	    } 
 
 
-//	}
+	}
 
     };
 
@@ -576,8 +576,13 @@ const WALL_E = 4;
 	request.responseType = "arraybuffer"; // Does this work for any MIME request?
 	// Once request has loaded, load and start audio buffer
 	request.onload = this.handleAudioRequest.bind(this, new_audio, request);
-	request.send();
-	return new_audio;
+	try { 
+	    request.send(); 
+	    return new_audio;
+	} catch (e) { 
+	    console.log(e.toString()); 
+	    return null;
+	}
     };
 
     /**

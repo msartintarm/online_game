@@ -32,13 +32,27 @@ void colorize() {\n\
   gl_FragColor = vec4(ambColor + diffColor + specColor, 1.0);\n\
 }\n\
 \n\
+\n\
 void colorTexture(sampler2D theSampler) {\n\
   vec3 textureColor = texture2D(theSampler, vec2(textureV.s, textureV.t)).xyz;\n\
   \n\
 \n\
+    vec3 textureColorz = texture2D(sampler1, vec2(textureV.s, textureV.t)).xyz;\n\
+    vec3 final_distance = normalize(normalize(lightNorm) + normalize(vec3(-textureColorz.x,-textureColorz.y,textureColorz.z)));\n\
+    vec3 reflectionV2 = reflect(normalize(final_distance), normalize(vertNorm));\n\
+  float diffuseV2 = dot(vertNorm, final_distance);\n\
+\n\
+float specularV2 = dot(normalize(reflectionV2), \n\
+                    normalize(vModel.xyz));\n\
+    if (specularV2 <= 0.0) { specularV2 = 0.0; }\n\
+    specularV2 = specularV2 * specularV2;\n\
+    specularV2 = specularV2 * specularV2;\n\
+    specularV2 = specularV2 * specularV2;\n\
+    specularV2 = specularV2 * specularV2;\n\
+\n\
   vec3 ambColor = textureColor / 3.0 * ambient_coeff_u;\n\
-  vec3 diffColor = textureColor * diffuseV * diffuse_coeff_u;\n\
-  vec3 specColor = textureColor * specular();\n\
+  vec3 diffColor = textureColor * diffuseV2 * diffuse_coeff_u;\n\
+  vec3 specColor = textureColor * specularV2;\n\
 \n\
   vec3 blendColor = mod(distanceV, 50.0) / 50.0;\n\
   vec3 normalColor = ambColor + diffColor + specColor;\n\
@@ -107,6 +121,7 @@ GLshader.prototype.init = function(gl_, gl_shader, frag_name, vert_name) {
 
     // Firefox says macs behave poorly if 
     // an unused attribute is bound to index 0
+    // So we specify 'position' before the link.
     gl_.bindAttribLocation(gl_shader, 0, "vPosA");
 
     gl_.linkProgram(gl_shader);

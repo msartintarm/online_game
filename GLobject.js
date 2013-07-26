@@ -359,8 +359,7 @@ GLobject.prototype.linkAttribs = function(gl_, shader_) {
 	gl_.uniform1f(shader_.unis["diffuse_coeff_u"], this.diffuse_coeff);
 
     // check to see if texture is used in shader
-    gl_.uniform1i(shader_.unis["sampler0"], 
-		  gl_.tex_enum[this.textureNum]);
+    gl_.uniform1i(shader_.unis["sampler0"], gl_.tex_enum[this.textureNum]);
 
     if(shader_.unis["specular_color_u"] !== null) { 
 	gl_.uniform3fv(shader_.unis["specular_color_u"], this.specular_color); }
