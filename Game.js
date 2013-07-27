@@ -1,4 +1,3 @@
-
 /**
  * Creates and initializes a game.
  */
@@ -10,6 +9,7 @@ const WALL_N = 1;
 const WALL_S = 2;
 const WALL_W = 3;
 const WALL_E = 4;
+const WALL_TOP = 5;
 
 
     var theTexture2 = new GLtexture(theCanvas.gl, BRICK_NORMAL_TEXTURE);
@@ -170,6 +170,10 @@ const WALL_E = 4;
 					 this.web_audio.destination, true, 0.0, 4.0);
 
 	this.player_string.initBuffers(gl_);
+	this.left_string.initBuffers(gl_);
+	this.right_string.initBuffers(gl_);
+	this.jump_string.initBuffers(gl_);
+	this.collision_string.initBuffers(gl_);
 	this.player.initBuffers(gl_);
 	this.background.initBuffers(gl_);
 
@@ -321,7 +325,9 @@ const WALL_E = 4;
 
     this.startJump = function() {
 
+
 	if (this.in_jump === true) return;
+	this.jump_string.initBuffers(theCanvas.gl);
 	this.jump_started = false;
 	this.jumping_up = true;
 	this.jumping_down = false;
@@ -331,7 +337,9 @@ const WALL_E = 4;
 
     this.startLeftMove = function() {
 
+
 	if (this.in_left_move === true) return;
+	this.left_string.initBuffers(theCanvas.gl);
 	this.left_count = -1;
 	this.left_started = false;
 	this.in_left_move = true;
@@ -340,6 +348,7 @@ const WALL_E = 4;
     this.startRightMove = function() {
 
 	if (this.in_right_move === true) return;
+	this.right_string.initBuffers(theCanvas.gl);
 	this.right_count = -1;
 	this.right_started = false;
 	this.in_right_move = true;
@@ -409,13 +418,14 @@ const WALL_E = 4;
 
 	// First, check vertical indexes. Next, check horizontal indexes.
 	if (this.movement[1] + this.player_height > object.y_min &&
-	    this.movement[1] < object.y_max &&
+	    this.movement[1] <= object.y_max &&
 	    this.movement[0] - this.player_width < object.x_max && 
 	    this.movement[0] + this.player_width > object.x_min) {
 
-	    // Collision detected. Which side of the box did we cross? Look at old
-	    // movement to determine this.
+	    // Collision detected. Which side of the box did we cross? 
+	    // Look at old movement to determine which value changed.
 	    if (this.movement_old[1] >= object.y_max) return WALL_N;
+	    if (this.movement[1] >= object.y_max) return WALL_N;
 	    if (this.movement_old[1] + this.player_height <= object.y_min) return WALL_S;
 	    if (this.movement_old[0] - this.player_width >= object.x_max) return WALL_E;
 	    if (this.movement_old[0] + this.player_width <= object.x_min) return WALL_W;
@@ -479,11 +489,7 @@ const WALL_E = 4;
 
 	    } else {
 		var count = (--this.jump_count);
-//		if (count < 0) { 
-//		    this.in_jump = false; 
-//		} else {
-		    this.movement[1] -= 15 - (count / 2);
-//		}
+		this.movement[1] -= 15 - (count / 2);
 	    }
 	}
 
@@ -492,21 +498,28 @@ const WALL_E = 4;
 	// Collision. How far should we go to be on grid?
 	var grid_dist;
 	var i;
+	var on_wall = false;
 	for(i = this.floor.length - 1; i >= 0; --i) { 
 
 	    switch (this.detectCollision(this.floor[i])) {
 	    case WALL_W:
+		this.collision_string.initBuffers(theCanvas.gl);
 		// Convert to 1.0 scale, round to integer, convert back
 		this.movement[0] = this.grid * Math.floor(this.movement[0] / this.grid);
 		this.in_right_move = false;
 		break;
 	    case WALL_E:
+		// Convert to 1.0 scale, round to integer, convert back
 		this.movement[0] = this.grid * Math.ceil(this.movement[0] / this.grid);
 		this.in_left_move = false;
 		break;
 	    case WALL_N: // Here, just move to the top of the wall.
-		this.movement[1] = this.floor[i].y_max;
-		this.in_jump = false;
+		if(this.jumping_down === true) {
+		    this.movement[1] = this.floor[i].y_max;
+		    this.in_jump = false;
+		    this.player_string.initBuffers(theCanvas.gl);
+		}
+		on_wall = true;
 		break;
 	    case WALL_S:
 		this.jump_count = this.jump_dist.length;
@@ -516,10 +529,15 @@ const WALL_E = 4;
 	    default: // WALL_NONE
 		break;
 	    } 
-
-
 	}
 
+	if(on_wall === false && this.in_jump === false) {
+	    console.log("freefallin!");
+	    this.jump_count = this.jump_dist.length;
+	    this.jumping_up = false; 
+	    this.jumping_down = true; 
+	    this.in_jump = true;
+	}
     };
 
     this.initWebAudio = function() {

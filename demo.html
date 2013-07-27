@@ -1,56 +1,53 @@
-<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN'
-	  'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'>
-<!-- All text on this page is property of Aberger / Sartin-Tarm. (c) 2013. -->
-<html xmlns='http://www.w3.org/1999/xhtml'>
+<!DOCTYPE html> <!-- HTML 5 -->
+<!-- All text on this page is property of Michael Sartin-Tarm. (c) 2013. -->
+<!-- License pending. -->
+<html>
   <head>
-    <meta http-equiv='Content-Type' content='text/html charset=utf-8'/>
+    <meta charset="UTF-8"/>
     <title>WebGL Demo</title>
-    <link rel='stylesheet' type='text/css' href='styles.css'/>
-    <link rel='icon' type='image/x-icon' href='./favicon.ico'/>
+    <link rel='stylesheet' type="text/css" href="styles.css"/>
+    <link rel='icon' type="image/x-icon" href="favicon.ico"/>
 
-    <!-- External JS math libraries -->
-    <script src="libs/gl-matrix.js" type="text/javascript" async="async"></script> 
-    <script src="libs/webgl-utils.js" type="text/javascript" async="async"></script>
+    <!-- External JS libraries -->
+    <script src="libs/gl-matrix.js" type="application/javascript" async="async"></script> 
+    <!-- Only used for RequestAnimFrame -->
+    <script src="libs/webgl-utils.js" type="application/javascript" async="async"></script>
 
     <!-- Global constants and functions -->
-    <script src="functions.js" type="text/javascript"></script>
-    <script src="constants.js" type="text/javascript" async="async"></script>
+    <script src="functions.js" type="application/javascript"></script>
+    <script src="constants.js" type="application/javascript" async="async"></script>
 
     <!-- GL classes -->
-    <script src="GLobject.js" type="text/javascript" async="async"></script>
-    <script src="GLmatrix.js" type="text/javascript" async="async"></script>
-    <script src="GLtexture.js" type="text/javascript" async="async"></script>
-    <script src="GLframe.js" type="text/javascript" async="async"></script>
-    <script src="GLshader.js" type="text/javascript" async="async"></script>
-    <script src="GLcanvas.js" type="text/javascript" async="async"></script>
-    <script src="GLstring.js" type="text/javascript" async="async"></script>
+    <script src="GLobject.js" type="application/javascript" async="async"></script>
+    <script src="GLmatrix.js" type="application/javascript" async="async"></script>
+    <script src="GLtexture.js" type="application/javascript" async="async"></script>
+    <script src="GLframe.js" type="application/javascript" async="async"></script>
+    <script src="GLshader.js" type="application/javascript" async="async"></script>
+    <script src="GLcanvas.js" type="application/javascript" async="async"></script>
+    <script src="GLstring.js" type="application/javascript" async="async"></script>
 
     <!-- Simple objects -->
-    <script src="Cylinder.js" type="text/javascript" async="async"></script>
-    <script src="Sphere.js" type="text/javascript" async="async"></script>
-    <script src="Torus.js" type="text/javascript" async="async"></script>
-    <script src="Disk.js" type="text/javascript" async="async"></script>
-    <script src="Quad.js" type="text/javascript" async="async"></script>
+    <script src="Cylinder.js" type="application/javascript" async="async"></script>
+    <script src="Sphere.js" type="application/javascript" async="async"></script>
+    <script src="Torus.js" type="application/javascript" async="async"></script>
+    <script src="Disk.js" type="application/javascript" async="async"></script>
+    <script src="Quad.js" type="application/javascript" async="async"></script>
 
     <!-- Complex objects lv.1 -->
-    <script src="Stool.js" type="text/javascript" async="async"></script>
-    <script src="SixSidedPrism.js" type="text/javascript" async="async"></script>
-    <script src="Ball.js" type="text/javascript" async="async"></script>
-    <script src="ThickCyl.js" type="text/javascript" async="async"></script>
+    <script src="Stool.js" type="application/javascript" async="async"></script>
+    <script src="SixSidedPrism.js" type="application/javascript" async="async"></script>
+    <script src="Ball.js" type="application/javascript" async="async"></script>
+    <script src="ThickCyl.js" type="application/javascript" async="async"></script>
     
     <!-- Complex objects lv.2 -->
-    <script src="StoolPyramid.js" type="text/javascript" async="async"></script>
-    <script src="MazePiece.js" type="text/javascript" async="async"></script>
-    <script src="Jumbotron.js" type="text/javascript" async="async"></script>
+    <script src="StoolPyramid.js" type="application/javascript" async="async"></script>
+    <script src="MazePiece.js" type="application/javascript" async="async"></script>
+    <script src="Jumbotron.js" type="application/javascript" async="async"></script>
 
     <!-- Environments -->
-    <script src="Skybox.js" type="text/javascript" async="async"></script>
-    <script src="Cagebox.js" type="text/javascript" async="async"></script>
-    <script src="Game.js" type="text/javascript" async="async"></script>
-
-    <canvas id="textureCanvas" style="display:none;">
-      I'm sorry your browser does not support the HTML5 canvas element.
-    </canvas>
+    <script src="Skybox.js" type="application/javascript" async="async"></script>
+    <script src="Cagebox.js" type="application/javascript" async="async"></script>
+    <script src="Game.js" type="application/javascript" async="async"></script>
   </head>
 
   <body onload="theCanvas = new GLcanvas().init();">
@@ -60,101 +57,108 @@
       <div class='one_third'>Demo</div>
     </div>
 
-    <div id="banner">       
+    <div id="wrap">
+      <div id="banner">       
 
-      <div id="display" style="padding-top:8px; width:100%;">
+	<div id="display" style="padding-top:8px; width:100%;">
 
-	<!-- Toggled off when stadium loads -->
-	<div id="stadium_params" style="display:inline-block;">
-	  <div style="float:left;">Name:</div>
-	  <input id="stadium_name" type="text" style="float:right; width:60%;"
-		 class="start_button stadium_input"/>
-	  <br/>
-	  <div style="float:left;">Balls:</div>
-	  <input id="stadium_balls" type="text" style="float:right; width:60%;"
-		 value="20" class="start_button stadium_input"/>
-	  <input id="stadium_balls" type="button" style="float:left;"
-		 value="Play" class="start_button stadium_input" />
+	  <!-- Toggled off when stadium loads -->
+	  <div id="stadium_params" style="display:inline-block;">
+	    <div style="float:left;">Name:</div>
+	    <input id="stadium_name" type="text" style="float:right; width:60%;"
+		   class="start_button stadium_input"/>
+	    <br/>
+	    <div style="float:left;">Balls:</div>
+	    <input id="stadium_balls" type="text" style="float:right; width:60%;"
+		   value="20" class="start_button stadium_input"/>
+	    <input id="stadium_balls" type="button" style="float:left;"
+		   value="Play" class="start_button stadium_input" />
+	  </div>
+
+	  <!-- Toggled on when stadium loads -->
+
 	</div>
 
-	<!-- Toggled on when stadium loads -->
+	<canvas id="textureCanvas" style="float:left;display:none;">
+	  I'm sorry your browser does not support the HTML5 canvas element.
+	</canvas>
 
       </div>
 
-    </div>
-
-    <div id="keyboard" style="position:absolute; bottom: 0px; left: 0px; color: #ffffff;"></div>
-    <div class='main'>
-      <canvas id="glcanvas" width="1100"></canvas>
-      <!-- 
-	   We use a table with 2x2 cells, 
-	   lumping all the links into their own cells..
-	-->
-      <br/>
-      <table id="button_table" style="width:100%;">
-	<thead><tr>
-	    <th><u>Shapes</u></th>
-	    <th><u>Environments</u></th>
-	</tr></thead>
-	<tbody><tr>
-	    <td>
-	      <input type="button" 
-		     onclick="theCanvas.start('cylinder');" 
-		     value="Cylinder" 
-		     class="start_button"/>
-	      <input type="button" 
-		     onclick="theCanvas.start('skybox');" 
-		     value="Skybox" 
-		     class="start_button"/>
-	      <input type="button" 
-		     onclick="theCanvas.start('sphere');" 
-		     value="Sphere" 
-		     class="start_button"/>
-	      <input type="button" 
-		     onclick="theCanvas.start('stool');" 
-		     value="Stool" 
-		     class="start_button"/>
-	      <input type="button" 
-		     onclick="theCanvas.start('text');" 
-		     value="Text" 
-		     class="start_button"/>
-	      <input type="button" 
-		     onclick="theCanvas.start('torus');" 
-		     value="Torus" 
-		     class="start_button"/>
-	    </td>
-	    <td>
-	      <input type="button" 
-		     onclick="theCanvas.start('shadow');" 
-		     value="Shadows" 
-		     class="start_button"/>
-	      <input type="button" 
-		     onclick="theCanvas.start('jumbotron');" 
-		     value="Jumbotron" 
-		     class="start_button"/>
-	      <input type="button" 
-		     value="Maze (disabled)" 
-		     class="start_button" style="color:#aa4455;font-size:22px;" disabled="disabled"/>
-	      <input type="button" 
-		     value="Stadium (disabled)" 
-		     class="start_button" style="color:#aa4455;font-size:22px;" disabled="disabled"/>
-	      <input type="button" 
-		     onclick="theCanvas.start('game');" 
-		     value="Game" 
-		     class="start_button"/>
-	    </td>
-	</tr></tbody>
-      </table>
-      <div style="position: inherit;left:0px;top:0px;width:16px;height:16px;">
-	<div class="lowAcross" ></div>
-	<div class="topAcross" ></div>
-	<div class="leftSide" ></div>
-	<div class="rightSide" ></div>
-	<div class="topLeft" ></div>
-	<div class="topRight" ></div>
-	<div class="lowLeft" ></div>
-	<div class="lowRight" ></div>
+      <div id="keyboard" style="position:absolute; bottom: 0px; left: 0px; color: #ffffff;"></div>
+      <div class='main'>
+	<canvas id="glcanvas" width="1100"></canvas>
+	<!-- 
+	     We use a table with 2x2 cells, 
+	     lumping all the links into their own cells..
+	  -->
+	<br/>
+	<table id="button_table" style="width:100%;">
+	  <thead><tr>
+	      <th><u>Shapes</u></th>
+	      <th><u>Environments</u></th>
+	  </tr></thead>
+	  <tbody><tr>
+	      <td>
+		<input type="button" 
+		       onclick="theCanvas.start('cylinder');" 
+		       value="Cylinder" 
+		       class="start_button"/>
+		<input type="button" 
+		       onclick="theCanvas.start('skybox');" 
+		       value="Skybox" 
+		       class="start_button"/>
+		<input type="button" 
+		       onclick="theCanvas.start('sphere');" 
+		       value="Sphere" 
+		       class="start_button"/>
+		<input type="button" 
+		       onclick="theCanvas.start('stool');" 
+		       value="Stool" 
+		       class="start_button"/>
+		<input type="button" 
+		       onclick="theCanvas.start('text');" 
+		       value="Text" 
+		       class="start_button"/>
+		<input type="button" 
+		       onclick="theCanvas.start('torus');" 
+		       value="Torus" 
+		       class="start_button"/>
+	      </td>
+	      <td>
+		<input type="button" 
+		       onclick="theCanvas.start('shadow');" 
+		       value="Shadows" 
+		       class="start_button"/>
+		<input type="button" 
+		       onclick="theCanvas.start('jumbotron');" 
+		       value="Jumbotron" 
+		       class="start_button"/>
+		<input type="button" 
+		       value="Maze (disabled)" 
+		       class="start_button" style="color:#aa4455;font-size:22px;" disabled="disabled"/>
+		<input type="button" 
+		       value="Stadium (disabled)" 
+		       class="start_button" style="color:#aa4455;font-size:22px;" disabled="disabled"/>
+		<input type="button" 
+		       onclick="theCanvas.start('game');" 
+		       value="Game" 
+		       class="start_button"/>
+	      </td>
+	  </tr></tbody>
+	</table>
+	<div style="position: inherit;left:0px;top:0px;width:16px;height:16px;">
+	  <div class="lowAcross" ></div>
+	  <div class="topAcross" ></div>
+	  <div class="leftSide" ></div>
+	  <div class="rightSide" ></div>
+	  <div class="topLeft" ></div>
+	  <div class="topRight" ></div>
+	  <div class="lowLeft" ></div>
+	  <div class="lowRight" ></div>
+	</div>
       </div>
+      <div style="clear:both;"></div>
     </div>
 
 
@@ -258,9 +262,9 @@
 
 	vec3 actual_color = textureColor * 1.6;
 	
-	float yellow =  (actual_color.r + actual_color.g) / 2.0;
+	float yellow =  dot(max(vec2(actual_color.r, actual_color.g),0.0), vec2(0.75, 0.75));
 
-	gl_FragColor = vec4(yellow, yellow, actual_color.b, background);
+	gl_FragColor = vec4(yellow, yellow, actual_color.b / (yellow + 0.01), background);
 	}
 
 	void main(void) {
@@ -276,8 +280,8 @@
 	float the_beat = hi_hat_u;
 
 	vec3 textureColor = texture2D(theSampler, textureV).xyz;
-	textureColor[0] *= sway;
-	textureColor[1] *= -sway2;
+	textureColor[0] *= 4.0 * sway;
+	textureColor[1] *= -4.0 * sway2;
 	textureColor[2] *= abs((sway * sway2));
 
 	float background = clamp(length(textureColor) * 5.0, 0.8, 1.0);
@@ -288,10 +292,51 @@
 	  the_beat / 20. * texture2D(theSampler, textureV);
 	  }
 
-	  void main(void) { colorTexture(sampler0); 
+	  void main(void) { colorTexture(sampler1); 
 
 	  }
       </textarea>
+      <textarea id="shader_frag_default">
+	void colorize() {
+	vec3 ambColor = colorV / 3.0 * ambient_coeff_u;
+	vec3 diffColor = colorV / 3.0 * diffuseV * diffuse_coeff_u;
+	vec3 specColor = specular_color_u * specular();
+	gl_FragColor = vec4(ambColor + diffColor + specColor, 1.0);
+	}
+
+
+	void colorTexture(sampler2D theSampler) {
+	vec3 textureColor = texture2D(theSampler, vec2(textureV.s, textureV.t)).xyz;
+	
+
+	vec3 textureColorz = texture2D(sampler1, vec2(textureV.s, textureV.t)).xyz;
+	vec3 final_distance = normalize(normalize(lightNorm) + normalize(vec3(textureColorz.x,textureColorz.y,textureColorz.z)));
+	vec3 reflectionV2 = reflect(normalize(final_distance), normalize(vertNorm));
+	float diffuseV2 = dot(vertNorm, final_distance);
+
+	float specularV2 = dot(normalize(reflectionV2), 
+        normalize(vModel.xyz));
+	if (specularV2 <= 0.0) { specularV2 = 0.0; }
+			  specularV2 = specularV2 * specularV2;
+			  specularV2 = specularV2 * specularV2;
+			  specularV2 = specularV2 * specularV2;
+			  specularV2 = specularV2 * specularV2;
+
+			  vec3 ambColor = textureColor / 3.0 * ambient_coeff_u;
+			  vec3 diffColor = textureColor * diffuseV2 * diffuse_coeff_u;
+			  vec3 specColor = textureColor * specularV2;
+
+			  vec3 blendColor = mod(distanceV, 50.0) / 50.0;
+			  vec3 normalColor = ambColor + diffColor + specColor;
+			  gl_FragColor = vec4(normalColor, 1.0);
+			  }
+
+			  void main(void) {
+			  //  if(dot(normalize(vertNorm), vec3(0.0, 0.0,-1.0)) < 0.0) {  
+										 //    discard; 
+										 colorTexture(sampler0);
+										 }
+										 </textarea>
       <textarea id="shader_vert_default" rows="20">
 	void main(void) {
 	// -- Position -- //
@@ -342,5 +387,6 @@
 		       }
 		       </textarea>
     </div>
+
   </body>
 </html>

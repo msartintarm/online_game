@@ -24,48 +24,7 @@ void main(void) {\n\
     this.fragment["canvas"] = document.getElementById("shader_frag_canvas").value;
     this.fragment["player"] = document.getElementById("shader_frag_player").value;
 
-    this.fragment["default"] = "\
-void colorize() {\n\
-  vec3 ambColor = colorV / 3.0 * ambient_coeff_u;\n\
-  vec3 diffColor = colorV / 3.0 * diffuseV * diffuse_coeff_u;\n\
-  vec3 specColor = specular_color_u * specular();\n\
-  gl_FragColor = vec4(ambColor + diffColor + specColor, 1.0);\n\
-}\n\
-\n\
-\n\
-void colorTexture(sampler2D theSampler) {\n\
-  vec3 textureColor = texture2D(theSampler, vec2(textureV.s, textureV.t)).xyz;\n\
-  \n\
-\n\
-    vec3 textureColorz = texture2D(sampler1, vec2(textureV.s, textureV.t)).xyz;\n\
-    vec3 final_distance = normalize(normalize(lightNorm) + normalize(vec3(-textureColorz.x,-textureColorz.y,textureColorz.z)));\n\
-    vec3 reflectionV2 = reflect(normalize(final_distance), normalize(vertNorm));\n\
-  float diffuseV2 = dot(vertNorm, final_distance);\n\
-\n\
-float specularV2 = dot(normalize(reflectionV2), \n\
-                    normalize(vModel.xyz));\n\
-    if (specularV2 <= 0.0) { specularV2 = 0.0; }\n\
-    specularV2 = specularV2 * specularV2;\n\
-    specularV2 = specularV2 * specularV2;\n\
-    specularV2 = specularV2 * specularV2;\n\
-    specularV2 = specularV2 * specularV2;\n\
-\n\
-  vec3 ambColor = textureColor / 3.0 * ambient_coeff_u;\n\
-  vec3 diffColor = textureColor * diffuseV2 * diffuse_coeff_u;\n\
-  vec3 specColor = textureColor * specularV2;\n\
-\n\
-  vec3 blendColor = mod(distanceV, 50.0) / 50.0;\n\
-  vec3 normalColor = ambColor + diffColor + specColor;\n\
-  gl_FragColor = vec4(normalColor, 1.0);\n\
-}\n\
-\n\
-void main(void) {\n\
-//  if(dot(normalize(vertNorm), vec3(0.0, 0.0,-1.0)) < 0.0) {  \n\
-//    discard; \n\
-colorTexture(sampler0);\n\
-}\n\
-";
-
+    this.fragment["default"] = document.getElementById("shader_frag_default").value;
     this.fragment["frame"] = "\
 void main(void) {\n\
 \n\
