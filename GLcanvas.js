@@ -27,9 +27,6 @@ function GLcanvas() {
 
     this.resizeCounter = 0;
 
-    document.getElementById("stadium_name").focus();
-    document.getElementById("stadium_name").value = "Hogarth";
-
     return this;
 }
 
@@ -110,7 +107,8 @@ GLcanvas.prototype.start = function(theScene) {
 	this.canvas.style.display = "block";
 //	this.canvas.style.width = "100%";
 //	this.canvas.width = this.canvas.offsetWidth - 16;
-	this.canvas.width = window.innerWidth * .75 - 5;
+	// Same calcs the div's go through with padding, minus an additional five.
+	this.canvas.width = (window.innerWidth - 30) * .75 - 25;
 	this.canvas.height = window.innerHeight - 25;
 
 	if(this.initGL() !== 0) {

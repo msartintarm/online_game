@@ -65,21 +65,18 @@ const WALL_TOP = 5;
     this.hit_sound[2].load();
     this.hit_sound[3].load();
     this.hit_sound[4].load();
-
     this.hi_hat = 0;
     
-    this.player_name = document.getElementById("stadium_name").value;
-
-    this.player_string = new GLstring(this.player_name, TEXT_TEXTURE, 
-				      theCanvas.gl.shader_player);
-    this.left_string = new GLstring("left", TEXT_TEXTURE, 
-				      theCanvas.gl.shader_player);
-    this.right_string = new GLstring("right", TEXT_TEXTURE, 
-				      theCanvas.gl.shader_player);
-    this.jump_string = new GLstring("jump", TEXT_TEXTURE, 
-				      theCanvas.gl.shader_player);
-    this.collision_string = new GLstring("Ouch!", TEXT_TEXTURE, 
-				      theCanvas.gl.shader_player);
+    // Setup player textures
+    this.player_name = "Oname";
+    document.getElementById("player_name").focus();
+    document.getElementById("player_name").value = this.player_name;
+    // Specify string to use, texture ID, and shader to use
+    this.player_string = new GLstring(this.player_name, TEXT_TEXTURE, theCanvas.gl.shader_player);
+    this.left_string = new GLstring("left", TEXT_TEXTURE, theCanvas.gl.shader_player);
+    this.right_string = new GLstring("right", TEXT_TEXTURE, theCanvas.gl.shader_player);
+    this.jump_string = new GLstring("jump", TEXT_TEXTURE, theCanvas.gl.shader_player);
+    this.collision_string = new GLstring("Ouch!", TEXT_TEXTURE, theCanvas.gl.shader_player);
 
     var player_width = this.grid;
     var bg_width = 1200;

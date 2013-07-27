@@ -1,8 +1,9 @@
 <?php
 
+// To execute: `php -S localhost:8000 -t .`
 
 $path = pathinfo($_SERVER["SCRIPT_FILENAME"]);
-if ($path["extension"] == "js") {
+if ($path["extension"] === "js") {
 
   $old_file = $_SERVER["SCRIPT_FILENAME"];
   $new_file = $old_file . ".gz";
@@ -18,4 +19,5 @@ if ($path["extension"] == "js") {
 } else {
   return FALSE;
 }
+
 ?>

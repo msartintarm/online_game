@@ -7,7 +7,7 @@
     <title>WebGL Demo</title>
     <link rel='stylesheet' type="text/css" href="styles.css"/>
     <link rel='icon' type="image/x-icon" href="favicon.ico"/>
-
+ 
     <!-- External JS libraries -->
     <script src="libs/gl-matrix.js" type="application/javascript" async="async"></script> 
     <!-- Only used for RequestAnimFrame -->
@@ -57,27 +57,29 @@
       <div class='one_third'>Demo</div>
     </div>
 
-    <div id="wrap">
-      <div id="banner">       
+    <div class="wrap" id="wrap_all">
+	<div id="banner">       
+      <div class="wrap">
 
-	<div id="display" style="padding-top:8px; width:100%;">
+	  <div id="display" style="padding-top:8px; width:100%;">
 
-	  <!-- Toggled off when stadium loads -->
-	  <div id="stadium_params" style="display:inline-block;">
-	    <div style="float:left;">Name:</div>
-	    <input id="stadium_name" type="text" style="float:right; width:60%;"
-		   class="start_button stadium_input"/>
-	    <br/>
-	    <div style="float:left;">Balls:</div>
-	    <input id="stadium_balls" type="text" style="float:right; width:60%;"
-		   value="20" class="start_button stadium_input"/>
-	    <input id="stadium_balls" type="button" style="float:left;"
-		   value="Play" class="start_button stadium_input" />
-	  </div>
+	    <!-- Toggled off when stadium loads -->
+	    <div id="stadium_params" style="display:inline-block;">
+	      <div style="float:left;">Name:</div>
+	      <input id="player_name" type="text" style="float:right; width:60%;"
+		     class="start_button stadium_input"/>
+	      <br/>
+	      <div style="float:left;">Balls:</div>
+	      <input id="stadium_balls" type="text" style="float:right; width:60%;"
+		     value="20" class="start_button stadium_input"/>
+	      <input id="stadium_balls" type="button" style="float:left;"
+		     value="Play" class="start_button stadium_input" />
+	    </div>
 
-	  <!-- Toggled on when stadium loads -->
+	    <!-- Toggled on when stadium loads -->
 
 	</div>
+	  </div>
 
 	<canvas id="textureCanvas" style="float:left;display:none;">
 	  I'm sorry your browser does not support the HTML5 canvas element.
@@ -87,6 +89,7 @@
 
       <div id="keyboard" style="position:absolute; bottom: 0px; left: 0px; color: #ffffff;"></div>
       <div class='main'>
+	<div class="wrap">
 	<canvas id="glcanvas" width="1100"></canvas>
 	<!-- 
 	     We use a table with 2x2 cells, 
@@ -157,6 +160,7 @@
 	  <div class="lowLeft" ></div>
 	  <div class="lowRight" ></div>
 	</div>
+      </div>
       </div>
       <div style="clear:both;"></div>
     </div>

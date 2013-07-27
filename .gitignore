@@ -165,4 +165,8 @@ pip-log.txt
 # Emacs Files
 *~
 
+# Temp Windows Files
 *#
+
+# Server-Generated Files
+*.js.gz
