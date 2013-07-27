@@ -1,10 +1,5 @@
 
 /**
- * Object holding modelview and perspective matrices.
- */
-var theMatrix;
-
-/**
  * This is basically a wrapper class for the GL context.
  * It links together objects that are in scenes to things
  * defined within the context, such as shaders.
@@ -14,16 +9,11 @@ function GLcanvas() {
     this.textures = [];
     this.textureNums = [];
     this.frame_count = 0;
-    this.canvas = document.getElementById("glcanvas");
     this.gl = null;
-	
-    // Create status bar
-    var display = document.getElementById("display");
-    display.innerHTML = "<p id=\"glcanvas_status\"></p>" + display.innerHTML;
+    this.canvas = null;
 	
     // if we have errors, don't keep trying to draw the scene
     this.has_errors = false;
-    theMatrix = new GLmatrix();
 
     this.resizeCounter = 0;
 
@@ -104,6 +94,7 @@ GLcanvas.prototype.start = function(theScene) {
 	document.getElementById("button_table").style.display = "none";
 	document.getElementById("footer").style.display = "none";
 
+	this.canvas = document.getElementById("glcanvas");
 	this.canvas.style.display = "block";
 //	this.canvas.style.width = "100%";
 //	this.canvas.width = this.canvas.offsetWidth - 16;
@@ -119,6 +110,8 @@ GLcanvas.prototype.start = function(theScene) {
 	    theWindow.focus();
 	    return;
 	}
+
+	// Create and compile shaders before they are used.
 
 	this.shader_source = new GLshader;
 	this.shader_count = 0;
@@ -144,7 +137,11 @@ GLcanvas.prototype.start = function(theScene) {
 	}
 	   
 	this.objects = [];
-	   
+
+	// start matrix models
+	theMatrix = new GLmatrix(this.gl);
+	this.matrix = theMatrix;
+
 	// Instantiate models
 	this.createScene(theScene);
 
@@ -363,3 +360,11 @@ GLcanvas.prototype.initUniform = function(gl_shader, uni) {
 };
 
 var theCanvas;
+
+/**
+ * Object holding modelview and perspective matrices.
+ */
+var theMatrix;
+
+theCanvas = new GLcanvas();
+theCanvas.init();

@@ -50,7 +50,7 @@
     <script src="Game.js" type="application/javascript" async="async"></script>
   </head>
 
-  <body onload="theCanvas = new GLcanvas().init();">
+  <body>
     <div id='header'>
       <div class='one_third'>WebGL:</div>
       <div class='one_third'>A</div>
@@ -62,6 +62,7 @@
       <div class="wrap">
 
 	  <div id="display" style="padding-top:8px; width:100%;">
+	    <p id="glcanvas_status"></p>
 
 	    <!-- Toggled off when stadium loads -->
 	    <div id="stadium_params" style="display:inline-block;">

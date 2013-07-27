@@ -4,7 +4,9 @@
    Functions manipulating these matrices set flags, ensuring we
    do not perform expensive matrix operations unless necessary
  */
-function GLmatrix() {
+function GLmatrix(gl_) {
+
+    this.gl = gl_;
 
     this.matrices = new Float32Array(48);
 
@@ -180,6 +182,7 @@ GLmatrix.prototype.moveInToPlay = function() {
 	this.distToMove = [0,-1,-50/10];
 	moveCount = 10;
 };
+
 GLmatrix.prototype.dropIn = function() {
     var thePos = vec4.fromValues(0,0,0,1);
     var newPos = vec4.fromValues(0,0,0,1);
@@ -193,45 +196,6 @@ GLmatrix.prototype.dropIn = function() {
     moveCount = 100;
     StadiumInitSeqNum = 2;
 };
-
-GLmatrix.prototype.runStadiumInit = function() {
-    /*
-      StadiumInitSeqNum === 0 
-             balls are still flying in to position
-      StadiumInitSeqNum === 1 
-             balls in position call dropIn function
-	     only call dropIn once but it runs 100 frames
-      StadiumInitSeqNum === 2
-             drop in has finished its 100 frames
-      StadiumInitSeqNum === 3
-              we are in place
-	      turn on priveledgedMode (collision detection only really
-	        as you can't move during init sequence anyways)
-      StadiumInitSeqNum == 4
-              init sequence has completed
-     */
-    if(stadiumMode && StadiumInitSeqNum === 0){
-	this.moveInToPlay();
-	//console.log("Made it to seq 1");
-	if(ballInitSeqOver === true)
-	    StadiumInitSeqNum = 1;
-    }
-    else if(stadiumMode && StadiumInitSeqNum === 1){
-	this.dropIn(); 
-	//console.log("Made it to seq 2");
-    }
-    else if(stadiumMode && StadiumInitSeqNum === 2){
-	if(moveCount === 0)
-	    StadiumInitSeqNum = 3;
-        //console.log("Made it to seq 3");
-    }
-    else if(stadiumMode && StadiumInitSeqNum === 3){
-	priveledgedMode.toggle();
-	StadiumInitSeqNum = 4;
-	//console.log("Made it to seq 4");
-    }
-}
-    
 
 /**
    Rotate between supported speed modes:
@@ -324,10 +288,10 @@ GLmatrix.prototype.update = function() {
  * View / model / normal ops I got from:
  http://www.songho.ca/opengl/gl_transform.html
 */
-GLmatrix.prototype.setViewUniforms = function(gl_, shader_) {
+GLmatrix.prototype.setViewUniforms = function(shader_) {
 
     if (this.pMatrixChanged === true) {
-	gl_.uniformMatrix4fv(shader_.unis["pMatU"], false, this.pMatrix);
+	this.gl.uniformMatrix4fv(shader_.unis["pMatU"], false, this.pMatrix);
 	this.pMatrixChanged = false;
     }
     if (this.vMatrixChanged === true) {
@@ -338,8 +302,8 @@ GLmatrix.prototype.setViewUniforms = function(gl_, shader_) {
 	this.vMatrixChanged = false;
     }
 
-    gl_.uniformMatrix4fv(shader_.unis["mvnMatU"], false, this.matrices);
-    gl_.uniformMatrix4fv(shader_.unis["lMatU"], false, this.ilMatrix);
+    this.gl.uniformMatrix4fv(shader_.unis["mvnMatU"], false, this.matrices);
+    this.gl.uniformMatrix4fv(shader_.unis["lMatU"], false, this.ilMatrix);
 };
 
 
@@ -347,7 +311,7 @@ GLmatrix.prototype.setViewUniforms = function(gl_, shader_) {
 /**
  * Per-vertex uniforms must be set each time.
  */
-GLmatrix.prototype.setVertexUniforms = function(gl_, shader_) {
+GLmatrix.prototype.setVertexUniforms = function(shader_) {
 
     if (this.mMatrixChanged === true) { 
 	// perceived normals: (inverse of modelview
@@ -358,7 +322,7 @@ GLmatrix.prototype.setVertexUniforms = function(gl_, shader_) {
 	this.mMatrixChanged = false;
     }
 
-    gl_.uniformMatrix4fv(shader_.unis["mvnMatU"], false, this.matrices);
+    this.gl.uniformMatrix4fv(shader_.unis["mvnMatU"], false, this.matrices);
 };
 
 GLmatrix.prototype.push = function() {

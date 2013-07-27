@@ -83,7 +83,7 @@ const WALL_TOP = 5;
     var floor_width = player_width;
     this.floor = [];
 
-    theMatrix.vTranslate([0,0,750]);
+    theCanvas.matrix.vTranslate([0,0,750]);
 
     this.player = new Quad(
 	[ player_width / 2, player_width, -1],
@@ -137,14 +137,14 @@ const WALL_TOP = 5;
 	// Basically in our game, we know this stuff only
 	// ever gets called in certain patterns.
 	theCanvas.changeShader(gl_.shader);
-	theMatrix.setViewUniforms(gl_, gl_.shader);
+	theMatrix.setViewUniforms(gl_.shader);
 	gl_.uniformMatrix4fv(gl_.shader.unis["pMatU"], false, theMatrix.pMatrix);
 	gl_.uniform1i(gl_.shader.unis["sampler1"], gl_.tex_enum[BRICK_NORMAL_TEXTURE]);
 	theCanvas.changeShader(gl_.shader_player);
-	theMatrix.setViewUniforms(gl_, gl_.shader_player);
+	theMatrix.setViewUniforms(gl_.shader_player);
 	gl_.uniformMatrix4fv(gl_.shader_player.unis["pMatU"], false, theMatrix.pMatrix);
 	theCanvas.changeShader(gl_.shader_canvas);
-	theMatrix.setViewUniforms(gl_, gl_.shader_canvas);
+	theMatrix.setViewUniforms(gl_.shader_canvas);
 	gl_.uniformMatrix4fv(gl_.shader_canvas.unis["pMatU"], false, theMatrix.pMatrix);
 
 //	gl_.uniform1f(player_shader.unis["hi_hat_u"], this.hi_hat);
@@ -225,7 +225,7 @@ const WALL_TOP = 5;
 	//    this.floor : gl_.shader
 
 	theCanvas.changeShader(gl_.shader);
-	theMatrix.setViewUniforms(gl_, gl_.shader);
+	theMatrix.setViewUniforms(gl_.shader);
 
 	gl_.uniform3fv(gl_.shader.unis["lightPosU"], this.movement);
 
@@ -237,7 +237,7 @@ const WALL_TOP = 5;
 	theMatrix.translate(this.movement);
 
 	theCanvas.changeShader(player_shader);
-	theMatrix.setVertexUniforms(gl_, player_shader);
+	theMatrix.setVertexUniforms(player_shader);
 
 	this.player.draw(gl_);
 	theMatrix.pop();
@@ -246,7 +246,7 @@ const WALL_TOP = 5;
 	theMatrix.translate(this.bg_movement);
 
 	theCanvas.changeShader(gl_.shader_canvas);
-	theMatrix.setVertexUniforms(gl_, gl_.shader_canvas);
+	theMatrix.setVertexUniforms(gl_.shader_canvas);
 
 	this.background.draw(gl_);
 	theMatrix.pop();
