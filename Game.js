@@ -90,7 +90,7 @@ function Game() {
     var bg_width = 1200;
     var floor_width = player_width;
     this.floor = [];
-
+    this.three_dee = [];
     theCanvas.matrix.vTranslate([0,300,750]);
 
     this.player = new Quad(
@@ -119,9 +119,20 @@ function Game() {
 	    [-floor_width, -3 * floor_width, -1],
 	    [ floor_width,                0, -1],
 	    [ floor_width, -3 * floor_width, -1])
-			.translate([i * floor_width * 2, 0, 0])
+			.translate([i * floor_width * 2, 0, 40])
 			.setTexture(RUG_TEXTURE)
 			.add2DCoords());
+	this.three_dee.push(new SixSidedPrism(
+	    [-floor_width,                0, -1],
+	    [-floor_width, -3 * floor_width, -1],
+	    [ floor_width, -3 * floor_width, -1],
+	    [ floor_width,                0, -1],
+	    [-floor_width,                0, -1 - floor_width],
+	    [-floor_width, -3 * floor_width, -1 - floor_width],
+	    [ floor_width, -3 * floor_width, -1 - floor_width],
+	    [ floor_width,                0, -1 - floor_width])
+			.translate([i * floor_width * 2, 0, 40])
+			.setTexture(RUG_TEXTURE));
 	// todo: turn into a '
 //	this.floor[i + 10].x_
     }
@@ -184,6 +195,9 @@ function Game() {
 	for(i = 0; i < this.floor.length; ++i){
 	    this.floor[i].initBuffers(gl_);
 	}
+	for(i = 0; i < this.three_dee.length; ++i){
+	    this.three_dee[i].initBuffers(gl_);
+	}
     };
 
     this.draw = function(gl_) {
@@ -237,6 +251,9 @@ function Game() {
 
 	for(i = 0; i < this.floor.length; ++i){
 	    this.floor[i].draw(gl_);
+	}
+	for(i = 0; i < this.three_dee.length; ++i){
+	    this.three_dee[i].draw(gl_);
 	}
 
 	theMatrix.push();
@@ -616,6 +633,9 @@ function Game() {
      */
     this.playMusic = function() {
 
+	var web = this.web_audio;
+	var audio = this.audio;
+
 	// Asynchronously set up each audio element
 	this.audio.forEach(
 	    function(gl_audio) {
@@ -623,23 +643,33 @@ function Game() {
 		gl_audio.source = this.web_audio.createBufferSource();
 		gl_audio.source.connect(gl_audio.dest);
 		gl_audio.source.buffer = gl_audio.buffer;
-		gl_audio.source.loop = true;
-		gl_audio.source.loopEnd = gl_audio.length;
 		gl_audio.offset = 0;
+		gl_audio.source1 = true;
 	    }, this);
 
-	// Done setting up. They will play one second after the start of the loop.
-	var time = this.web_audio.currentTime + 1;
-	var web = this.web_audio;
+	// Done setting up. They will play two seconds after the start of the loop.
 
-	this.audio.forEach(
-	    function(gl_audio) {
-		if (gl_audio.auto_play === true) {
-		    gl_audio.source.start(time - web.currentTime + gl_audio.delay, 0);
+	window.setInterval(function() {
+	    var time = web.currentTime + 2;
+	    [audio[0], audio[2]].forEach(
+		function(gl_audio) {
+		    if (gl_audio.source1 === true) {
+			// set up source 2
+			gl_audio.source2 = web.createBufferSource();
+			gl_audio.source2.connect(gl_audio.dest);
+			gl_audio.source2.buffer = gl_audio.buffer;
+			gl_audio.source2.start(time - web.currentTime + gl_audio.delay, 0);
+			gl_audio.source1 = false;
+		    } else {
+			gl_audio.source = web.createBufferSource();
+			gl_audio.source.connect(gl_audio.dest);
+			gl_audio.source.buffer = gl_audio.buffer;
+			gl_audio.source.start(time - web.currentTime + gl_audio.delay, 0);
+			gl_audio.source1 = true;
+		    }
 		}
-	    }
-	);
-	
+	    );
+	}, 2000);
 	
 	
     };
