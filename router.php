@@ -1,21 +1,28 @@
 <?php
 
-// To execute: `php -S localhost:8000 -t .`
+  //To execute: `php -S localhost:8000 -t .`
 
-$path = pathinfo($_SERVER["SCRIPT_FILENAME"]);
-if ($path["extension"] === "js") {
+$oldF = $_SERVER["SCRIPT_FILENAME"];
+$path = pathinfo($oldF);
+$ext = $path["extension"];
 
-  $old_file = $_SERVER["SCRIPT_FILENAME"];
-  $new_file = $old_file . ".gz";
+if ($ext === "js") {
 
+  $oldF = $_SERVER["SCRIPT_FILENAME"];
+  $newF = $oldF . ".gz";
 
-  $gz = gzopen ( $new_file, 'w9' );
-  gzwrite ( $gz, file_get_contents($old_file) );
+  $gz = gzopen ( $newF, 'w9' );
+  gzwrite ( $gz, file_get_contents($oldF) );
   gzclose ($gz);
   header("Content-Type: application/javascript");
   header("Content-Encoding: gzip");
-  readfile($new_file);
+  header("Cache-Control: public");
+  header('Last-Modified: '.gmdate('D, d M Y H:i:s', filemtime($newF)));
+  readfile($newF);
 
+} else if ($ext === "gif" || $ext === "jpg") {
+  header("Cache-Control: public");
+  readfile($oldF);
 } else {
   return FALSE;
 }
