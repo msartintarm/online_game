@@ -48,14 +48,12 @@ function GLmatrix(gl_) {
     this.vMatrixNewChanged = false;
 
     // Here is some random, unrelated stuff.
-    this.r2 = Math.sqrt(2);
     this.mStack = [];
 
     this.distToMove = vec3.create();
 
     // Toggled by member function 'toggleSpeed'
     this.speedMode = 0;
-}
 
 var moveDist = 20.1; //default to maze
 var lookDist = 1/10; //default to maze
@@ -63,7 +61,7 @@ var lookDist = 1/10; //default to maze
 /**
    Writes a perspective view into internal perspective matrix
 */
-GLmatrix.prototype.perspective = function(zoom, aRatio, zNear, zFar) {
+this.perspective = function(zoom, aRatio, zNear, zFar) {
     mat4.perspective(this.pMatrix, zoom, aRatio, zNear, zFar); 
     this.pMatrixChanged = true;
 };
@@ -71,40 +69,34 @@ GLmatrix.prototype.perspective = function(zoom, aRatio, zNear, zFar) {
 /**
    Writes an orthogonal view into internal perspective matrix
 */
-GLmatrix.prototype.ortho = function(left, right, bottom, top, near, far) {
+this.ortho = function(left, right, bottom, top, near, far) {
     mat4.ortho(this.pMatrix, left, right, bottom, top, near, far); 
     this.pMatrixChanged = true;
 };
 
-GLmatrix.prototype.viewMaze = function() {
+this.viewMaze = function() {
     this.vTranslate([20,2,9.0]);
     this.vRotate(Math.PI, [0, 1, 0]);
 };
 
-var StadiumInitSeqNum = 0;
-GLmatrix.prototype.viewStadium = function() {
-    this.vTranslate([-1500,1000,1500]);
-    this.vRotate(-Math.PI/4, [0, 1, 0]);
-};
-
-GLmatrix.prototype.translate = function(vector) {
+this.translate = function(vector) {
     mat4.translate(this.mMatrix, this.mMatrix, vector); 
     this.mMatrixChanged = true;
 };
 
-GLmatrix.prototype.rotate = function(angle, vector) {
+this.rotate = function(angle, vector) {
     mat4.rotate(this.mMatrix, this.mMatrix, angle, vector); 
     this.mMatrixChanged = true;
 };
 
-GLmatrix.prototype.vTranslate = function(vector) {
+this.vTranslate = function(vector) {
     mat4.translate(this.vMatrixNew,
 		   this.vMatrixNew, 
 		   vector); 
     this.vMatrixNewChanged = true;
 };
 
-GLmatrix.prototype.translateN = function(vector) {
+this.translateN = function(vector) {
     mat4.translate(this.mMatrix, 
 		   this.mMatrix,
 		   [-vector[0], 
@@ -113,55 +105,55 @@ GLmatrix.prototype.translateN = function(vector) {
     this.mMatrixChanged = true;
 };
 
-GLmatrix.prototype.rotate = function(rads, vector) {
+this.rotate = function(rads, vector) {
     mat4.rotate(this.mMatrix, this.mMatrix, rads, vector);
     this.mMatrixChanged = true;
 };
 
-GLmatrix.prototype.vRotate = function(rads, vector) {
+this.vRotate = function(rads, vector) {
     mat4.rotate(this.vMatrixNew, this.vMatrixNew, rads, vector);
     this.vMatrixNewChanged = true;
 };
 
-GLmatrix.prototype.scale = function(vector) {
+this.scale = function(vector) {
     mat4.scale(this.mMatrix, this.mMatrix, vector); 
     this.mMatrixChanged = true;
 };
-GLmatrix.prototype.mul = function(m) {
+this.mul = function(m) {
     mat4.multiply(this.mMatrix, this.mMatrix, m); 
     this.mMatrixChanged = true;
 };
 
-GLmatrix.prototype.vMul = function(v) {
+this.vMul = function(v) {
     mat4.multiply(this.vMatrix, this.vMatrix, v); 
     this.vMatrixChanged = true;
 };
 
-GLmatrix.prototype.lookUp = function() {
+this.lookUp = function() {
 	radiansToRotate = (lookDist * 2 * Math.PI)/10;
 	rotateCount = 10;
 	vectorRotation = [1,0,0];
 };
 
-GLmatrix.prototype.lookDown = function() {
+this.lookDown = function() {
 	radiansToRotate = (lookDist * 2 * Math.PI)/10;
 	rotateCount = 10;
 	vectorRotation = [-1,0,0];
 };
 
-GLmatrix.prototype.lookRight = function(distance) {
+this.lookRight = function(distance) {
 	radiansToRotate = (lookDist * distance * Math.PI)/10;
 	rotateCount = 10;
 	vectorRotation = [0,-1,0];
 };
 
-GLmatrix.prototype.turnAround = function(rads){
+this.turnAround = function(rads){
     radiansToRotate = rads/10;
     rotateCount = 10;
     vectorRotation = [0,1,0];
 };
 
-GLmatrix.prototype.moveForward = function() {
+this.moveForward = function() {
     if(moveCount !== 0  && moveAccel <= 5){
         moveAccel += 0.1;
     }
@@ -173,28 +165,14 @@ GLmatrix.prototype.moveForward = function() {
     moveCount = 10;
 };
 
-GLmatrix.prototype.moveBack = function() {
+this.moveBack = function() {
     this.distToMove = [0,0,moveDist/10];
     moveCount = 10;
 };
 
-GLmatrix.prototype.moveInToPlay = function() {
+this.moveInToPlay = function() {
 	this.distToMove = [0,-1,-50/10];
 	moveCount = 10;
-};
-
-GLmatrix.prototype.dropIn = function() {
-    var thePos = vec4.fromValues(0,0,0,1);
-    var newPos = vec4.fromValues(0,0,0,1);
-    var curPos = vec4.fromValues(0,0,0,1);
-
-    vec4.transformMat4(newPos, thePos, this.vMatrixNew);
-    vec4.transformMat4(newPos, newPos, this.vMatrix);
-    vec4.transformMat4(curPos, curPos, this.vMatrix);
-
-    this.distToMove = [0,(-curPos[1]/100)+(12.5/100),-(curPos[2]+400)/100];
-    moveCount = 100;
-    StadiumInitSeqNum = 2;
 };
 
 /**
@@ -204,7 +182,7 @@ GLmatrix.prototype.dropIn = function() {
    2 = fast (10x)
    'Shift' toggles between the modes
 */
-GLmatrix.prototype.toggleSpeed = function() {
+this.toggleSpeed = function() {
     this.speedMode += 1;
     this.speedMode %= 3;
     var keyboard = document.getElementById("keyboard");
@@ -224,7 +202,7 @@ GLmatrix.prototype.toggleSpeed = function() {
 var moveCount = 0;
 var moveAccel = 1;
 
-GLmatrix.prototype.gradualMove = function() {
+this.gradualMove = function() {
 
     if(moveCount > 0) {
 	switch (this.speedMode) {
@@ -249,25 +227,17 @@ GLmatrix.prototype.gradualMove = function() {
 var rotateCount = 0;
 var radiansToRotate = 0; 
 var vectorRotation = [0,0,0];
-GLmatrix.prototype.gradualRotate = function() {
+this.gradualRotate = function() {
     if(rotateCount > 0) {
 	this.vRotate(radiansToRotate, vectorRotation);
 	rotateCount -= 1;
     }
 };
 
-
-GLmatrix.prototype.newViewAllowed = function() {
-    if(mazeMode)
-	return myMaze.checkPosition();
-    if(stadiumMode)
-	return myStadium.checkPosition();
-};
-
 /**
  * Input: amount of time to go up for x squares.
  */
-GLmatrix.prototype.update = function() {
+this.update = function() {
 
     if(GLobject.has_collided > 0) GLobject.has_collided --;
 
@@ -288,12 +258,10 @@ GLmatrix.prototype.update = function() {
  * View / model / normal ops I got from:
  http://www.songho.ca/opengl/gl_transform.html
 */
-GLmatrix.prototype.setViewUniforms = function(shader_) {
+this.setViewUniforms = function(shader_) {
 
-    if (this.pMatrixChanged === true) {
-	this.gl.uniformMatrix4fv(shader_.unis["pMatU"], false, this.pMatrix);
-	this.pMatrixChanged = false;
-    }
+    var gl_ = this.gl;
+    var unis = shader_.unis;
     if (this.vMatrixChanged === true) {
 	// models and lights are transformed by 
 	//  inverse of viewing matrix
@@ -302,8 +270,8 @@ GLmatrix.prototype.setViewUniforms = function(shader_) {
 	this.vMatrixChanged = false;
     }
 
-    this.gl.uniformMatrix4fv(shader_.unis["mvnMatU"], false, this.matrices);
-    this.gl.uniformMatrix4fv(shader_.unis["lMatU"], false, this.ilMatrix);
+    gl_.uniformMatrix4fv(unis["mvnMatU"], false, this.matrices);
+    gl_.uniformMatrix4fv(unis["lMatU"], false, this.ilMatrix);
 };
 
 
@@ -311,7 +279,7 @@ GLmatrix.prototype.setViewUniforms = function(shader_) {
 /**
  * Per-vertex uniforms must be set each time.
  */
-GLmatrix.prototype.setVertexUniforms = function(shader_) {
+this.setVertexUniforms = function(shader_) {
 
     if (this.mMatrixChanged === true) { 
 	// perceived normals: (inverse of modelview
@@ -325,14 +293,17 @@ GLmatrix.prototype.setVertexUniforms = function(shader_) {
     this.gl.uniformMatrix4fv(shader_.unis["mvnMatU"], false, this.matrices);
 };
 
-GLmatrix.prototype.push = function() {
+this.push = function() {
     var copy = mat4.clone(this.mMatrix);
     this.mStack.push(copy);
 };
 
-GLmatrix.prototype.pop = function() {
+this.pop = function() {
     if (this.mStack.length === 0) {
         throw "Invalid pop"; }
     mat4.copy(this.mMatrix, this.mStack.pop());
     this.mMatrixChanged = true;
 };
+
+    return this;
+}

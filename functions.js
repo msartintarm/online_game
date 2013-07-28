@@ -182,8 +182,9 @@ function _oSetShader(shader) {
 }
 
 function _oInvertNorms() {
-    for(var i = 0; i < this.o.data["norm"].length; ++i) {
-	this.o.data["norm"][i] = -this.o.data["norm"][i];
+    var oData = this.o.data["norm"];
+    for(var i = 0; i < oData.length; ++i) {
+	oData[i] = -oData[i];
     }
     return this;
 }

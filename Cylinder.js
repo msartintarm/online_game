@@ -17,6 +17,10 @@ function Cylinder(base_radius, top_radius, height, slices, stacks) {
     var theta = Math.atan((base_radius-top_radius)/height);
     var z_norm = Math.sin(theta);
     var xy =  Math.cos(theta);
+    
+    var nData = this.o.data["norm"];
+    var pData = this.o.data["pos"];
+    var cData = this.o.data["col"];
 
     for (var i = 0; i <= stacks; i++) {
 	// From 0 to height
@@ -34,11 +38,19 @@ function Cylinder(base_radius, top_radius, height, slices, stacks) {
 	    var y_norm = y*xy
 	    // z norm = sin theta
 
-	    this.o.addNorms(x_norm, y_norm, z_norm);
-	    this.o.addPos(radius * x, radius * y, z);
-	    this.o.addColors(colorVec[2],
-			     colorVec[1],
-			     colorVec[0]);
+
+	    nData.push(x_norm);
+	    nData.push(y_norm);
+	    nData.push(z_norm);
+
+	    pData.push(radius * x);
+	    pData.push(radius * y);
+	    pData.push(z);
+
+	    cData.push(colorVec[2]);
+	    cData.push(colorVec[1]);
+	    cData.push(colorVec[0]);
+
 	}
     }
 
@@ -50,6 +62,9 @@ function Cylinder(base_radius, top_radius, height, slices, stacks) {
     //        Array indices of C and D are A / B + 1
 
     var index_uses = [];
+    var cData = this.o.data["col"];
+    var iData = this.o.data["index"];
+
     for (var i = 0; i < this.stacks; i++) {
 	for (var j = 0; j < this.slices; j++) {
 
@@ -59,31 +74,37 @@ function Cylinder(base_radius, top_radius, height, slices, stacks) {
 	    var C = A + 1;
 	    var D = B + 1;
 
+
+
 	    if(!index_uses[A]) { 
 		index_uses[A] = 1; index_uses[B] = 1; 
-		this.o.data["col"][3*C] = 0;
-		this.o.data["col"][3*C+1] = 0.7;
-		this.o.data["col"][3*C+2] = 0.7;
-		this.o.data["col"][3*D] = 0;
-		this.o.data["col"][3*D+1] = 0;
-		this.o.data["col"][3*D+2] = 1;
+		cData[3*C] = 0;
+		cData[3*C+1] = 0.7;
+		cData[3*C+2] = 0.7;
+		cData[3*D] = 0;
+		cData[3*D+1] = 0;
+		cData[3*D+2] = 1;
 	    } else {
-		this.o.data["col"][3*A] = 1;
-		this.o.data["col"][3*A+1] = 0;
-		this.o.data["col"][3*A+2] = 0;
-		this.o.data["col"][3*B] = 0;
-		this.o.data["col"][3*B+1] = 1;
-		this.o.data["col"][3*B+2] = 0;
-		this.o.data["col"][3*C] = 0;
-		this.o.data["col"][3*C+1] = 0.7;
-		this.o.data["col"][3*C+2] = 0.7;
-		this.o.data["col"][3*D] = 0;
-		this.o.data["col"][3*D+1] = 0;
-		this.o.data["col"][3*D+2] = 1;
+		cData[3*A] = 1;
+		cData[3*A+1] = 0;
+		cData[3*A+2] = 0;
+		cData[3*B] = 0;
+		cData[3*B+1] = 1;
+		cData[3*B+2] = 0;
+		cData[3*C] = 0;
+		cData[3*C+1] = 0.7;
+		cData[3*C+2] = 0.7;
+		cData[3*D] = 0;
+		cData[3*D+1] = 0;
+		cData[3*D+2] = 1;
 	    }
 
-	    this.o.addIndexes(A, B, C);
-	    this.o.addIndexes(B, D, C);
+	    iData.push(A);
+	    iData.push(B);
+	    iData.push(C);
+	    iData.push(B);
+	    iData.push(D);
+	    iData.push(C);
 	}
     }
 }

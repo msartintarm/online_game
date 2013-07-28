@@ -22,6 +22,7 @@ const TEXT_TEXTURE2 = 18;
 const TEXT_TEXTURE3 = 19;
 const TEXT_TEXTURE4 = 20;
 const BRICK_NORMAL_TEXTURE = 21;
+const HEAVEN_NORMAL_TEXTURE = 22;
 
 // -- Maze Piece wall locations -- //
 const FRONT = 0x1; // 0001

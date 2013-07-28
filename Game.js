@@ -3,16 +3,15 @@
  */
 function Game() {  
 
-// Used in collision detection.
-const WALL_NONE = 0;
-const WALL_N = 1;
-const WALL_S = 2;
-const WALL_W = 3;
-const WALL_E = 4;
-const WALL_TOP = 5;
-
+    // Used in collision detection.
+    const WALL_NONE = 0;
+    const WALL_N = 1;
+    const WALL_S = 2;
+    const WALL_W = 3;
+    const WALL_E = 4;
 
     var theTexture2 = new GLtexture(theCanvas.gl, BRICK_NORMAL_TEXTURE);
+    var theTexture3 = new GLtexture(theCanvas.gl, HEAVEN_NORMAL_TEXTURE);
 
     var i; // for init loop
 
@@ -21,7 +20,7 @@ const WALL_TOP = 5;
 
     // handles movement
     this.grid = 50;
-    this.movement = vec3.create();
+    this.movement = vec3.fromValues(0, 2, 0);
     this.movement_old = vec3.create();
     this.bg_movement = vec3.create();
     this.total = null;
@@ -29,10 +28,16 @@ const WALL_TOP = 5;
     this.cam_left_count = 0;
     this.cam_right_count = 0;
     this.in_jump = false;
+    this.cam_in_left_move = false;
+    this.cam_in_right_move = false;
     this.in_left_move = false;
     this.in_right_move = false;
     this.in_change = false;
     this.change_x = [];
+
+    this.right_key_down = false;
+    this.left_key_down = false;
+    this.jump_key_down = false;
 
     // Jump distance is a vector of linear X values
     // When we increment y-pos by these array values, the effect is a parabolic jump
@@ -78,12 +83,15 @@ const WALL_TOP = 5;
     this.jump_string = new GLstring("jump", TEXT_TEXTURE, theCanvas.gl.shader_player);
     this.collision_string = new GLstring("Ouch!", TEXT_TEXTURE, theCanvas.gl.shader_player);
 
+    // new shader effect
+    this.floor_effect = 0;
+
     var player_width = this.grid;
     var bg_width = 1200;
     var floor_width = player_width;
     this.floor = [];
 
-    theCanvas.matrix.vTranslate([0,0,750]);
+    theCanvas.matrix.vTranslate([0,300,750]);
 
     this.player = new Quad(
 	[ player_width / 2, player_width, -1],
@@ -108,9 +116,9 @@ const WALL_TOP = 5;
     for(var i = -10; i <= 10; ++i) {
 	this.floor.push(new Quad(
 	    [-floor_width,                0, -1],
-	    [-floor_width, -2 * floor_width, -1],
+	    [-floor_width, -3 * floor_width, -1],
 	    [ floor_width,                0, -1],
-	    [ floor_width, -2 * floor_width, -1])
+	    [ floor_width, -3 * floor_width, -1])
 			.translate([i * floor_width * 2, 0, 0])
 			.setTexture(RUG_TEXTURE)
 			.add2DCoords());
@@ -120,9 +128,9 @@ const WALL_TOP = 5;
 
     this.push_button = new Quad(
 	[-floor_width, 4 * floor_width, -1],
-	[-floor_width, 2 * floor_width, -1],
+	[-floor_width, 3 * floor_width, -1],
 	[ floor_width, 4 * floor_width, -1],
-	[ floor_width, 2 * floor_width, -1])
+	[ floor_width, 3 * floor_width, -1])
 	.setTexture(BRICK_TEXTURE)
 	.add2DCoords();
 
@@ -139,7 +147,6 @@ const WALL_TOP = 5;
 	theCanvas.changeShader(gl_.shader);
 	theMatrix.setViewUniforms(gl_.shader);
 	gl_.uniformMatrix4fv(gl_.shader.unis["pMatU"], false, theMatrix.pMatrix);
-	gl_.uniform1i(gl_.shader.unis["sampler1"], gl_.tex_enum[BRICK_NORMAL_TEXTURE]);
 	theCanvas.changeShader(gl_.shader_player);
 	theMatrix.setViewUniforms(gl_.shader_player);
 	gl_.uniformMatrix4fv(gl_.shader_player.unis["pMatU"], false, theMatrix.pMatrix);
@@ -205,13 +212,9 @@ const WALL_TOP = 5;
 	    this.total = this.total * 2/3 + sum/3;
 	    this.total2 = sum;
 	}
-	this.hi_hat = (this.hi_hat > 1) ? this.hi_hat - 1: 0;
+	if (this.hi_hat > 0) this.hi_hat -= 1;
 
 	var player_shader = this.player.o.shader;
-	if (!!player_shader && player_shader.unis["hi_hat_u"] !== -1) {
-	    theCanvas.changeShader(player_shader);
-	    gl_.uniform1f(player_shader.unis["hi_hat_u"], this.hi_hat);
-	}
 
 	// Analyse movement, which draws upon sound, and activated moves.
 	this.updateMovement();
@@ -226,8 +229,11 @@ const WALL_TOP = 5;
 
 	theCanvas.changeShader(gl_.shader);
 	theMatrix.setViewUniforms(gl_.shader);
-
-	gl_.uniform3fv(gl_.shader.unis["lightPosU"], this.movement);
+	var unis = gl_.shader.unis;
+	gl_.uniform1f(unis["hi_hat_u"], this.hi_hat);
+	gl_.uniform1f(unis["wall_hit_u"], this.floor_effect);
+	gl_.uniform3fv(unis["lightPosU"], [0, 0, 500]);
+	gl_.uniform1i(unis["sampler1"], gl_.tex_enum[BRICK_NORMAL_TEXTURE]);
 
 	for(i = 0; i < this.floor.length; ++i){
 	    this.floor[i].draw(gl_);
@@ -237,6 +243,7 @@ const WALL_TOP = 5;
 	theMatrix.translate(this.movement);
 
 	theCanvas.changeShader(player_shader);
+	gl_.uniform1f(player_shader.unis["hi_hat_u"], this.hi_hat);
 	theMatrix.setVertexUniforms(player_shader);
 
 	this.player.draw(gl_);
@@ -247,6 +254,7 @@ const WALL_TOP = 5;
 
 	theCanvas.changeShader(gl_.shader_canvas);
 	theMatrix.setVertexUniforms(gl_.shader_canvas);
+	gl_.uniform1i(gl_.shader_canvas.unis["sampler1"], gl_.tex_enum[HEAVEN_NORMAL_TEXTURE]);
 
 	this.background.draw(gl_);
 	theMatrix.pop();
@@ -298,19 +306,9 @@ const WALL_TOP = 5;
 	    case 32: // Spacebar
 		var audio = this.audio[0];
 		if(audio.playing) {
-		    audio.offset += this.web_audio.currentTime - 
-			audio.elapsed_time;
-		    console.log("Playing for " + audio.offset + " seconds.");
 		    audio.source.stop(0);
 		} else {
-		    // Load start time from offset.
-		    audio.source = this.web_audio.createBufferSource();
-		    audio.source.buffer = audio.buffer;
-		    audio.source.loop = true;
-		    audio.source.connect(this.low_pass);
-		    console.log("Starting after " + audio.offset + " seconds.");
 		    audio.source.start(0, audio.offset);
-		    audio.elapsed_time = this.web_audio.currentTime;
 		}
 		audio.playing = !audio.playing;
 		break;
@@ -353,7 +351,7 @@ const WALL_TOP = 5;
 
     this.startCameraLeftMove = function() {
 
-	if (this.cam_in_left_move) return;
+	if (this.cam_in_left_move === true) return;
 	this.player_x_pos += 7;
 	this.cam_left_count = 14;
 	this.cam_in_left_move = true;
@@ -361,7 +359,7 @@ const WALL_TOP = 5;
 
     this.startCameraRightMove = function() {
 
-	if (this.cam_in_right_move) return;
+	if (this.cam_in_right_move === true) return;
 
 	this.player_x_pos -= 7;
 	this.cam_right_count = 14;
@@ -419,9 +417,9 @@ const WALL_TOP = 5;
 	    this.movement[0] - this.player_width < object.x_max && 
 	    this.movement[0] + this.player_width > object.x_min) {
 
-	    // Collision detected. Which side of the box did we cross? 
-	    // Look at old movement to determine which value changed.
-	    if (this.movement_old[1] >= object.y_max) return WALL_N;
+	    // Which side of the box did we cross during the previous frame?
+	    if (this.movement_old[1] >= object.y_max)
+		return WALL_N;
 	    if (this.movement[1] >= object.y_max) return WALL_N;
 	    if (this.movement_old[1] + this.player_height <= object.y_min) return WALL_S;
 	    if (this.movement_old[0] - this.player_width >= object.x_max) return WALL_E;
@@ -434,10 +432,11 @@ const WALL_TOP = 5;
     this.playSound = function() {
 	var audio = this.audio[1];
 	// Load start time from offset.
-	this.audio[1].source = this.web_audio.createBufferSource();
-	this.audio[1].source.buffer = this.audio[1].buffer;
-	this.audio[1].source.connect(this.web_audio.destination);
-	this.audio[1].source.start(0,0);
+	var source = this.web_audio.createBufferSource();
+	source.buffer = audio.buffer;
+	source.connect(this.web_audio.destination);
+	source.start(0,0);
+	audio.source = source;
     };
 
     this.updateMovement = function() {
@@ -480,13 +479,14 @@ const WALL_TOP = 5;
 		if (count >= this.jump_dist.length) { 
 		    this.jumping_up = false; 
 		    this.jumping_down = true; 
+		    this.jump_count = 0;
 		} else {
 		    this.movement[1] += 15 - (count / 2);
 		}
 
 	    } else {
-		var count = (--this.jump_count);
-		this.movement[1] -= 15 - (count / 2);
+		var count = (++this.jump_count);
+		this.movement[1] -= count;
 	    }
 	}
 
@@ -498,7 +498,12 @@ const WALL_TOP = 5;
 	var on_wall = false;
 	for(i = this.floor.length - 1; i >= 0; --i) { 
 
-	    switch (this.detectCollision(this.floor[i])) {
+	    var floor = this.floor[i];
+	    floor.collided = this.detectCollision(floor);
+
+	    if(floor.collided !== WALL_NONE)
+
+	    switch (floor.collided) {
 	    case WALL_W:
 		this.collision_string.initBuffers(theCanvas.gl);
 		// Convert to 1.0 scale, round to integer, convert back
@@ -511,15 +516,16 @@ const WALL_TOP = 5;
 		this.in_left_move = false;
 		break;
 	    case WALL_N: // Here, just move to the top of the wall.
-		if(this.jumping_down === true) {
-		    this.movement[1] = this.floor[i].y_max;
+		if(this.jumping_down === true && this.in_jump === true) {
+		    this.movement[1] = floor.y_max;
 		    this.in_jump = false;
+		    this.jumping_down = false;
 		    this.player_string.initBuffers(theCanvas.gl);
 		}
 		on_wall = true;
 		break;
 	    case WALL_S:
-		this.jump_count = this.jump_dist.length;
+		this.jump_count = 0;
 		this.jumping_up = false; 
 		this.jumping_down = true; 
 		break;
@@ -528,11 +534,18 @@ const WALL_TOP = 5;
 	    } 
 	}
 
+	if(this.push_button.collided === WALL_N) this.floor_effect += 1;
+	else if (this.floor_effect > 0) this.floor_effect -= 1; 
+
+	if(this.floor_effect > 0) console.log("floor effect: " + this.floor_effect);
+
+
 	if(on_wall === false && this.in_jump === false) {
 	    console.log("freefallin!");
-	    this.jump_count = this.jump_dist.length;
+	    this.jump_count = 0;
 	    this.jumping_up = false; 
 	    this.jumping_down = true; 
+	    this.jump_started = false;
 	    this.in_jump = true;
 	}
     };
@@ -607,30 +620,28 @@ const WALL_TOP = 5;
 	this.audio.forEach(
 	    function(gl_audio) {
 
-		if (gl_audio.auto_play === true) {
-		    // Save initial time we start audio, so we can pause / play.
-		    gl_audio.source = this.web_audio.createBufferSource();
-		    gl_audio.source.connect(gl_audio.dest);
-		    gl_audio.source.buffer = gl_audio.buffer;
-		    gl_audio.source.loop = true;
-		    gl_audio.source.loopEnd = gl_audio.length;
-		    gl_audio.elapsed_time = this.web_audio.currentTime;
-		    gl_audio.offset = 0;
-
-		    gl_audio.playing = true;
-		    gl_audio.source.start(gl_audio.delay,0);
-		}
+		gl_audio.source = this.web_audio.createBufferSource();
+		gl_audio.source.connect(gl_audio.dest);
+		gl_audio.source.buffer = gl_audio.buffer;
+		gl_audio.source.loop = true;
+		gl_audio.source.loopEnd = gl_audio.length;
+		gl_audio.offset = 0;
 	    }, this);
 
 	// Done setting up. They will play one second after the start of the loop.
 	var time = this.web_audio.currentTime + 1;
-	for (var i = 0; i < this.audio.length; ++i) {
-	    if (this.audio[i].auto_play === true) {
-		this.audio[i].source.start(time - this.web_audio.currentTime
-					    + this.audio[i].delay, 0);
-	    }
-	}
+	var web = this.web_audio;
 
+	this.audio.forEach(
+	    function(gl_audio) {
+		if (gl_audio.auto_play === true) {
+		    gl_audio.source.start(time - web.currentTime + gl_audio.delay, 0);
+		}
+	    }
+	);
+	
+	
+	
     };
 
     return this;

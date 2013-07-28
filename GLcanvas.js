@@ -171,7 +171,7 @@ GLcanvas.prototype.start = function(theScene) {
 
 	// Set background color, clear everything, and
 	//  enable depth testing
-	this.gl.clearColor(0.1, 0.1, 0.1, 1.0);
+	this.gl.clearColor(0.1, 0.1, 0.1, 0.0);
 	this.gl.clearDepth(1.0);
 	this.gl.enable(this.gl.DEPTH_TEST);
     } else {
@@ -288,9 +288,9 @@ GLcanvas.prototype.initShaders = function(gl_shader, frag, vert) {
     this.initAttribute(gl_shader, "vColA");
     this.initAttribute(gl_shader, "textureA");
 
-    this.initUniform(gl_shader, "frames_elapsed_u")
-    this.initUniform(gl_shader, "hi_hat_u")
-    this.initUniform(gl_shader, "wall_hit_u")
+    this.initUniform(gl_shader, "frames_elapsed_u");
+    this.initUniform(gl_shader, "hi_hat_u");
+    this.initUniform(gl_shader, "wall_hit_u");
     this.initUniform(gl_shader, "ambient_coeff_u");
     this.initUniform(gl_shader, "diffuse_coeff_u");
     this.initUniform(gl_shader, "specular_coeff_u");

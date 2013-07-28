@@ -34,6 +34,8 @@ function GLobject() {
 
     /**
      * Pass 3 numbers into the object's internal arrays
+     *
+     * rewritten a la http://jsperf.com/array-indexing-in-loops
      */
     this.addNorms = function(x,y,z) {     
 	this.data["norm"].push(x);
