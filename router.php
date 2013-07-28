@@ -22,7 +22,7 @@ if ($ext === "js") {
 
 } else if ($ext === "gif" || $ext === "jpg") {
   header("Cache-Control: public");
-  readfile($oldF);
+  return FALSE;
 } else {
   return FALSE;
 }

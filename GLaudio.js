@@ -5,6 +5,7 @@ function GLaudio() {
 
     if (typeof AudioContext !== "undefined") this.web_audio = new AudioContext();
     else if (typeof webkitAudioContext !== "undefined") this.web_audio = new webkitAudioContext();
+
     else throw new Error('Use a browser that supports AudioContext for music.');
 
     this.analyser = this.web_audio.createAnalyser();
@@ -13,7 +14,7 @@ function GLaudio() {
 
     this.low_pass = this.web_audio.createBiquadFilter();
     this.low_pass.type = "lowpass";
-    this.low_pass.frequency = 100;
+    this.low_pass.frequency.value = 200;
     this.low_pass.connect(this.analyser);
 
     this.audio = [];
@@ -27,16 +28,9 @@ function GLaudio() {
     this.total = 0;
     this.total2 = 0;
 
-    this.pause = function() {
-	var audio = this.audio[0];
-	if(audio.playing) {
-	    audio.source.stop(0);
-	} else {
-	    audio.source.start(0, audio.offset);
-	}
-	audio.playing = !audio.playing;
-	
-    };
+    this.pause = function() { console.err("Pause not supported."); }; // Need to re-implement
+
+    var triggered = false;
 
     this.analyze = function(gl_) {
 
@@ -46,23 +40,24 @@ function GLaudio() {
 	    var FFTData = new Uint8Array(this.analyser.frequencyBinCount);
 	    this.analyser.getByteFrequencyData(FFTData);
 
-	    var sum = FFTData[0] + FFTData[1] + FFTData[2];
-
-	    if(this.total === 0) this.total = sum;
-	    if(this.total < 0.1) this.total = 0.1;
-	    if(this.total2 === 0) this.total2 = sum;
-
-	    // Rough ratio of this sound to previous sounds
-	    if(sum > 2 * this.total && sum > 1.5 * this.total2 ) { 
-		this.hi_hat = 11;
-		if (this.log_music) {
-		    console.log("%.2f", sum / this.total); 
-		}
+	    var sum = 0;
+	    for(var x = FFTData.length - 1; x >= 0; --x) {
+		sum += Math.abs(FFTData[x]);
 	    }
 
-	    // I'm going to call this the 'rolling average' filter.
-	    this.total = this.total * 2/3 + sum/3;
-	    this.total2 = sum;
+
+	    if(triggered === false) {
+		if (sum > 15) { 
+		    this.hi_hat = 11;
+		    if (this.log_music) console.log("ds %.2f", sum);
+		    triggered = true;
+		}
+	    } else {
+		if (sum < 10) {
+		    if (this.log_music) console.log("-zzz-"); 
+		    triggered = false;
+		}
+	    }
 	}
 
 	if (this.hi_hat > 0) this.hi_hat -= 1;
@@ -75,8 +70,7 @@ function GLaudio() {
 	var source = this.web_audio.createBufferSource();
 	source.buffer = audio.buffer;
 	source.connect(this.web_audio.destination);
-	source.start(0,0);
-	audio.source = source;
+	source.start(1.0);
     };
 
     this.handleAudioRequest = function(gl_audio, request) {
@@ -104,9 +98,11 @@ function GLaudio() {
 	var new_audio = {};
 	new_audio.auto_play = auto_start;
 	new_audio.dest = destination;
+	new_audio.delay = 0;
+	new_audio.loop_length = null;
 	if (auto_start === true) {
 	    new_audio.delay = loop_delay;
-	    new_audio.length = loop_length;
+	    new_audio.loop_length = loop_length;
 	}
 	var request = new XMLHttpRequest();
 	request.open("GET", url, true);
@@ -131,39 +127,31 @@ function GLaudio() {
 	var audio = this.audio;
 
 	// Asynchronously set up each audio element
-	this.audio.forEach(
-	    function(gl_audio) {
-
-		gl_audio.source = this.web_audio.createBufferSource();
-		gl_audio.source.connect(gl_audio.dest);
-		gl_audio.source.buffer = gl_audio.buffer;
-		gl_audio.offset = 0;
-		gl_audio.source1 = true;
-	    }, this);
+	audio.forEach(function(gl_audio) {
+	    gl_audio.source_num = 0; // number of buffers to rotate between
+	    gl_audio.loop_count = gl_audio.delay;
+	    gl_audio.source = new Array(6);
+	});
 
 	// Done setting up. They will play two seconds after the start of the loop.
 
 	window.setInterval(function() {
-	    var time = web.currentTime + 2;
-	    [audio[0], audio[2]].forEach(
+
+	    audio.forEach(
 		function(gl_audio) {
-		    if (gl_audio.source1 === true) {
+		    if(gl_audio.loop_length !== null && 
+		       ((++(gl_audio.loop_count)) % gl_audio.loop_length === 0)) {
+			// var source1 = gl_audio.source[gl_audio.source_num];
+			var source2 = gl_audio.source[(++(gl_audio.source_num)) % 6];
 			// set up source 2
-			gl_audio.source2 = web.createBufferSource();
-			gl_audio.source2.connect(gl_audio.dest);
-			gl_audio.source2.buffer = gl_audio.buffer;
-			gl_audio.source2.start(time - web.currentTime + gl_audio.delay, 0);
-			gl_audio.source1 = false;
-		    } else {
-			gl_audio.source = web.createBufferSource();
-			gl_audio.source.connect(gl_audio.dest);
-			gl_audio.source.buffer = gl_audio.buffer;
-			gl_audio.source.start(time - web.currentTime + gl_audio.delay, 0);
-			gl_audio.source1 = true;
+			source2 = web.createBufferSource(),
+			source2.connect(gl_audio.dest),
+			source2.buffer = gl_audio.buffer;
+			source2.start(0, 0);
 		    }
 		}
 	    );
-	}, 2000);
+	}, 250);
 	
 	
     };

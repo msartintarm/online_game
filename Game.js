@@ -17,12 +17,12 @@ function Game() {
 
     // createAudio(origin URL, destination node, loop[, loop offset, loop time])
     // These are at 120 BPM: 1 sec = 2 beats
-    // Low-pass input detects movement, occuring on the half-beat; slightly below 0.25s
-    audio.createAudio("music/beats.mp3", audio.low_pass, true, 0.22, 2.0);
-    // Non-looping sound, which will be triggered by the above sample
+    // 1. Low-pass input detects movement, occuring on the half-beat; slightly below 0.25s
+    // 2. Non-looping sound, which will be triggered by the above sample
+    // 3. Rest of the song.
+    audio.createAudio("music/beats.mp3", audio.low_pass, true, 1, 8);
     audio.createAudio("music/electro_hat.wav", audio.web_audio.destination, false);
-    // Rest of the song.
-    audio.createAudio("music/backing_beat.wav", audio.web_audio.destination, true, 0.0, 4.0);
+    audio.createAudio("music/backing_beat.wav", audio.web_audio.destination, true, 0, 8);
 
     var i; // for init loop
 
@@ -84,6 +84,7 @@ function Game() {
     var bg_width = 1200;
     var floor_width = player_width;
     this.floor = [];
+    this.push_button = [];
     this.three_dee = [];
     theCanvas.matrix.vTranslate([0,300,750]);
 
@@ -131,15 +132,13 @@ function Game() {
 //	this.floor[i + 10].x_
     }
 
-    this.push_button = new Quad(
+    this.push_button[0] = new Quad(
 	[-floor_width, 4 * floor_width, -1],
 	[-floor_width, 3 * floor_width, -1],
 	[ floor_width, 4 * floor_width, -1],
 	[ floor_width, 3 * floor_width, -1])
 	.setTexture(BRICK_TEXTURE)
 	.add2DCoords();
-
-    this.floor.push(this.push_button);
 
     this.initBuffers = function(gl_) {
 	
@@ -172,6 +171,9 @@ function Game() {
 	for(i = 0; i < this.floor.length; ++i){
 	    this.floor[i].initBuffers(gl_);
 	}
+	for(i = 0; i < this.push_button.length; ++i){
+	    this.push_button[i].initBuffers(gl_);
+	}
 	for(i = 0; i < this.three_dee.length; ++i){
 	    this.three_dee[i].initBuffers(gl_);
 	}
@@ -181,7 +183,6 @@ function Game() {
 
 	audio.analyze();
 
-	var player_shader = this.player.o.shader;
 
 	// Analyse movement, which draws upon sound, and activated moves.
 	this.updateMovement();
@@ -205,6 +206,11 @@ function Game() {
 	for(i = 0; i < this.floor.length; ++i){
 	    this.floor[i].draw(gl_);
 	}
+
+	for(i = 0; i < this.push_button.length; ++i){
+	    this.push_button[i].draw(gl_);
+	}
+
 	for(i = 0; i < this.three_dee.length; ++i){
 	    this.three_dee[i].draw(gl_);
 	}
@@ -212,8 +218,10 @@ function Game() {
 	theMatrix.push();
 	theMatrix.translate(this.movement);
 
+	var player_shader = this.player.o.shader;
 	theCanvas.changeShader(player_shader);
-	gl_.uniform1f(player_shader.unis["hi_hat_u"], audio.hi_hat);
+	var unis = player_shader.unis;
+	gl_.uniform1f(unis["hi_hat_u"], audio.hi_hat);
 	theMatrix.setVertexUniforms(player_shader);
 
 	this.player.draw(gl_);
@@ -271,7 +279,7 @@ function Game() {
 		this.startJump();
 		break;
 	    case 40: // down
-		this.log_music = !(this.log_music);
+		audio.log_music = !(audio.log_music);
 		break;
 	    case 32: // Spacebar
 		audio.pause();
@@ -349,7 +357,6 @@ function Game() {
 	if (count >= this.move_dist.length) { 
 	    this.in_right_move = false;
 	    if (this.right_key_down === true) this.startRightMove();
-//	    this.playSound();
 	    return;
 	}
 	
@@ -363,7 +370,6 @@ function Game() {
 	if (count >= this.move_dist.length) { 
 	    this.in_left_move = false;
 	    if (this.left_key_down === true) this.startLeftMove();
-//	    this.playSound();
 	    return;
 	}
 
@@ -449,14 +455,17 @@ function Game() {
 	var grid_dist;
 	var i;
 	var on_wall = false;
-	for(i = this.floor.length - 1; i >= 0; --i) { 
+	var length1 = this.floor.length;
+	for(i = length1 + this.push_button.length - 1; i >= 0; --i) { 
 
-	    var floor = this.floor[i];
-	    floor.collided = this.detectCollision(floor);
+	    var object = (i < length1)? 
+		this.floor[i]:
+		this.push_button[i - length1];
+	    object.collided = this.detectCollision(object);
 
-	    if(floor.collided !== WALL_NONE)
+	    if(object.collided !== WALL_NONE)
 
-	    switch (floor.collided) {
+	    switch (object.collided) {
 	    case WALL_W:
 		this.collision_string.initBuffers(theCanvas.gl);
 		// Convert to 1.0 scale, round to integer, convert back
@@ -470,7 +479,7 @@ function Game() {
 		break;
 	    case WALL_N: // Here, just move to the top of the wall.
 		if(this.jumping_down === true && this.in_jump === true) {
-		    this.movement[1] = floor.y_max;
+		    this.movement[1] = object.y_max;
 		    this.in_jump = false;
 		    this.jumping_down = false;
 		    this.player_string.initBuffers(theCanvas.gl);
@@ -487,7 +496,7 @@ function Game() {
 	    } 
 	}
 
-	if(this.push_button.collided === WALL_N) this.floor_effect += 1;
+	if(this.push_button[0].collided === WALL_N) this.floor_effect += 1;
 	else if (this.floor_effect > 0) this.floor_effect -= 1; 
 
 	if(this.floor_effect > 0) console.log("floor effect: " + this.floor_effect);
