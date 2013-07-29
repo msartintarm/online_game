@@ -280,8 +280,8 @@
 	specularV2 = specularV2 * specularV2;
 	specularV2 = specularV2 * specularV2;
 
-	vec3 ambColor = textureColor / 2.0;
-	vec3 diffColor = textureColor * diffuseV2 * 0.3;
+	vec3 ambColor = textureColor / 3.0;
+	vec3 diffColor = textureColor * diffuseV2 * 0.6;
 	vec3 specColor = textureColor * specularV2;
 
 	vec3 blendColor = mod(distanceV, 50.0) / 50.0;
@@ -300,7 +300,7 @@
         changedColor = vec3(yellow, yellow, actual_color.b / (yellow + 0.01));
   
 
-	gl_FragColor = vec4(normalize(changedColor), background);
+	gl_FragColor = vec4((changedColor + 2.0 * normalize(changedColor)) / 3.0, background);
 	}
 
 	void main(void) {
@@ -364,7 +364,7 @@
 			  vec3 blendColor = mod(distanceV, 50.0) / 50.0;
 			  vec3 normalColor = ambColor + diffColor + specColor;
 
-			  float wall_hit_coeff = min(wall_hit_u * 2.0, 150.0) / 40.0;
+			  float wall_hit_coeff = wall_hit_u / 40.0;
 			  gl_FragColor = vec4(normalColor + ((ambColor + normalColor) * 
 			  wall_hit_coeff), 1.0);
 			  }

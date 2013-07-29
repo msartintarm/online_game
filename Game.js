@@ -22,7 +22,7 @@ function Game() {
     // 3. Rest of the song.
     audio.createAudio("music/beats.mp3", audio.low_pass, true, 1, 8);
     audio.createAudio("music/electro_hat.wav", audio.web_audio.destination, false);
-    audio.createAudio("music/backing_beat.wav", audio.web_audio.destination, true, 0, 8);
+    audio.createAudio("music/backing_beat.wav", audio.delay, true, 0, 8, 0.300);
 
     var i; // for init loop
 
@@ -46,6 +46,7 @@ function Game() {
     this.right_key_down = false;
     this.left_key_down = false;
     this.jump_key_down = false;
+    this.hi_hat = 0;
 
     // Jump distance is a vector of linear X values
     // When we increment y-pos by these array values, the effect is a parabolic jump
@@ -81,64 +82,82 @@ function Game() {
     this.floor_effect = 0;
 
     var player_width = this.grid;
-    var bg_width = 1200;
     var floor_width = player_width;
     this.floor = [];
     this.push_button = [];
     this.three_dee = [];
     theCanvas.matrix.vTranslate([0,300,750]);
 
-    this.player = new Quad(
-	[ player_width / 2, player_width, -1],
-	[ player_width / 2,            0, -1],
-	[-player_width / 2, player_width, -1],
-	[-player_width / 2,            0, -1])
+
+    // x is width (from -w to w), y is height (from 0 to h), z is length (never varies over l)
+    var w = this.grid / 2;
+    var h = this.grid;
+    var l = -1;
+    this.player = new Quad([ w, h, l], 
+			   [ w, 0, l], 
+			   [-w, h, l], 
+			   [-w, 0, l])
 	.setTexture(TEXT_TEXTURE)
-	.setShader(theCanvas.gl.shader_player);
+        .setShader(theCanvas.gl.shader_player);
     this.player_x_pos = 0;
     this.player_y_pos = 0;
-    this.player_width = player_width / 2;
-    this.player_height = player_width;
+    this.player_width = w;
+    this.player_height = h;
 
-    this.background = new Quad(
-	[-bg_width, bg_width, -20],
-	[-bg_width,-bg_width, -20],
-	[ bg_width, bg_width, -20],
-	[ bg_width,-bg_width, -20])
+    var wh = 1200;
+    var l2= -20;
+    this.background = new Quad([-wh, wh, l2],
+			       [-wh,-wh, l2],
+			       [ wh, wh, l2],
+			       [ wh,-wh, l2])
 	.setTexture(HEAVEN_TEXTURE)
 	.setShader(theCanvas.gl.shader_canvas);
 
-    for(var i = -10; i <= 10; ++i) {
+    for(var i=-10; i<=10; ++i) {
+	var w_ = floor_width, h_ = -3 * floor_width, l_ = -1;
 	this.floor.push(new Quad(
-	    [-floor_width,                0, -1],
-	    [-floor_width, -3 * floor_width, -1],
-	    [ floor_width,                0, -1],
-	    [ floor_width, -3 * floor_width, -1])
-			.translate([i * floor_width * 2, 0, 40])
+	    [-w_,  0, l_],
+	    [-w_, h_, l_],
+	    [ w_,  0, l_],
+	    [ w_, h_, l_])
+			.translate([i * 2 * w, 0, 40])
 			.setTexture(RUG_TEXTURE)
 			.add2DCoords());
 	this.three_dee.push(new SixSidedPrism(
-	    [-floor_width,                0, -1],
-	    [-floor_width, -3 * floor_width, -1],
-	    [ floor_width, -3 * floor_width, -1],
-	    [ floor_width,                0, -1],
-	    [-floor_width,                0, -1 - floor_width],
-	    [-floor_width, -3 * floor_width, -1 - floor_width],
-	    [ floor_width, -3 * floor_width, -1 - floor_width],
-	    [ floor_width,                0, -1 - floor_width])
-			.translate([i * floor_width * 2, 0, 40])
+	    [-w_,  0, -1],
+	    [-w_, h_, -1],
+	    [ w_, h_, -1],
+	    [ w_,  0, -1],
+	    [-w_,  0, -1 - floor_width],
+	    [-w_, h_, -1 - floor_width],
+	    [ w_, h_, -1 - floor_width],
+	    [ w_,  0, -1 - floor_width])
+			.translate([i * 2.0 * w, 0, 40])
 			.setTexture(RUG_TEXTURE));
 	// todo: turn into a '
 //	this.floor[i + 10].x_
     }
 
+    w = floor_width;
+    h = floor_width;
+    l = -1;
+    var v = 3 * h;
     this.push_button[0] = new Quad(
-	[-floor_width, 4 * floor_width, -1],
-	[-floor_width, 3 * floor_width, -1],
-	[ floor_width, 4 * floor_width, -1],
-	[ floor_width, 3 * floor_width, -1])
+	[-w, h+v, l],
+	[-w,   v, l],
+	[ w, h+v, l],
+	[ w,   v, l])
 	.setTexture(BRICK_TEXTURE)
 	.add2DCoords();
+    v = 7 * h;
+    this.push_button[1] = new Quad(
+	[-w, h+v, l],
+	[-w,   v, l],
+	[ w, h+v, l],
+	[ w,   v, l])
+	.setTexture(BRICK_TEXTURE)
+	.add2DCoords();
+    this.push_button[1].magical = true;
 
     this.initBuffers = function(gl_) {
 	
@@ -181,8 +200,8 @@ function Game() {
 
     this.draw = function(gl_) {
 
-	audio.analyze();
-
+	if (audio.analyze() === true) this.hi_hat = 11;
+	else if (this.hi_hat > 0) this.hi_hat -= 1;
 
 	// Analyse movement, which draws upon sound, and activated moves.
 	this.updateMovement();
@@ -198,7 +217,7 @@ function Game() {
 	theCanvas.changeShader(gl_.shader);
 	theMatrix.setViewUniforms(gl_.shader);
 	var unis = gl_.shader.unis;
-	gl_.uniform1f(unis["hi_hat_u"], audio.hi_hat);
+	gl_.uniform1f(unis["hi_hat_u"], this.hi_hat);
 	gl_.uniform1f(unis["wall_hit_u"], this.floor_effect);
 	gl_.uniform3fv(unis["lightPosU"], [0, 0, 500]);
 	gl_.uniform1i(unis["sampler1"], gl_.tex_enum[BRICK_NORMAL_TEXTURE]);
@@ -221,7 +240,7 @@ function Game() {
 	var player_shader = this.player.o.shader;
 	theCanvas.changeShader(player_shader);
 	var unis = player_shader.unis;
-	gl_.uniform1f(unis["hi_hat_u"], audio.hi_hat);
+	gl_.uniform1f(unis["hi_hat_u"], this.hi_hat);
 	theMatrix.setVertexUniforms(player_shader);
 
 	this.player.draw(gl_);
@@ -309,6 +328,10 @@ function Game() {
 	this.left_count = -1;
 	this.left_started = false;
 	this.in_left_move = true;
+	if(this.in_right_move === true && this.right_started === false) {
+	    this.in_right_move = false;
+	}
+
     };
 
     this.startRightMove = function() {
@@ -318,6 +341,9 @@ function Game() {
 	this.right_count = -1;
 	this.right_started = false;
 	this.in_right_move = true;
+	if(this.in_left_move === true && this.left_started === false) {
+	    this.in_left_move = false;
+	}
     };
 
     this.startCameraLeftMove = function() {
@@ -380,6 +406,8 @@ function Game() {
 
     this.detectCollision = function(object) {
 
+	if(object.magical) return WALL_NONE;
+
 	// First, check vertical indexes. Next, check horizontal indexes.
 	if (this.movement[1] + this.player_height > object.y_min &&
 	    this.movement[1] <= object.y_max &&
@@ -407,11 +435,11 @@ function Game() {
 	else if(this.player_x_pos > 7) this.startCameraRightMove();
 
 	// Check whether it's time to initiate a move that's been triggered.
-        if (this.in_right_move === true && audio.hi_hat == 10) { 
+        if (this.in_right_move === true && this.hi_hat == 10) { 
 	    this.right_started = true; audio.playSound(); } 
-        if (this.in_left_move === true && this.left_started === false && audio.hi_hat == 10) { 
+        if (this.in_left_move === true && this.left_started === false && this.hi_hat == 10) { 
 	    this.left_started = true; audio.playSound(); } 
-	if (this.in_jump === true && this.jump_started === false && audio.hi_hat == 10) { 
+	if (this.in_jump === true && this.jump_started === false && this.hi_hat == 10) { 
 	    this.jump_started = true; } 
 
 
@@ -496,11 +524,15 @@ function Game() {
 	    } 
 	}
 
-	if(this.push_button[0].collided === WALL_N) this.floor_effect += 1;
-	else if (this.floor_effect > 0) this.floor_effect -= 1; 
-
-	if(this.floor_effect > 0) console.log("floor effect: " + this.floor_effect);
-
+	if(this.push_button[0].collided === WALL_N) {
+	    this.push_button[1].magical = false;
+	    if (this.floor_effect !== 75) this.floor_effect ++;
+	} else if(this.push_button[0].collided === WALL_N) {
+	    this.push_button[2].magical = false;
+	    if (this.floor_effect !== 75) this.floor_effect ++;
+	} else {
+	    this.floor_effect --;
+	}
 
 	if(on_wall === false && this.in_jump === false) {
 	    console.log("freefallin!");
