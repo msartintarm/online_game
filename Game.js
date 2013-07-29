@@ -23,6 +23,7 @@ function Game() {
     // 3. Rest of the song.
     audio.createAudio("music/beats.mp3", audio.low_pass, true, 1, 8);
     audio.createAudio("music/electro_hat.wav", audio.web_audio.destination, false);
+    audio.createAudio("music/jump_open_hat.wav", audio.web_audio.destination, false);
     audio.createAudio("music/backing_beat.wav", audio.delay, true, 0, 8, 0.300);
 
     var i; // for init loop
@@ -97,8 +98,8 @@ function Game() {
     var l = -1;
     this.player = new Quad([ w, h, l], 
 			   [ w, 0, l], 
-			   [-w, h, l], 
-			   [-w, 0, l])
+			   [-w, 0, l],
+			   [-w, h, l]) 
 	.setTexture(TEXT_TEXTURE)
         .setShader(theCanvas.gl.shader_player);
     this.player_width = w;
@@ -124,14 +125,14 @@ function Game() {
 			.setTexture(RUG_TEXTURE)
 			.add2DCoords());
 	this.three_dee.push(new SixSidedPrism(
-	    [-w_,  0, -1],
-	    [-w_, h_, -1],
-	    [ w_, h_, -1],
-	    [ w_,  0, -1],
-	    [-w_,  0, -1 - floor_width],
-	    [-w_, h_, -1 - floor_width],
-	    [ w_, h_, -1 - floor_width],
-	    [ w_,  0, -1 - floor_width])
+	    [-w_,  0, l],
+	    [-w_, h_, l],
+	    [ w_, h_, l],
+	    [ w_,  0, l],
+	    [-w_,  0, l - floor_width],
+	    [-w_, h_, l - floor_width],
+	    [ w_, h_, l - floor_width],
+	    [ w_,  0, l - floor_width])
 			.translate([i * 2.0 * w, 0, 40])
 			.setTexture(RUG_TEXTURE));
 	if(i === -11) { this.floor[0].translate([-12 * w, 0, 0]).add2DCoords();
@@ -145,6 +146,8 @@ function Game() {
     l = -1;
     var v = 3 * h;
     var d = 12 * this.grid;
+    this.push_button[0] = new Quad([d-w,h+v,l],[d-w,v,l],[d+w,h+v,l],[d+w,v,l])
+	.setTexture(BRICK_TEXTURE).add2DCoords();
     this.push_button[0] = new Quad([d-w,h+v,l],[d-w,v,l],[d+w,h+v,l],[d+w,v,l])
 	.setTexture(BRICK_TEXTURE).add2DCoords();
     v += 1 * this.grid;
@@ -479,11 +482,11 @@ function Game() {
 
 	// Check whether it's time to initiate a move that's been triggered.
         if (this.in_right_move === true && this.hi_hat == 10) { 
-	    this.right_started = true; audio.playSound(); } 
+	    this.right_started = true; audio.playSound(1); } 
         if (this.in_left_move === true && this.left_started === false && this.hi_hat == 10) { 
-	    this.left_started = true; audio.playSound(); } 
+	    this.left_started = true; audio.playSound(1); } 
 	if (this.in_jump === true && this.jump_started === false && this.hi_hat == 10) { 
-	    this.jump_started = true; } 
+	    this.jump_started = true; audio.playSound(2); } 
 
 
 
@@ -574,7 +577,7 @@ function Game() {
 	    if (this.floor_effect !== 75) this.floor_effect ++;
 	    else console.log("Max Power!");
 	} else {
-	    this.floor_effect --;
+	    if (this.floor_effect > 0) this.floor_effect --;
 	}
 
 	if(on_wall === false && this.in_jump === false) {

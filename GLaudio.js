@@ -70,10 +70,10 @@ function GLaudio() {
 
     };
 
-    this.playSound = function() {
+    this.playSound = function(num) {
 
 	var source = this.web_audio.createBufferSource();
-	source.buffer = this.audio[1].buffer;
+	source.buffer = this.audio[num].buffer;
 	source.connect(this.web_audio.destination);
 	source.start(0, 0);
     };
@@ -104,7 +104,7 @@ function GLaudio() {
 	new_audio.auto_play = auto_start;
 	new_audio.dest = destination;
 	new_audio.delay = 0;
-	new_audio.loop_length = null;
+	new_audio.loop_length = 0;
 	if (auto_start === true) {
 	    new_audio.delay = loop_delay;
 	    new_audio.loop_length = loop_length;
@@ -142,7 +142,7 @@ function GLaudio() {
 	var playBuffer = function() {
 	    for(var i = 0; i < audio.length; ++i) {
 		var gl_audio = audio[i];
-		if(gl_audio.loop_length !== null && 
+		if(gl_audio.loop_length !== 0 && 
 		   ((++(gl_audio.loop_count)) % gl_audio.loop_length === 0)) {
 		    var source2 = gl_audio.source[(++(gl_audio.source_num)) % 
 						  gl_audio.source.length];
