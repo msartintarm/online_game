@@ -17,7 +17,8 @@ function Game() {
 
     // createAudio(origin URL, destination node, loop[, loop offset, loop time])
     // These are at 120 BPM: 1 sec = 2 beats
-    // 1. Low-pass input detects movement, occuring on the half-beat; slightly below 0.25s
+    // 0. Low-pass input detects movement, occuring on the half-beat; slightly below 0.25s
+    // 1. Non-looping sound, which will be triggered by the above sample
     // 2. Non-looping sound, which will be triggered by the above sample
     // 3. Rest of the song.
     audio.createAudio("music/beats.mp3", audio.low_pass, true, 1, 8);
@@ -31,6 +32,7 @@ function Game() {
     this.movement = vec3.fromValues(0, 2, 0);
     this.movement_old = vec3.create();
     this.bg_movement = vec3.create();
+    this.cam_movement = vec3.create();
     this.total = null;
     this.total2 = null;
     this.cam_left_count = 0;
@@ -99,8 +101,6 @@ function Game() {
 			   [-w, 0, l])
 	.setTexture(TEXT_TEXTURE)
         .setShader(theCanvas.gl.shader_player);
-    this.player_x_pos = 0;
-    this.player_y_pos = 0;
     this.player_width = w;
     this.player_height = h;
 
@@ -113,7 +113,7 @@ function Game() {
 	.setTexture(HEAVEN_TEXTURE)
 	.setShader(theCanvas.gl.shader_canvas);
 
-    for(var i=-10; i<=10; ++i) {
+    for(var i=-11; i<=10; ++i) {
 	var w_ = floor_width, h_ = -3 * floor_width, l_ = -1;
 	this.floor.push(new Quad(
 	    [-w_,  0, l_],
@@ -134,6 +134,8 @@ function Game() {
 	    [ w_,  0, -1 - floor_width])
 			.translate([i * 2.0 * w, 0, 40])
 			.setTexture(RUG_TEXTURE));
+	if(i === -11) { this.floor[0].translate([-12 * w, 0, 0]).add2DCoords();
+			this.three_dee[0].translate([-12 * w, 0, 0]); }
 	// todo: turn into a '
 //	this.floor[i + 10].x_
     }
@@ -142,22 +144,62 @@ function Game() {
     h = floor_width;
     l = -1;
     var v = 3 * h;
-    this.push_button[0] = new Quad(
-	[-w, h+v, l],
-	[-w,   v, l],
-	[ w, h+v, l],
-	[ w,   v, l])
-	.setTexture(BRICK_TEXTURE)
-	.add2DCoords();
-    v = 7 * h;
-    this.push_button[1] = new Quad(
-	[-w, h+v, l],
-	[-w,   v, l],
-	[ w, h+v, l],
-	[ w,   v, l])
-	.setTexture(BRICK_TEXTURE)
-	.add2DCoords();
+    var d = 12 * this.grid;
+    this.push_button[0] = new Quad([d-w,h+v,l],[d-w,v,l],[d+w,h+v,l],[d+w,v,l])
+	.setTexture(BRICK_TEXTURE).add2DCoords();
+    v += 1 * this.grid;
+    d += 2 * this.grid;
+    this.push_button[1] = new Quad([d-w,h+v,l],[d-w,v,l],[d+w,h+v,l],[d+w,v,l])
+	.setTexture(BRICK_TEXTURE).add2DCoords();
     this.push_button[1].magical = true;
+    d += 2 * this.grid;
+    v += 1 * this.grid;
+    this.push_button[2] = new Quad([d-w,h+v,l],[d-w,v,l],[d+w,h+v,l],[d+w,v,l])
+	.setTexture(BRICK_TEXTURE).add2DCoords();
+    d += 2 * this.grid;
+    v += 1 * this.grid;
+    this.push_button[3] = new Quad([d-w,h+v,l],[d-w,v,l],[d+w,h+v,l],[d+w,v,l])
+	.setTexture(BRICK_TEXTURE).add2DCoords();
+    d += 2 * this.grid;
+    v += 1 * this.grid;
+    this.push_button[4] = new Quad([d-w,h+v,l],[d-w,v,l],[d+w,h+v,l],[d+w,v,l])
+	.setTexture(BRICK_TEXTURE).add2DCoords();
+
+    w /= 2;
+    d += w;
+    for(var j = 5; j < 16; ++j) {
+	d += 2 * this.grid;
+	this.push_button[j] = new Quad([d-w,h+v,l],[d-w,v,l],[d+w,h+v,l],[d+w,v,l])
+	    .setTexture(BRICK_TEXTURE).add2DCoords();
+    }
+    v -= 2*w;
+    d += 4 * this.grid;
+    for(var j = 16; j < 19; ++j) {
+	d -= 2 * this.grid;
+	this.push_button[j] = new Quad([d-w,h+v,l],[d-w,v,l],[d+w,h+v,l],[d+w,v,l])
+	    .setTexture(BRICK_TEXTURE).add2DCoords();
+    }
+    v += 2*w;
+    d -= 4 * this.grid;
+    for(var j = 19; j < 22; ++j) {
+	d += 2 * this.grid;
+	this.push_button[j] = new Quad([d-w,h+v,l],[d-w,v,l],[d+w,h+v,l],[d+w,v,l])
+	    .setTexture(BRICK_TEXTURE).add2DCoords();
+    }
+    v -= 2*w;
+    d += 4 * this.grid;
+    for(var j = 22; j < 25; ++j) {
+	d -= 2 * this.grid;
+	this.push_button[j] = new Quad([d-w,h+v,l],[d-w,v,l],[d+w,h+v,l],[d+w,v,l])
+	    .setTexture(BRICK_TEXTURE).add2DCoords();
+    }
+    v += 2*w;
+    d -= 4 * this.grid;
+    for(var j = 25; j < 28; ++j) {
+	d += 2 * this.grid;
+	this.push_button[j] = new Quad([d-w,h+v,l],[d-w,v,l],[d+w,h+v,l],[d+w,v,l])
+	    .setTexture(BRICK_TEXTURE).add2DCoords();
+    }
 
     this.initBuffers = function(gl_) {
 	
@@ -219,7 +261,7 @@ function Game() {
 	var unis = gl_.shader.unis;
 	gl_.uniform1f(unis["hi_hat_u"], this.hi_hat);
 	gl_.uniform1f(unis["wall_hit_u"], this.floor_effect);
-	gl_.uniform3fv(unis["lightPosU"], [0, 0, 500]);
+	gl_.uniform3fv(unis["lightPosU"], [0, 200, 40]);
 	gl_.uniform1i(unis["sampler1"], gl_.tex_enum[BRICK_NORMAL_TEXTURE]);
 
 	for(i = 0; i < this.floor.length; ++i){
@@ -348,18 +390,17 @@ function Game() {
 
     this.startCameraLeftMove = function() {
 
-	if (this.cam_in_left_move === true) return;
-	this.player_x_pos += 7;
-	this.cam_left_count = 14;
+	if (this.cam_in_left_move === true || this.cam_in_right_move === true) return;
+	this.cam_movement[0] -= (15 * this.grid);
+	this.cam_left_count = 30;
 	this.cam_in_left_move = true;
     };
 
     this.startCameraRightMove = function() {
 
-	if (this.cam_in_right_move === true) return;
-
-	this.player_x_pos -= 7;
-	this.cam_right_count = 14;
+	if (this.cam_in_right_move === true || this.cam_in_left_move === true) return;
+	this.cam_movement[0] += (15 * this.grid);
+	this.cam_right_count = 30;
 	this.cam_in_right_move = true;
     };
 
@@ -373,7 +414,7 @@ function Game() {
 	console.log("movement frame " + count + ": " + this.change_x[count]);
 	
 	this.movement[0] += this.change_x[count] * this.grid;
-	this.bg_movement[0] += this.grid / 30;
+	this.bg_movement[0] += this.grid / 100;
 
     };
 
@@ -387,7 +428,7 @@ function Game() {
 	}
 	
 	this.movement[0] += this.move_dist[count] * this.grid;
-	this.bg_movement[0] += this.grid / 30;
+	this.bg_movement[0] += this.grid / 100;
 
     };
 
@@ -431,8 +472,10 @@ function Game() {
 	vec3.copy(this.movement_old, this.movement);
 
 	// TODO: restore functionality to these functions
-	if(this.player_x_pos < -7) this.startCameraLeftMove();
-	else if(this.player_x_pos > 7) this.startCameraRightMove();
+	if(this.movement[0] < this.cam_movement[0] - 400) this.startCameraLeftMove();
+	else if(this.movement[0] > this.cam_movement[0] + 400) this.startCameraRightMove();
+
+	if(this.movement[1] < -500) { vec3.set(this.movement, 0,10,0); return; }
 
 	// Check whether it's time to initiate a move that's been triggered.
         if (this.in_right_move === true && this.hi_hat == 10) { 
@@ -499,11 +542,13 @@ function Game() {
 		// Convert to 1.0 scale, round to integer, convert back
 		this.movement[0] = this.grid * Math.floor(this.movement[0] / this.grid);
 		this.in_right_move = false;
+		if (this.right_key_down === true) this.startRightMove();
 		break;
 	    case WALL_E:
 		// Convert to 1.0 scale, round to integer, convert back
 		this.movement[0] = this.grid * Math.ceil(this.movement[0] / this.grid);
 		this.in_left_move = false;
+		if (this.left_key_down === true) this.startLeftMove();
 		break;
 	    case WALL_N: // Here, just move to the top of the wall.
 		if(this.jumping_down === true && this.in_jump === true) {
@@ -527,9 +572,7 @@ function Game() {
 	if(this.push_button[0].collided === WALL_N) {
 	    this.push_button[1].magical = false;
 	    if (this.floor_effect !== 75) this.floor_effect ++;
-	} else if(this.push_button[0].collided === WALL_N) {
-	    this.push_button[2].magical = false;
-	    if (this.floor_effect !== 75) this.floor_effect ++;
+	    else console.log("Max Power!");
 	} else {
 	    this.floor_effect --;
 	}

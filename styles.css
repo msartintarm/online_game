@@ -1,7 +1,19 @@
-thead { color: green; }
-tbody { color: blue; }
+thead { 
+    color: green; 
+    cursor: default;        /* make the cursor like hovering over an <a> element */
+    -moz-user-select: all;
+    -webkit-user-select: all;
+    -khtml-user-select: all;
+}
+tbody { color: blue; 
+    -moz-user-select: all;
+    -webkit-user-select: all;
+    -khtml-user-select: all;
 
-a:link {text-decoration: none; }
+}
+
+a:link {text-decoration: none; 
+}
 a:visited {color: #880000; }
 a:active {color: red; }
 a:hover {text-decoration: underline; color: red;}
@@ -36,6 +48,9 @@ body:after {
 }
 
 body {
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
     background-color: #111111;
     font-family: Verdana, sans-serif;
     padding-left: 15px;

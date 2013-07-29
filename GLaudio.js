@@ -20,7 +20,6 @@ function GLaudio() {
 
     this.analyser = this.web_audio.createAnalyser();
     this.analyser.fftSize = 32;
-    this.analyser.connect(this.web_audio.destination);
 
     this.low_pass = this.web_audio.createBiquadFilter();
     this.low_pass.type = "lowpass";
