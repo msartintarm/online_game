@@ -70,14 +70,18 @@ function GLaudio() {
 
     };
 
-    this.playSound = function(num) {
+    // Close out function context to the world.
+    this.playSound = (function(web_audio, sounds) { 
 
-	var source = this.web_audio.createBufferSource();
-	source.buffer = this.audio[num].buffer;
-	source.connect(this.web_audio.destination);
-	source.start(0, 0);
-    };
-
+	return function(num, length) {
+	    var source = web_audio.createBufferSource();
+	    source.buffer = sounds[num].buffer;
+	    source.connect(web_audio.destination);
+	    if (!length) source.start(0, 0);
+	    else source.start(0, length);
+	};
+    } (this.web_audio, this.audio));
+    
     this.handleAudioRequest = function(gl_audio, request) {
 
 	this.web_audio.decodeAudioData(

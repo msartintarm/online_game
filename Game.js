@@ -4,11 +4,11 @@
 function Game() {  
 
     // Used in collision detection.
-    const WALL_NONE = 0;
-    const WALL_N = 1;
-    const WALL_S = 2;
-    const WALL_W = 3;
-    const WALL_E = 4;
+    var WALL_NONE = 0;
+    var WALL_N = 1;
+    var WALL_S = 2;
+    var WALL_W = 3;
+    var WALL_E = 4;
 
     var theTexture2 = new GLtexture(theCanvas.gl, BRICK_NORMAL_TEXTURE);
     var theTexture3 = new GLtexture(theCanvas.gl, HEAVEN_NORMAL_TEXTURE);
@@ -24,86 +24,36 @@ function Game() {
     audio.createAudio("music/beats.mp3", audio.low_pass, true, 1, 8);
     audio.createAudio("music/electro_hat.wav", audio.web_audio.destination, false);
     audio.createAudio("music/jump_open_hat.wav", audio.web_audio.destination, false);
-    audio.createAudio("music/backing_beat.wav", audio.delay, true, 0, 8, 0.300);
+    audio.createAudio("music/backing_beat.wav", audio.delay, true, 0, 8);
 
     var i; // for init loop
 
+var player = new Player(50);
+
     // handles movement
     this.grid = 50;
-    this.movement = vec3.fromValues(0, 2, 0);
-    this.movement_old = vec3.create();
     this.bg_movement = vec3.create();
     this.cam_movement = vec3.create();
-    this.total = null;
-    this.total2 = null;
     this.cam_left_count = 0;
     this.cam_right_count = 0;
-    this.in_jump = false;
     this.cam_in_left_move = false;
     this.cam_in_right_move = false;
-    this.in_left_move = false;
-    this.in_right_move = false;
     this.in_change = false;
     this.change_x = [];
 
-    this.right_key_down = false;
-    this.left_key_down = false;
-    this.jump_key_down = false;
     this.hi_hat = 0;
 
     // Jump distance is a vector of linear X values
     // When we increment y-pos by these array values, the effect is a parabolic jump
-    this.jump_dist = [];
-    for (i = 0; i <= 30; ++i) {
-	this.jump_dist.push (15 - (i / 2));
-    }
-
-    // Move distance is a group of numbers, normalized so their sum is 1.0
-    this.move_dist = [];
-    var move_total = 0;
-    for (i = 0; i <= 8; ++i) {
-	var move_num = 64 - (i*i);
-	this.move_dist.push (move_num);
-	move_total += move_num;
-    }
-    for (i = 0; i <= 8; ++i) {
-	this.move_dist[i] /= move_total;
-    }
-    
-    // Setup player textures
-    this.player_name = "Oname";
-    document.getElementById("player_name").focus();
-    document.getElementById("player_name").value = this.player_name;
-    // Specify string to use, texture ID, and shader to use
-    this.player_string = new GLstring(this.player_name, TEXT_TEXTURE, theCanvas.gl.shader_player);
-    this.left_string = new GLstring("left", TEXT_TEXTURE, theCanvas.gl.shader_player);
-    this.right_string = new GLstring("right", TEXT_TEXTURE, theCanvas.gl.shader_player);
-    this.jump_string = new GLstring("jump", TEXT_TEXTURE, theCanvas.gl.shader_player);
-    this.collision_string = new GLstring("Ouch!", TEXT_TEXTURE, theCanvas.gl.shader_player);
 
     // new shader effect
     this.floor_effect = 0;
 
-    var player_width = this.grid;
-    var floor_width = player_width;
+    var floor_width = this.grid;
     this.floor = [];
     this.push_button = [];
     this.three_dee = [];
     theCanvas.matrix.vTranslate([0,300,750]);
-
-
-    // x is width (from -w to w), y is height (from 0 to h), z is length (never varies over l)
-    var w = this.grid / 2;
-    var h = this.grid;
-    var l = -1;
-    this.player = new Quad([ w, h, l], 
-			   [ w, 0, l], 
-			   [-w, 0, l],
-			   [-w, h, l]) 
-	.setTexture(TEXT_TEXTURE)
-        .setShader(theCanvas.gl.shader_player);
-    this.player_width = w;
-    this.player_height = h;
 
     var wh = 1200;
     var l2= -20;
@@ -121,87 +71,85 @@ function Game() {
 	    [-w_, h_, l_],
 	    [ w_,  0, l_],
 	    [ w_, h_, l_])
-			.translate([i * 2 * w, 0, 40])
+			.translate([i * 2 * w_, 0, 40])
 			.setTexture(RUG_TEXTURE)
 			.add2DCoords());
 	this.three_dee.push(new SixSidedPrism(
-	    [-w_,  0, l],
-	    [-w_, h_, l],
-	    [ w_, h_, l],
-	    [ w_,  0, l],
-	    [-w_,  0, l - floor_width],
-	    [-w_, h_, l - floor_width],
-	    [ w_, h_, l - floor_width],
-	    [ w_,  0, l - floor_width])
-			.translate([i * 2.0 * w, 0, 40])
+	    [-w_,  0, l_],
+	    [-w_, h_, l_],
+	    [ w_, h_, l_],
+	    [ w_,  0, l_],
+	    [-w_,  0, l_ - floor_width],
+	    [-w_, h_, l_ - floor_width],
+	    [ w_, h_, l_ - floor_width],
+	    [ w_,  0, l_ - floor_width])
+			.translate([i * 2.0 * w_, 0, 40])
 			.setTexture(RUG_TEXTURE));
-	if(i === -11) { this.floor[0].translate([-12 * w, 0, 0]).add2DCoords();
-			this.three_dee[0].translate([-12 * w, 0, 0]); }
-	// todo: turn into a '
-//	this.floor[i + 10].x_
+	if(i === -11) { this.floor[0].translate([-12 * w_, 0, 0]).add2DCoords();
+			this.three_dee[0].translate([-12 * w_, 0, 0]); }
     }
 
-    w = floor_width;
-    h = floor_width;
+    var w = floor_width;
+    var h = floor_width;
     l = -1;
     var v = 3 * h;
     var d = 12 * this.grid;
-    this.push_button[0] = new Quad([d-w,h+v,l],[d-w,v,l],[d+w,h+v,l],[d+w,v,l])
-	.setTexture(BRICK_TEXTURE).add2DCoords();
-    this.push_button[0] = new Quad([d-w,h+v,l],[d-w,v,l],[d+w,h+v,l],[d+w,v,l])
-	.setTexture(BRICK_TEXTURE).add2DCoords();
+    this.push_button.push(new Quad([d-w,h+v,l],[d-w,v,l],[d+w,h+v,l],[d+w,v,l])
+	.setTexture(BRICK_TEXTURE).add2DCoords());
+    this.push_button.push(new Quad([d-w,h+v,l],[d-w,v,l],[d+w,h+v,l],[d+w,v,l])
+	.setTexture(BRICK_TEXTURE).add2DCoords());
     v += 1 * this.grid;
     d += 2 * this.grid;
-    this.push_button[1] = new Quad([d-w,h+v,l],[d-w,v,l],[d+w,h+v,l],[d+w,v,l])
-	.setTexture(BRICK_TEXTURE).add2DCoords();
+    this.push_button.push(new Quad([d-w,h+v,l],[d-w,v,l],[d+w,h+v,l],[d+w,v,l])
+	.setTexture(BRICK_TEXTURE).add2DCoords());
     this.push_button[1].magical = true;
     d += 2 * this.grid;
     v += 1 * this.grid;
-    this.push_button[2] = new Quad([d-w,h+v,l],[d-w,v,l],[d+w,h+v,l],[d+w,v,l])
-	.setTexture(BRICK_TEXTURE).add2DCoords();
+    this.push_button.push(new Quad([d-w,h+v,l],[d-w,v,l],[d+w,h+v,l],[d+w,v,l])
+	.setTexture(BRICK_TEXTURE).add2DCoords());
     d += 2 * this.grid;
     v += 1 * this.grid;
-    this.push_button[3] = new Quad([d-w,h+v,l],[d-w,v,l],[d+w,h+v,l],[d+w,v,l])
-	.setTexture(BRICK_TEXTURE).add2DCoords();
+    this.push_button.push(new Quad([d-w,h+v,l],[d-w,v,l],[d+w,h+v,l],[d+w,v,l])
+	.setTexture(BRICK_TEXTURE).add2DCoords());
     d += 2 * this.grid;
     v += 1 * this.grid;
-    this.push_button[4] = new Quad([d-w,h+v,l],[d-w,v,l],[d+w,h+v,l],[d+w,v,l])
-	.setTexture(BRICK_TEXTURE).add2DCoords();
+    this.push_button.push(new Quad([d-w,h+v,l],[d-w,v,l],[d+w,h+v,l],[d+w,v,l])
+	.setTexture(BRICK_TEXTURE).add2DCoords());
 
     w /= 2;
     d += w;
     for(var j = 5; j < 16; ++j) {
 	d += 2 * this.grid;
-	this.push_button[j] = new Quad([d-w,h+v,l],[d-w,v,l],[d+w,h+v,l],[d+w,v,l])
-	    .setTexture(BRICK_TEXTURE).add2DCoords();
+	this.push_button.push(new Quad([d-w,h+v,l],[d-w,v,l],[d+w,h+v,l],[d+w,v,l])
+	    .setTexture(BRICK_TEXTURE).add2DCoords());
     }
     v -= 2*w;
     d += 4 * this.grid;
     for(var j = 16; j < 19; ++j) {
 	d -= 2 * this.grid;
-	this.push_button[j] = new Quad([d-w,h+v,l],[d-w,v,l],[d+w,h+v,l],[d+w,v,l])
-	    .setTexture(BRICK_TEXTURE).add2DCoords();
+	this.push_button.push(new Quad([d-w,h+v,l],[d-w,v,l],[d+w,h+v,l],[d+w,v,l])
+	    .setTexture(BRICK_TEXTURE).add2DCoords());
     }
     v += 2*w;
     d -= 4 * this.grid;
     for(var j = 19; j < 22; ++j) {
 	d += 2 * this.grid;
-	this.push_button[j] = new Quad([d-w,h+v,l],[d-w,v,l],[d+w,h+v,l],[d+w,v,l])
-	    .setTexture(BRICK_TEXTURE).add2DCoords();
+	this.push_button.push(new Quad([d-w,h+v,l],[d-w,v,l],[d+w,h+v,l],[d+w,v,l])
+	    .setTexture(BRICK_TEXTURE).add2DCoords());
     }
     v -= 2*w;
     d += 4 * this.grid;
     for(var j = 22; j < 25; ++j) {
 	d -= 2 * this.grid;
-	this.push_button[j] = new Quad([d-w,h+v,l],[d-w,v,l],[d+w,h+v,l],[d+w,v,l])
-	    .setTexture(BRICK_TEXTURE).add2DCoords();
+	this.push_button.push(new Quad([d-w,h+v,l],[d-w,v,l],[d+w,h+v,l],[d+w,v,l])
+	    .setTexture(BRICK_TEXTURE).add2DCoords());
     }
     v += 2*w;
     d -= 4 * this.grid;
     for(var j = 25; j < 28; ++j) {
 	d += 2 * this.grid;
-	this.push_button[j] = new Quad([d-w,h+v,l],[d-w,v,l],[d+w,h+v,l],[d+w,v,l])
-	    .setTexture(BRICK_TEXTURE).add2DCoords();
+	this.push_button.push(new Quad([d-w,h+v,l],[d-w,v,l],[d+w,h+v,l],[d+w,v,l])
+	    .setTexture(BRICK_TEXTURE).add2DCoords());
     }
 
     this.initBuffers = function(gl_) {
@@ -215,21 +163,11 @@ function Game() {
 	theCanvas.changeShader(gl_.shader);
 	theMatrix.setViewUniforms(gl_.shader);
 	gl_.uniformMatrix4fv(gl_.shader.unis["pMatU"], false, theMatrix.pMatrix);
-	theCanvas.changeShader(gl_.shader_player);
-	theMatrix.setViewUniforms(gl_.shader_player);
-	gl_.uniformMatrix4fv(gl_.shader_player.unis["pMatU"], false, theMatrix.pMatrix);
 	theCanvas.changeShader(gl_.shader_canvas);
 	theMatrix.setViewUniforms(gl_.shader_canvas);
 	gl_.uniformMatrix4fv(gl_.shader_canvas.unis["pMatU"], false, theMatrix.pMatrix);
 
-//	gl_.uniform1f(player_shader.unis["hi_hat_u"], this.hi_hat);
-
-	this.player_string.initBuffers(gl_);
-	this.left_string.initBuffers(gl_);
-	this.right_string.initBuffers(gl_);
-	this.jump_string.initBuffers(gl_);
-	this.collision_string.initBuffers(gl_);
-	this.player.initBuffers(gl_);
+	player.initBuffers(gl_);
 	this.background.initBuffers(gl_);
 
 	for(i = 0; i < this.floor.length; ++i){
@@ -279,17 +217,7 @@ function Game() {
 	    this.three_dee[i].draw(gl_);
 	}
 
-	theMatrix.push();
-	theMatrix.translate(this.movement);
-
-	var player_shader = this.player.o.shader;
-	theCanvas.changeShader(player_shader);
-	var unis = player_shader.unis;
-	gl_.uniform1f(unis["hi_hat_u"], this.hi_hat);
-	theMatrix.setVertexUniforms(player_shader);
-
-	this.player.draw(gl_);
-	theMatrix.pop();
+	player.draw(gl_, this.hi_hat);
 
 	theMatrix.push();
 	theMatrix.translate(this.bg_movement);
@@ -313,34 +241,34 @@ function Game() {
 	document.onkeyup = function(the_event) {
 
 	    switch(the_event.keyCode) {
-	    case 39: this.right_key_down = false; break;
-	    case 37: this.left_key_down = false; break;
+	    case 39: player.right_key_down = false; break;
+	    case 37: player.left_key_down = false; break;
 	    case 38: // up
-		this.startJump();
-		this.jump_key_down = false;
+		player.startJump();
+		player.jump_key_down = false;
 		break;
 	    default:
 		break;
 	    }
-	}.bind(this);
+	}
 
 	document.onkeydown = function(the_event) {
 
 	    switch(the_event.keyCode) {
 	    case 39: // right
-		if(this.right_key_down === true) break;
-		this.right_key_down = true;
-		this.startRightMove();
+		if(player.right_key_down === true) break;
+		player.right_key_down = true;
+		player.startRightMove();
 		break;
 	    case 37: // left
-		if(this.left_key_down === true) break;
-		this.left_key_down = true;
-		this.startLeftMove();
+		if(player.left_key_down === true) break;
+		player.left_key_down = true;
+		player.startLeftMove();
 		break;
 	    case 38: // up
-		if(this.jump_key_down === true) break;
-		this.jump_key_down = true;
-		this.startJump();
+		if(player.jump_key_down === true) break;
+		player.jump_key_down = true;
+		player.startJump();
 		break;
 	    case 40: // down
 		audio.log_music = !(audio.log_music);
@@ -351,44 +279,7 @@ function Game() {
 	    default:
 		break;
 	    }
-	}.bind(this);
-    };
-
-    this.startJump = function() {
-
-	if (this.in_jump === true) return;
-	this.jump_string.initBuffers(theCanvas.gl);
-	this.jump_started = false;
-	this.jumping_up = true;
-	this.jumping_down = false;
-	this.jump_count = -1;
-	this.in_jump = true;
-    };
-
-    this.startLeftMove = function() {
-
-
-	if (this.in_left_move === true) return;
-	this.left_string.initBuffers(theCanvas.gl);
-	this.left_count = -1;
-	this.left_started = false;
-	this.in_left_move = true;
-	if(this.in_right_move === true && this.right_started === false) {
-	    this.in_right_move = false;
-	}
-
-    };
-
-    this.startRightMove = function() {
-
-	if (this.in_right_move === true) return;
-	this.right_string.initBuffers(theCanvas.gl);
-	this.right_count = -1;
-	this.right_started = false;
-	this.in_right_move = true;
-	if(this.in_left_move === true && this.left_started === false) {
-	    this.in_left_move = false;
-	}
+	};
     };
 
     this.startCameraLeftMove = function() {
@@ -407,88 +298,12 @@ function Game() {
 	this.cam_in_right_move = true;
     };
 
-    this.changeMovement = function() {
-	var count = ++this.change_count;
-	if (count >= this.change_x.length) { 
-	    this.in_change = false;
-	    return;
-	}
-
-	console.log("movement frame " + count + ": " + this.change_x[count]);
-	
-	this.movement[0] += this.change_x[count] * this.grid;
-	this.bg_movement[0] += this.grid / 100;
-
-    };
-
-    this.moveRight = function() {
-	if (this.right_started === false) return;
-	var count = ++this.right_count;
-	if (count >= this.move_dist.length) { 
-	    this.in_right_move = false;
-	    if (this.right_key_down === true) this.startRightMove();
-	    return;
-	}
-	
-	this.movement[0] += this.move_dist[count] * this.grid;
-	this.bg_movement[0] += this.grid / 100;
-
-    };
-
-    this.moveLeft = function () {
-	var count = (++this.left_count);
-	if (count >= this.move_dist.length) { 
-	    this.in_left_move = false;
-	    if (this.left_key_down === true) this.startLeftMove();
-	    return;
-	}
-
-	this.movement[0] -= this.move_dist[count] * this.grid;
-	this.bg_movement[0] -= this.grid / 30;
-
-    };
-
-    this.detectCollision = function(object) {
-
-	if(object.magical) return WALL_NONE;
-
-	// First, check vertical indexes. Next, check horizontal indexes.
-	if (this.movement[1] + this.player_height > object.y_min &&
-	    this.movement[1] <= object.y_max &&
-	    this.movement[0] - this.player_width < object.x_max && 
-	    this.movement[0] + this.player_width > object.x_min) {
-
-	    // Which side of the box did we cross during the previous frame?
-	    if (this.movement_old[1] >= object.y_max)
-		return WALL_N;
-	    if (this.movement[1] >= object.y_max) return WALL_N;
-	    if (this.movement_old[1] + this.player_height <= object.y_min) return WALL_S;
-	    if (this.movement_old[0] - this.player_width >= object.x_max) return WALL_E;
-	    if (this.movement_old[0] + this.player_width <= object.x_min) return WALL_W;
-	} 
-	return WALL_NONE;
-		
-    };
-
     this.updateMovement = function() {
 
-	vec3.copy(this.movement_old, this.movement);
-
+	var x_ = player.xPos();
 	// TODO: restore functionality to these functions
-	if(this.movement[0] < this.cam_movement[0] - 400) this.startCameraLeftMove();
-	else if(this.movement[0] > this.cam_movement[0] + 400) this.startCameraRightMove();
-
-	if(this.movement[1] < -500) { vec3.set(this.movement, 0,10,0); return; }
-
-	// Check whether it's time to initiate a move that's been triggered.
-        if (this.in_right_move === true && this.hi_hat == 10) { 
-	    this.right_started = true; audio.playSound(1); } 
-        if (this.in_left_move === true && this.left_started === false && this.hi_hat == 10) { 
-	    this.left_started = true; audio.playSound(1); } 
-	if (this.in_jump === true && this.jump_started === false && this.hi_hat == 10) { 
-	    this.jump_started = true; audio.playSound(2); } 
-
-
+	if(player.xPos() < this.cam_movement[0] - 400) this.startCameraLeftMove();
+	else if(player.xPos() > this.cam_movement[0] + 400) this.startCameraRightMove();
 
 	// Handle camera natively as it doesn't need much logic.
 	if (this.cam_in_right_move === true) {
@@ -500,77 +315,19 @@ function Game() {
 	    else theMatrix.vTranslate([-this.grid * 0.5, 0, 0]);
 	}
 
-	// We may be 'changing a move' due to collision constraints.
-	// Otherwise, all other moves are valid and there's no particular priority.
-	if (this.in_change === true) this.changeMovement();
-	if (this.in_right_move === true && this.right_started === true) this.moveRight();
-	if (this.in_left_move === true && this.left_started === true) this.moveLeft();
-	if (this.in_jump === true && this.jump_started === true) {
-
-	    if (this.jumping_up === true) {
-		var count = (++this.jump_count);
-		if (count >= this.jump_dist.length) { 
-		    this.jumping_up = false; 
-		    this.jumping_down = true; 
-		    this.jump_count = 0;
-		} else {
-		    this.movement[1] += 15 - (count / 2);
-		}
-
-	    } else {
-		var count = (++this.jump_count);
-		this.movement[1] -= count;
-	    }
-	}
-
-	// Can we move here, or would a collision prevent it?
+	player.updateMovement(this.hi_hat === 10, audio.playSound);
 
 	// Collision. How far should we go to be on grid?
-	var grid_dist;
 	var i;
-	var on_wall = false;
 	var length1 = this.floor.length;
+
 	for(i = length1 + this.push_button.length - 1; i >= 0; --i) { 
 
-	    var object = (i < length1)? 
-		this.floor[i]:
-		this.push_button[i - length1];
-	    object.collided = this.detectCollision(object);
-
-	    if(object.collided !== WALL_NONE)
-
-	    switch (object.collided) {
-	    case WALL_W:
-		this.collision_string.initBuffers(theCanvas.gl);
-		// Convert to 1.0 scale, round to integer, convert back
-		this.movement[0] = this.grid * Math.floor(this.movement[0] / this.grid);
-		this.in_right_move = false;
-		if (this.right_key_down === true) this.startRightMove();
-		break;
-	    case WALL_E:
-		// Convert to 1.0 scale, round to integer, convert back
-		this.movement[0] = this.grid * Math.ceil(this.movement[0] / this.grid);
-		this.in_left_move = false;
-		if (this.left_key_down === true) this.startLeftMove();
-		break;
-	    case WALL_N: // Here, just move to the top of the wall.
-		if(this.jumping_down === true && this.in_jump === true) {
-		    this.movement[1] = object.y_max;
-		    this.in_jump = false;
-		    this.jumping_down = false;
-		    this.player_string.initBuffers(theCanvas.gl);
-		}
-		on_wall = true;
-		break;
-	    case WALL_S:
-		this.jump_count = 0;
-		this.jumping_up = false; 
-		this.jumping_down = true; 
-		break;
-	    default: // WALL_NONE
-		break;
-	    } 
+	    var object = (i < length1)? this.floor[i]: this.push_button[i - length1];
+	    player.detectCollision(object);
 	}
+
+	player.movePostCollision();
 
 	if(this.push_button[0].collided === WALL_N) {
 	    this.push_button[1].magical = false;
@@ -580,14 +337,6 @@ function Game() {
 	    if (this.floor_effect > 0) this.floor_effect --;
 	}
 
-	if(on_wall === false && this.in_jump === false) {
-	    console.log("freefallin!");
-	    this.jump_count = 0;
-	    this.jumping_up = false; 
-	    this.jumping_down = true; 
-	    this.jump_started = false;
-	    this.in_jump = true;
-	}
     };
 
     return this;

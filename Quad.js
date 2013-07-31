@@ -22,6 +22,16 @@ function Quad(a, b, c, d) {
     }
 
     this.o.addQuadIndexes(0, 2);
+
+
+    this.setTexture = function(texture) { 
+	this.o.setTexture(texture);
+	this.o.initTextures([1,0], [1,1], [0,0], [0,1]);
+	return this;
+    };
+    this.translate = _oTranslate;
+    this.setShader = _oSetShader;
+
     return this;
 }
 
@@ -53,12 +63,6 @@ Quad.prototype.add2DCoords = function() {
     return this;
 };
 
-
-Quad.prototype.setTexture = function(texture) { 
-    this.o.setTexture(texture);
-    this.o.initTextures([1,0], [1,1], [0,0], [0,1]);
-    return this;
-};
 
 /*
  * Invert the Y-coords of the texture within
@@ -153,6 +157,4 @@ Quad.prototype.initBuffers = _oInitBuffers;
 Quad.prototype.scale = _oScale;
 Quad.prototype.rotatePos = _oRotatePos;
 Quad.prototype.rotateNeg = _oRotateNeg;
-Quad.prototype.translate = _oTranslate;
-Quad.prototype.setShader = _oSetShader;
 Quad.prototype.draw = _oDraw;
