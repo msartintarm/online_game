@@ -16,9 +16,15 @@
 
 ###[How to Use Git](GIT.md)
 
-####External Refs:
+###External Refs
+
 - https://www.khronos.org/registry/webgl/specs/1.0/#2.1: Excellent WebGL specifications reference
 - http://webglstats.com/#h_texsize: WebGL Browser State
 - http://codeflow.org/entries/2013/feb/22/how-to-write-portable-webgl/: Texture limitations
 - http://www.html5rocks.com/en/tutorials/webaudio/intro/: Intro to using sounds in HTML5
 - http://graphics.cs.brown.edu/games/SteepParallax/: Cool Parallax!
+
+####Thinking about whether to stick with OOO, prototypes, or switch to closure-only
+- http://jsperf.com/mst shows a test - closure is faster for IE and FF, but not Chrome
+- Chrome is against closure: https://developers.google.com/speed/articles/optimizing-javascript
+- Article describing benefits: http://stackoverflow.com/questions/6614572/javascript-performance-with-closure
