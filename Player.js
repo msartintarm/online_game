@@ -72,19 +72,21 @@ function Player(gl_, grid_size) {
     this.width = w;
     this.height = h;
 
-    this.initBuffers = function(gl_) {
+    this.initBuffers = (function(gl, shader) {
 
-	theCanvas.changeShader(gl_.shader_player);
-	theMatrix.setViewUniforms(gl_.shader_player);
-	gl_.uniformMatrix4fv(gl_.shader_player.unis["pMatU"], false, theMatrix.pMatrix);
+	return function() {
+	theCanvas.changeShader(shader);
+	theMatrix.setViewUniforms(shader);
+	gl.uniformMatrix4fv(shader.unis["pMatU"], false, theMatrix.pMatrix);
 
-	player_string.initBuffers(gl_);
-	left_string.initBuffers(gl_);
-	right_string.initBuffers(gl_);
-	jump_string.initBuffers(gl_);
-	collision_string.initBuffers(gl_);
-	this.o.initBuffers(gl_);
-    };
+	player_string.initBuffers(gl);
+	left_string.initBuffers(gl);
+	right_string.initBuffers(gl);
+	jump_string.initBuffers(gl);
+	collision_string.initBuffers(gl);
+	this.o.initBuffers(gl);
+	};
+    }(gl_, gl_.shader_player));
 
     this.draw = function(gl_, hi_hat) {
 
