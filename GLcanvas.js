@@ -45,7 +45,7 @@ GLcanvas.prototype.createScene = function(objToDraw) {
 	this.objects.push(new MazePiece(5, NO_LEFT, TILE_TEXTURE));
 	this.objects.push(new Stool());
     } else if(objToDraw == "game") {
-	this.objects.push(new Game());
+	this.objects.push(new Game(this.gl));
     } else if(objToDraw == "text") {
 	this.string1 = new GLstring("testing 1.", TEXT_TEXTURE);
 	this.string2 = new GLstring("testing 2.", TEXT_TEXTURE2);

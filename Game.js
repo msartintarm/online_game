@@ -1,7 +1,7 @@
 /**
  * Creates and initializes a game.
  */
-function Game() {  
+function Game(gl_) {  
 
     // Used in collision detection.
     var WALL_NONE = 0;
@@ -28,7 +28,7 @@ function Game() {
 
     var i; // for init loop
 
-var player = new Player(50);
+var player = new Player(gl_, 50);
 
     // handles movement
     this.grid = 50;

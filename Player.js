@@ -2,7 +2,7 @@
  * Creates and initializes a player. Very similar to quad.
  * Methods will be used by game.
  */
-function Player(grid_size) {  
+function Player(gl_, grid_size) {  
 
     // Used in collision detection.
     var WALL_NONE = 0;
@@ -66,8 +66,9 @@ function Player(grid_size) {
 		    [ w, 0, l],
 		    [-w, 0, l],
 		    [-w, h, l]);
-    this.setTexture(TEXT_TEXTURE);
-    this.setShader(theCanvas.gl.shader_player);
+    this.o.setTexture(TEXT_TEXTURE);
+    this.o.initTextures([1,0], [1,1], [0,0], [0,1]);
+    this.o.shader = theCanvas.gl.shader_player;
     this.width = w;
     this.height = h;
 

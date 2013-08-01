@@ -17,7 +17,7 @@ if ($ext === "js") {
   header("Content-Type: application/javascript");
   header("Content-Encoding: gzip");
   header("Cache-Control: public");
-  header('Last-Modified: '.gmdate('D, d M Y H:i:s', filemtime($newF)));
+  header('Last-Modified: '.gmdate('D, d M Y H:i:s', filemtime($oldF)));
   readfile($newF);
 
 } else if ($ext === "gif" || $ext === "jpg") {
