@@ -122,7 +122,6 @@ function GLaudio() {
 	request.responseType = "arraybuffer"; // Does this work for any MIME request?
 	// Once request has loaded, load and start audio buffer
 	request.onload = this.handleAudioRequest.bind(this, new_audio, request, auto_start);
-	request.onerror = function(){ console.log("uh-oh!.."); };
 	try { 
 	    request.send(); 
 	    this.audio.push(new_audio);
@@ -133,42 +132,42 @@ function GLaudio() {
     };
 
 
-    var beat_count = 0;
-
     /**
-     * Once all audio elements are loaded, call them with specific start intervals.
+     * Create and start self-calling, closed function to play audio[] elements.
      */
-    this.playMusic = function() {
-
-	// Done setting up. Create and start self-calling, closed function to play elems.
-	var playBuffer = (function(web, audio) { return function() {
+    var playBuffer = (function(web, audio) { 
+	
+	// Use Web Audio's super-accurate internal clock to sync elements
+	var start_time = web.currentTime + 0.250; // 250 ms
+	// Increments each time playBuffer is called. Use % for specific time domains
+	var beat_count = 0;
+	
+	// Actual function! Is isolated within its own scope.
+	return function() {
 	    beat_count ++;
 	    for(var i = 0; i < audio.length; ++i) {
 		var gl_audio = audio[i];
 		if(gl_audio.auto_start === true && 
 		   (beat_count % gl_audio.loop_length) === gl_audio.delay) {
 		    
-		    var source2 = gl_audio.source[(++(gl_audio.source_num)) % 
-						  gl_audio.source.length];
-		    // set up source 2
-		    source2 = web.createBufferSource(),
-		    source2.connect(gl_audio.dest),
-		    source2.buffer = gl_audio.buffer;
-		    source2.start(start_time - web.currentTime, 0);
+		    // set up new source 
+		    var new_source = gl_audio.source[(++(gl_audio.source_num)) % 
+						     gl_audio.source.length];
+		    new_source = web.createBufferSource(),
+		    new_source.connect(gl_audio.dest),
+		    new_source.buffer = gl_audio.buffer;
+		    new_source.start(start_time - web.currentTime, 0);
 		}
 	    }
+	    // Elements will play 250 ms after this call
 	    start_time += 0.250;
 	    var new_timeout = (start_time - 0.050 - web.currentTime) * 1000;
 	    window.setTimeout(playBuffer, new_timeout);
-	};}) (this.web_audio, this.audio);
-
-	// 50-ms cushion to figure out things above
-	window.setTimeout(playBuffer, 200); // 200 ms
-	// But we use internal clock to issue final determination
-	var global_start = this.web_audio.currentTime;
-	var start_time = global_start + 0.250; // 50 ms
-	
-    };
+	};
+    }) (this.web_audio, this.audio);
+    
+    // 50-ms cushion to figure out things above
+    window.setTimeout(playBuffer, 200); // 200 ms
 
     return this;
 }

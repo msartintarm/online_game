@@ -26,8 +26,6 @@ function Game(gl_) {
     audio.createAudio("music/jump_open_hat.wav", audio.web_audio.destination, false);
     audio.createAudio("music/backing_beat.wav", audio.delay, true, 0, 8);
 
-    audio.playMusic();
-
     var i; // for init loop
 
     var player = new Player(gl_, 50);
