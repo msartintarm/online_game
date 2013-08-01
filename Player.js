@@ -39,6 +39,7 @@ function Player(gl_, grid_size) {
     this.right_key_down = false;
     this.left_key_down = false;
     this.jump_key_down = false;
+    this.shift_key_down = false;
 
     var player_width = grid_size;
     this.grid = grid_size;
@@ -64,29 +65,27 @@ function Player(gl_, grid_size) {
     // This might be a cool way of faking inheritance.
     Quad.bind(this)([ w, h, l],
 		    [ w, 0, l],
-		    [-w, 0, l],
-		    [-w, h, l]);
+		    [-w, h, l],
+		    [-w, 0, l]);
     this.o.setTexture(TEXT_TEXTURE);
     this.o.initTextures([1,0], [1,1], [0,0], [0,1]);
     this.o.shader = theCanvas.gl.shader_player;
     this.width = w;
     this.height = h;
 
-    this.initBuffers = (function(gl, shader) {
+    this.initBuffers = (function(gl, shader) { return function() {
 
-	return function() {
 	theCanvas.changeShader(shader);
 	theMatrix.setViewUniforms(shader);
 	gl.uniformMatrix4fv(shader.unis["pMatU"], false, theMatrix.pMatrix);
-
+	
 	player_string.initBuffers(gl);
 	left_string.initBuffers(gl);
 	right_string.initBuffers(gl);
 	jump_string.initBuffers(gl);
 	collision_string.initBuffers(gl);
 	this.o.initBuffers(gl);
-	};
-    }(gl_, gl_.shader_player));
+    }; } (gl_, gl_.shader_player));
 
     this.draw = function(gl_, hi_hat) {
 
@@ -115,8 +114,11 @@ function Player(gl_, grid_size) {
 	this.in_jump = true;
     };
 
+    var dist;
+
     this.startLeftMove = function() {
 
+	dist = (this.shift_key_down === true)? 2:1;
 	if (this.in_left_move === true) return;
 	left_string.initBuffers(theCanvas.gl);
 	this.left_count = -1;
@@ -130,6 +132,7 @@ function Player(gl_, grid_size) {
 
     this.startRightMove = function() {
 
+	dist = (this.shift_key_down === true)? 2:1;
 	if (this.in_right_move === true) return;
 	right_string.initBuffers(theCanvas.gl);
 	this.right_count = -1;
@@ -141,6 +144,7 @@ function Player(gl_, grid_size) {
     };
 
     this.moveRight = function() {
+
 	if (this.right_started === false) return;
 	var count = ++this.right_count;
 	if (count >= this.move_dist.length) { 
@@ -148,21 +152,18 @@ function Player(gl_, grid_size) {
 	    if (this.right_key_down === true) this.startRightMove();
 	    return;
 	}
-	
-	this.movement[0] += this.move_dist[count] * player_width;
-
+	this.movement[0] += this.move_dist[count] * player_width * dist;
     };
 
     this.moveLeft = function () {
+
 	var count = (++this.left_count);
 	if (count >= this.move_dist.length) { 
 	    this.in_left_move = false;
 	    if (this.left_key_down === true) this.startLeftMove();
 	    return;
 	}
-
-	this.movement[0] -= this.move_dist[count] * player_width;
-
+	this.movement[0] -= this.move_dist[count] * player_width * dist;
     };
 
     var on_wall = false;

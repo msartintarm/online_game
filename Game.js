@@ -26,9 +26,11 @@ function Game(gl_) {
     audio.createAudio("music/jump_open_hat.wav", audio.web_audio.destination, false);
     audio.createAudio("music/backing_beat.wav", audio.delay, true, 0, 8);
 
+    audio.playMusic();
+
     var i; // for init loop
 
-var player = new Player(gl_, 50);
+    var player = new Player(gl_, 50);
 
     // handles movement
     this.grid = 50;
@@ -202,7 +204,7 @@ var player = new Player(gl_, 50);
 	var unis = gl_.shader.unis;
 	gl_.uniform1f(unis["hi_hat_u"], this.hi_hat);
 	gl_.uniform1f(unis["wall_hit_u"], this.floor_effect);
-	gl_.uniform3fv(unis["lightPosU"], [0, 200, 40]);
+	gl_.uniform3fv(unis["lightPosU"], [200, 200, -400]);
 	gl_.uniform1i(unis["sampler1"], gl_.tex_enum[BRICK_NORMAL_TEXTURE]);
 
 	for(i = 0; i < this.floor.length; ++i){
@@ -241,6 +243,7 @@ var player = new Player(gl_, 50);
 	document.onkeyup = function(the_event) {
 
 	    switch(the_event.keyCode) {
+	    case 16: player.shift_key_down = false; break;
 	    case 39: player.right_key_down = false; break;
 	    case 37: player.left_key_down = false; break;
 	    case 38: // up
@@ -255,6 +258,10 @@ var player = new Player(gl_, 50);
 	document.onkeydown = function(the_event) {
 
 	    switch(the_event.keyCode) {
+	    case 16: // shift
+		if(player.shift_key_down === true) break;
+		player.shift_key_down = true;
+		break;
 	    case 39: // right
 		if(player.right_key_down === true) break;
 		player.right_key_down = true;
@@ -297,7 +304,7 @@ var player = new Player(gl_, 50);
 	this.cam_right_count = 30;
 	this.cam_in_right_move = true;
     };
-
+    var triggered = false;
     this.updateMovement = function() {
 
 	var x_ = player.xPos();
@@ -329,8 +336,14 @@ var player = new Player(gl_, 50);
 
 	player.movePostCollision();
 
+
+	
 	if(this.push_button[0].collided === WALL_N) {
-	    this.push_button[1].magical = false;
+	    if(triggered === false)     {
+		audio.createAudio("music/clav_3.mp3", audio.delay, true, 0, 16);
+		triggered = true;
+		this.push_button[1].magical = false;
+	    }
 	    if (this.floor_effect !== 75) this.floor_effect ++;
 	    else console.log("Max Power!");
 	} else {

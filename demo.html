@@ -325,11 +325,11 @@
 
 	float background = clamp(length(textureColor) * 5.0, 0.8, 1.0);
 
-	gl_FragColor = vec4(textureColor * 1.6, background);
-	if(background < 0.95 && the_beat > 0.9) gl_FragColor = 
+	gl_FragColor = vec4(textureColor * 1.6, 1.0);
+/*	if(background < 0.95 && the_beat > 0.9) gl_FragColor = 
 	  (20. - the_beat) / 20. * vec4(textureColor * 1.6, background) +
 	  the_beat / 20. * texture2D(theSampler, textureV);
-	  }
+*/	  }
 
 	  void main(void) { colorTexture(sampler1); 
 

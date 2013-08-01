@@ -82,18 +82,23 @@ function GLaudio() {
 	};
     } (this.web_audio, this.audio));
     
-    this.handleAudioRequest = function(gl_audio, request) {
+    this.handleAudioRequest = (function(web) { 
+	return function(gl_audio, request, auto_start) {
 
-	this.web_audio.decodeAudioData(
-	    request.response,
-	    function(the_buffer) {
-		gl_audio.buffer = the_buffer;
-		if((--this.audio_to_load) === 0) this.playMusic();
-	    }.bind(this)
-	);
-    };
-
-    this.audio_to_load = 0;
+	    web.decodeAudioData(
+		request.response,
+		function(the_buffer) {
+		    gl_audio.buffer = the_buffer;
+		    gl_audio.auto_start = auto_start;
+		    if (auto_start === true) {
+			console.log("new music set up to play. ");
+		    } else {
+			console.log("new music set up, not to play. ");
+		    }
+		}
+	    );
+	}; 
+    } (this.web_audio));
 
     /**
      * Makes an audio object, sets it up, and starts it.
@@ -103,21 +108,21 @@ function GLaudio() {
     this.createAudio = function(url, destination, auto_start, loop_delay, loop_length) {
 
 	// Will be decremented once it's loaded
-	this.audio_to_load ++;
 	var new_audio = {};
-	new_audio.auto_play = auto_start;
 	new_audio.dest = destination;
-	new_audio.delay = 0;
-	new_audio.loop_length = 0;
-	if (auto_start === true) {
-	    new_audio.delay = loop_delay;
-	    new_audio.loop_length = loop_length;
-	}
+	new_audio.delay = (loop_delay)? loop_delay: 0;
+	new_audio.loop_length = (loop_length)? loop_length: 0;
+	new_audio.auto_start = false;
+	new_audio.source_num = 0; // number of buffers to rotate between
+	new_audio.source = new Array(NUM_LOOP_BUFFERS);
+
+
 	var request = new XMLHttpRequest();
 	request.open("GET", url, true);
 	request.responseType = "arraybuffer"; // Does this work for any MIME request?
 	// Once request has loaded, load and start audio buffer
-	request.onload = this.handleAudioRequest.bind(this, new_audio, request);
+	request.onload = this.handleAudioRequest.bind(this, new_audio, request, auto_start);
+	request.onerror = function(){ console.log("uh-oh!.."); };
 	try { 
 	    request.send(); 
 	    this.audio.push(new_audio);
@@ -127,27 +132,22 @@ function GLaudio() {
 	}
     };
 
+
+    var beat_count = 0;
+
     /**
      * Once all audio elements are loaded, call them with specific start intervals.
      */
     this.playMusic = function() {
 
-	var web = this.web_audio;
-	var audio = this.audio;
-
-	// Asynchronously set up each audio element
-	audio.forEach(function(gl_audio) {
-	    gl_audio.source_num = 0; // number of buffers to rotate between
-	    gl_audio.loop_count = gl_audio.delay;
-	    gl_audio.source = new Array(NUM_LOOP_BUFFERS);
-	});
-
-	// Done setting up. Create and start self-calling function to play them.
-	var playBuffer = function() {
+	// Done setting up. Create and start self-calling, closed function to play elems.
+	var playBuffer = (function(web, audio) { return function() {
+	    beat_count ++;
 	    for(var i = 0; i < audio.length; ++i) {
 		var gl_audio = audio[i];
-		if(gl_audio.loop_length !== 0 && 
-		   ((++(gl_audio.loop_count)) % gl_audio.loop_length === 0)) {
+		if(gl_audio.auto_start === true && 
+		   (beat_count % gl_audio.loop_length) === gl_audio.delay) {
+		    
 		    var source2 = gl_audio.source[(++(gl_audio.source_num)) % 
 						  gl_audio.source.length];
 		    // set up source 2
@@ -160,12 +160,12 @@ function GLaudio() {
 	    start_time += 0.250;
 	    var new_timeout = (start_time - 0.050 - web.currentTime) * 1000;
 	    window.setTimeout(playBuffer, new_timeout);
-	};
+	};}) (this.web_audio, this.audio);
 
 	// 50-ms cushion to figure out things above
 	window.setTimeout(playBuffer, 200); // 200 ms
 	// But we use internal clock to issue final determination
-	var global_start = web.currentTime;
+	var global_start = this.web_audio.currentTime;
 	var start_time = global_start + 0.250; // 50 ms
 	
     };

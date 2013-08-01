@@ -14,7 +14,7 @@ function Quad(a, b, c, d) {
     var temp2 = vec3.create();
     var normV = vec3.create();
 
-    vec3.cross(normV, vec3.sub(temp2,c,a), vec3.sub(temp1,b,a));
+    vec3.cross(normV, vec3.sub(temp2,b,a), vec3.sub(temp1,c,a));
     vec3.normalize(normV, normV);
     for (var i = 0; i < 4; ++i) {
 	this.o.addNormVec(normV);
