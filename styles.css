@@ -72,7 +72,7 @@ div#banner{
 div.wrap {
     width:100%;
     height:100%;
-    border: 4px inset #666666;
+    border: 10px inset #666666;
 }
 
 div#wrap_all {
@@ -143,33 +143,6 @@ div.main:after {
     background-color: #696969;
 }
 */
-div.topRight, div.lowAcross, 
-div.leftSide, div.rightSide, div.lowLeft, div.lowRight {     
-    position: absolute;
-    left:0px;
-    top:0px;
-}
-div.topLeft { 
-    width: 16px;
-    height: 16px;
-    background: url(graphics/cornerTopLeftNew.gif) top left no-repeat; 
-}
-
-div.topAcross { 
-    width: 100%;
-    height:16px;
-    background: url(graphics/cornerTopLeftNew.gif) top left no-repeat; 
-}
-
-div.topRight { background: url(graphics/cornerTopRightNew.gif) top right no-repeat; }
-div.topAcross { background: url(graphics/topAcrossNew.gif) top repeat-x; }
-div.lowAcross { background: url(graphics/lowAcrossNew.gif) bottom repeat-x; }
-div.leftSide { background: url(graphics/leftSideNew.gif) left repeat-y; }
-div.rightSide { background: url(graphics/rightSideNew.gif) right repeat-y; }
-div.lowLeft { background: url(graphics/cornerLowLeftNew.gif) bottom left no-repeat; }
-div.lowRight { background: url(graphics/cornerLowRightNew.gif) bottom right no-repeat; }
-
-
 
 div#header {
     width: 100%;
