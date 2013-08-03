@@ -255,6 +255,8 @@ function Game(gl_) {
 	    }
 	}
 
+	var v_distance = 3000;
+
 	document.onkeydown = function(the_event) {
 
 	    switch(the_event.keyCode) {
@@ -278,6 +280,11 @@ function Game(gl_) {
 		player.startJump();
 		break;
 	    case 40: // down
+		theCanvas.matrix.vTranslate([0, 0, v_distance]);
+		v_distance = -v_distance;
+
+		break;
+	    case 65: // a
 		audio.log_music = !(audio.log_music);
 		break;
 	    case 32: // Spacebar

@@ -82,9 +82,9 @@ function GLaudio() {
 	};
     } (this.web_audio, this.audio));
     
-    this.handleAudioRequest = (function(web) { 
-	return function(gl_audio, request, auto_start) {
+    this.handleAudioRequest = function(web, gl_audio, request, auto_start) { 
 
+	return function() {
 	    web.decodeAudioData(
 		request.response,
 		function(the_buffer) {
@@ -98,7 +98,7 @@ function GLaudio() {
 		}
 	    );
 	}; 
-    } (this.web_audio));
+    };
 
     /**
      * Makes an audio object, sets it up, and starts it.
@@ -108,20 +108,20 @@ function GLaudio() {
     this.createAudio = function(url, destination, auto_start, loop_delay, loop_length) {
 
 	// Will be decremented once it's loaded
-	var new_audio = {};
-	new_audio.dest = destination;
-	new_audio.delay = (loop_delay)? loop_delay: 0;
-	new_audio.loop_length = (loop_length)? loop_length: 0;
-	new_audio.auto_start = false;
-	new_audio.source_num = 0; // number of buffers to rotate between
-	new_audio.source = new Array(NUM_LOOP_BUFFERS);
-
+	var new_audio = {
+	    dest: destination,
+	    auto_start: false,
+	    loop_length: (loop_length)? loop_length: 0,
+	    delay: (loop_delay)? loop_delay: 0,
+	    source_num: 0, // number of buffers to rotate between
+	    source: new Array(NUM_LOOP_BUFFERS)
+	};
 
 	var request = new XMLHttpRequest();
 	request.open("GET", url, true);
 	request.responseType = "arraybuffer"; // Does this work for any MIME request?
 	// Once request has loaded, load and start audio buffer
-	request.onload = this.handleAudioRequest.bind(this, new_audio, request, auto_start);
+	request.onload = this.handleAudioRequest(this.web_audio, new_audio, request, auto_start);
 	try { 
 	    request.send(); 
 	    this.audio.push(new_audio);

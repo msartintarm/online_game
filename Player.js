@@ -118,7 +118,7 @@ function Player(gl_, grid_size) {
 
     this.startLeftMove = function() {
 
-	dist = (this.shift_key_down === true)? 2:1;
+	dist = (this.shift_key_down === true)? 3:1;
 	if (this.in_left_move === true) return;
 	left_string.initBuffers(theCanvas.gl);
 	this.left_count = -1;
@@ -132,7 +132,7 @@ function Player(gl_, grid_size) {
 
     this.startRightMove = function() {
 
-	dist = (this.shift_key_down === true)? 2:1;
+	dist = (this.shift_key_down === true)? 3:1;
 	if (this.in_right_move === true) return;
 	right_string.initBuffers(theCanvas.gl);
 	this.right_count = -1;
