@@ -55,6 +55,23 @@ function Game(gl_) {
     this.three_dee = [];
     theCanvas.matrix.vTranslate([0,300,750]);
 
+    this.wallPiece = (function(arr) { 
+
+    var w = floor_width;
+    var h = floor_width;
+
+	return function(x,y) {
+	    var x2 = x * w;
+	    var y2 = y * h;
+	    arr.push(new Quad([x2-w,y2+h,l],
+			      [x2-w,  y2,l],
+			      [x2+w,y2+h,l],
+			      [x2+w,  y2,l])
+		     .setTexture(BRICK_TEXTURE).add2DCoords());
+	};
+    }(this.push_button));
+	
+
     var wh = 1200;
     var l2= -20;
     this.background = new Quad([-wh, wh, l2],
@@ -89,67 +106,52 @@ function Game(gl_) {
 			this.three_dee[0].translate([-12 * w_, 0, 0]); }
     }
 
-    var w = floor_width;
-    var h = floor_width;
     l = -1;
-    var v = 3 * h;
-    var d = 12 * this.grid;
-    this.push_button.push(new Quad([d-w,h+v,l],[d-w,v,l],[d+w,h+v,l],[d+w,v,l])
-	.setTexture(BRICK_TEXTURE).add2DCoords());
-    this.push_button.push(new Quad([d-w,h+v,l],[d-w,v,l],[d+w,h+v,l],[d+w,v,l])
-	.setTexture(BRICK_TEXTURE).add2DCoords());
-    v += 1 * this.grid;
-    d += 2 * this.grid;
-    this.push_button.push(new Quad([d-w,h+v,l],[d-w,v,l],[d+w,h+v,l],[d+w,v,l])
-	.setTexture(BRICK_TEXTURE).add2DCoords());
+    var v = 3;
+    var d = 12;
+    this.wallPiece(d,v);
+    v += 1;
+    d += 2;
+    this.wallPiece(d,v);
     this.push_button[1].magical = true;
-    d += 2 * this.grid;
-    v += 1 * this.grid;
-    this.push_button.push(new Quad([d-w,h+v,l],[d-w,v,l],[d+w,h+v,l],[d+w,v,l])
-	.setTexture(BRICK_TEXTURE).add2DCoords());
-    d += 2 * this.grid;
-    v += 1 * this.grid;
-    this.push_button.push(new Quad([d-w,h+v,l],[d-w,v,l],[d+w,h+v,l],[d+w,v,l])
-	.setTexture(BRICK_TEXTURE).add2DCoords());
-    d += 2 * this.grid;
-    v += 1 * this.grid;
-    this.push_button.push(new Quad([d-w,h+v,l],[d-w,v,l],[d+w,h+v,l],[d+w,v,l])
-	.setTexture(BRICK_TEXTURE).add2DCoords());
+    d += 2;
+    v += 1;
+    this.wallPiece(d,v);
+    d += 2;
+    v += 1;
+    this.wallPiece(d,v);
+    d += 2;
+    v += 1;
+    this.wallPiece(d,v);
 
-    w /= 2;
-    d += w;
+    d += 1;
     for(var j = 5; j < 16; ++j) {
-	d += 2 * this.grid;
-	this.push_button.push(new Quad([d-w,h+v,l],[d-w,v,l],[d+w,h+v,l],[d+w,v,l])
-	    .setTexture(BRICK_TEXTURE).add2DCoords());
+	d += 2;
+	this.wallPiece(d,v);
     }
-    v -= 2*w;
-    d += 4 * this.grid;
+    v -= 2;
+    d += 4;
     for(var j = 16; j < 19; ++j) {
-	d -= 2 * this.grid;
-	this.push_button.push(new Quad([d-w,h+v,l],[d-w,v,l],[d+w,h+v,l],[d+w,v,l])
-	    .setTexture(BRICK_TEXTURE).add2DCoords());
+	d -= 2;
+	this.wallPiece(d,v);
     }
-    v += 2*w;
-    d -= 4 * this.grid;
+    v += 2;
+    d -= 4;
     for(var j = 19; j < 22; ++j) {
-	d += 2 * this.grid;
-	this.push_button.push(new Quad([d-w,h+v,l],[d-w,v,l],[d+w,h+v,l],[d+w,v,l])
-	    .setTexture(BRICK_TEXTURE).add2DCoords());
+	d += 2;
+	this.wallPiece(d,v);
     }
-    v -= 2*w;
-    d += 4 * this.grid;
+    v -= 2;
+    d += 4;
     for(var j = 22; j < 25; ++j) {
-	d -= 2 * this.grid;
-	this.push_button.push(new Quad([d-w,h+v,l],[d-w,v,l],[d+w,h+v,l],[d+w,v,l])
-	    .setTexture(BRICK_TEXTURE).add2DCoords());
+	d -= 2;
+	this.wallPiece(d,v);
     }
-    v += 2*w;
-    d -= 4 * this.grid;
+    v += 2;
+    d -= 4;
     for(var j = 25; j < 28; ++j) {
-	d += 2 * this.grid;
-	this.push_button.push(new Quad([d-w,h+v,l],[d-w,v,l],[d+w,h+v,l],[d+w,v,l])
-	    .setTexture(BRICK_TEXTURE).add2DCoords());
+	d += 2;
+	this.wallPiece(d,v);
     }
 
     this.initBuffers = function(gl_) {

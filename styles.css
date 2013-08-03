@@ -75,6 +75,10 @@ div.wrap {
     border: 10px inset #666666;
 }
 
+table#button_table {
+    border: 10px inset #666666;
+}
+
 div#wrap_all {
     background: url(graphics/banner.gif) repeat-y;
     background-size: 25%;
