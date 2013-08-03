@@ -1,4 +1,3 @@
-
 /**
  * This is basically a wrapper class for the GL context.
  * It links together objects that are in scenes to things
@@ -99,8 +98,9 @@ GLcanvas.prototype.start = function(theScene) {
 //	this.canvas.style.width = "100%";
 //	this.canvas.width = this.canvas.offsetWidth - 16;
 	// Same calcs the div's go through with padding, minus an additional five.
-	this.canvas.width = (window.innerWidth - 30) * .75 - 25;
+	this.canvas.width = window.innerWidth * .75 - 25;
 	this.canvas.height = window.innerHeight - 25;
+
 
 	if(this.initGL() !== 0) {
 	    var theWindow = window.open(
@@ -154,15 +154,12 @@ GLcanvas.prototype.start = function(theScene) {
 	// Get rid of unused JS  memory
 	this.shader_source.cleanup();
 
-	// Set up to draw the scene periodically.
+	// Set up mouse control.
 	document.onmousedown = handleMouseDown;
 	document.onmouseup = handleMouseUp;
 	document.onmousemove = handleMouseMove;
 
-	theMatrix.perspective(45,
-			      this.canvas.clientWidth / 
-			      Math.max(1, this.canvas.clientHeight),
-			      0.1, 300000.0);
+	this.resize();
 
 	if(textures_loading !== 0) 
 	    document.getElementById("glcanvas_status").innerHTML += 
@@ -223,15 +220,24 @@ GLcanvas.prototype.initGL = function() {
 };
 
 GLcanvas.prototype.resize = function() {
-    this.canvas.width = window.innerWidth * .75 - 5;
+    this.canvas.width = window.innerWidth * .75 - 25;
     this.canvas.height = window.innerHeight - 25;
-    this.gl.viewport(0, 0, this.gl.drawingBufferWidth, 
-		     this.gl.drawingBufferHeight);
-    theMatrix.perspective(45,
-			  this.gl.drawingBufferWidth / 
-			  this.gl.drawingBufferHeight,
-			  0.1, 30000.0);
+    this.gl.viewport(0, 0, this.canvas.width, 
+		     this.canvas.height);
+	theMatrix.perspective(45,
+			      this.canvas.width / 
+			      Math.max(1, this.canvas.height),
+			      0.1, 300000.0);
 
+	this.changeShader(this.gl.shader);
+	theMatrix.setViewUniforms(this.gl.shader);
+	this.gl.uniformMatrix4fv(this.gl.shader.unis["pMatU"], false, theMatrix.pMatrix);
+	this.changeShader(this.gl.shader_canvas);
+	theMatrix.setViewUniforms(this.gl.shader_canvas);
+	this.gl.uniformMatrix4fv(this.gl.shader_canvas.unis["pMatU"], false, theMatrix.pMatrix);
+	this.changeShader(this.gl.shader_player);
+	theMatrix.setViewUniforms(this.gl.shader_player);
+	this.gl.uniformMatrix4fv(this.gl.shader_player.unis["pMatU"], false, theMatrix.pMatrix);
 };
 
 /**

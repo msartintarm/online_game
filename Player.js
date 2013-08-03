@@ -75,10 +75,6 @@ function Player(gl_, grid_size) {
 
     this.initBuffers = (function(gl, shader) { return function() {
 
-	theCanvas.changeShader(shader);
-	theMatrix.setViewUniforms(shader);
-	gl.uniformMatrix4fv(shader.unis["pMatU"], false, theMatrix.pMatrix);
-	
 	player_string.initBuffers(gl);
 	left_string.initBuffers(gl);
 	right_string.initBuffers(gl);
@@ -190,7 +186,8 @@ function Player(gl_, grid_size) {
 		    this.jumping_down = false;
 		    player_string.initBuffers(theCanvas.gl);
 		}
-	    } else if (this.movement_old[1] + this.height <= object.y_min) {
+	    } else if (this.movement_old[1] + this.height < object.y_min) {
+		this.movement[1] = object.y_min - this.height;
 		object.collided = WALL_S;
 		this.jump_count = 0;
 		this.jumping_up = false; 

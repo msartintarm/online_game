@@ -249,17 +249,13 @@
 	float sway = sin(frames_elapsed_u / 100.0) / 2.0;
 	float sway2 = cos(frames_elapsed_u / 110.0) / 2.0;
 	float the_beat = hi_hat_u;
-	vec3 light_direction = vec3(-0.2, sway, sway2);
 
 	vec3 textureColor = texture2D(theSampler, textureV).xyz;
 
 	vec3 textureColorz = texture2D(sampler1, vec2(textureV.s, textureV.t)).xyz;
-	vec3 final_distance = normalize(normalize(light_direction) + 
-	normalize(vec3(textureColorz.x,
-	textureColorz.y,
-	textureColorz.z)));
-	vec3 reflectionV2 = reflect(normalize(final_distance), normalize(vertNorm));
-	float diffuseV2 = dot(vertNorm, final_distance);
+	vec3 reflectionV2 = reflect(normalize(lightNorm), normalize(normalize(vertNorm) + 
+          normalize(vec3(textureColorz.x, textureColorz.y, textureColorz.z))));
+	float diffuseV2 = dot(vertNorm, normalize(lightNorm));
 
 	float specularV2 = dot(normalize(reflectionV2), 
         normalize(vModel.xyz));
@@ -334,10 +330,9 @@
 	
 
 	vec3 textureColorz = texture2D(sampler1, vec2(textureV.s, textureV.t)).xyz;
-	vec3 final_distance = normalize(normalize(lightNorm) + 
-        normalize(vec3(-textureColorz.x, -textureColorz.y, textureColorz.z)));
-	vec3 reflectionV2 = reflect(final_distance, normalize(vertNorm));
-	float diffuseV2 = dot(vertNorm, final_distance);
+	vec3 reflectionV2 = reflect(normalize(lightNorm), normalize(
+          normalize(vertNorm) + normalize(vec3(-textureColorz.x, -textureColorz.y, -textureColorz.z))));
+	float diffuseV2 = dot(vertNorm, normalize(lightNorm));
 
 	float specularV2 = dot(normalize(reflectionV2), 
         normalize(vModel.xyz));

@@ -158,16 +158,9 @@ function Game(gl_) {
 	
 	this.mapKeys(); 
 
+	// Map uniforms ourself
 	GLobject.draw_optimized = true;
-
-	// Basically in our game, we know this stuff only
-	// ever gets called in certain patterns.
-	theCanvas.changeShader(gl_.shader);
-	theMatrix.setViewUniforms(gl_.shader);
-	gl_.uniformMatrix4fv(gl_.shader.unis["pMatU"], false, theMatrix.pMatrix);
-	theCanvas.changeShader(gl_.shader_canvas);
-	theMatrix.setViewUniforms(gl_.shader_canvas);
-	gl_.uniformMatrix4fv(gl_.shader_canvas.unis["pMatU"], false, theMatrix.pMatrix);
+	
 
 	player.initBuffers(gl_);
 	this.background.initBuffers(gl_);
