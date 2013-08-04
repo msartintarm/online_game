@@ -4,6 +4,19 @@
  */
 function Player(gl_, grid_size) {
 
+    var SHIFT=16;
+    var SPACE=32;
+    var LEFT=37;
+    var UP=38;
+    var RIGHT=39;
+    var DOWN=40;
+    var _A=65;
+
+    var key_down = { SHIFT: false,
+                     RIGHT: false,
+                     LEFT: false,
+                     UP: false };
+
     // Used in collision detection.
     var WALL_NONE = 0;
     var WALL_N = 1;
@@ -114,7 +127,7 @@ function Player(gl_, grid_size) {
 
     this.startLeftMove = function() {
 
-	dist = (this.shift_key_down === true)? 3:1;
+	dist = key_down[LEFT]? 3:1;
 	if (this.in_left_move === true) return;
 	left_string.initBuffers(theCanvas.gl);
 	this.left_count = -1;
@@ -128,7 +141,7 @@ function Player(gl_, grid_size) {
 
     this.startRightMove = function() {
 
-	dist = (this.shift_key_down === true)? 3:1;
+	dist = key_down[RIGHT]? 3:1;
 	if (this.in_right_move === true) return;
 	right_string.initBuffers(theCanvas.gl);
 	this.right_count = -1;
@@ -140,12 +153,11 @@ function Player(gl_, grid_size) {
     };
 
     this.moveRight = function() {
-
 	if (this.right_started === false) return;
 	var count = ++this.right_count;
 	if (count >= this.move_dist.length) {
 	    this.in_right_move = false;
-	    if (this.right_key_down === true) this.startRightMove();
+	    if (key_down[RIGHT]) this.startRightMove();
 	    return;
 	}
 	this.movement[0] += this.move_dist[count] * player_width * dist;
@@ -156,7 +168,7 @@ function Player(gl_, grid_size) {
 	var count = (++this.left_count);
 	if (count >= this.move_dist.length) {
 	    this.in_left_move = false;
-	    if (this.left_key_down === true) this.startLeftMove();
+	    if (key_down[LEFT]) this.startLeftMove();
 	    return;
 	}
 	this.movement[0] -= this.move_dist[count] * player_width * dist;
@@ -197,14 +209,12 @@ function Player(gl_, grid_size) {
 		// Convert to 1.0 scale, round to integer, convert back
 		this.movement[0] = this.grid * Math.ceil(this.movement[0] / this.grid);
 		this.in_left_move = false;
-		if (this.left_key_down === true) this.startLeftMove();
 	    } else if (this.movement_old[0] + this.width <= object.x_min) {
 		object.collided = WALL_W;
 		collision_string.initBuffers(theCanvas.gl);
 		// Convert to 1.0 scale, round to integer, convert back
 		this.movement[0] = this.grid * Math.floor(this.movement[0] / this.grid);
 		this.in_right_move = false;
-		if (this.right_key_down === true) this.startRightMove();
 	    } else console.log("Collision error..?");
 	} else {
 	    object.collided = WALL_NONE;
@@ -273,75 +283,36 @@ function Player(gl_, grid_size) {
      */
     this.mapKeys = function() {
 
-        var SHIFT=16;
-        var RIGHT=39;
-        var LEFT=37;
-        var UP=38;
+        // contains closed functions mapped to game keys
+        var game_keys = {
+            RIGHT: player.startRightMove,
+            LEFT: player.startLeftMove,
+            UP: player.startJump,
+            DOWN: (function(fn) {
+                // toggle a backward viewing matrix translation
+                var view_dist = 3000;
+                return function() {
+		    fn([0, 0, view_dist]);
+		    view_dist = -view_dist;
+		}; }) (theCanvas.matrix.vTranslate),
+            _A: function() { audio.log_music = !(audio.log_music); },
+            SPACE: function() { audio.pause(); }
+	};
 
-        var key_down = {
-            ;
+	document.onkeyup = (function(keys_down, playa) { return function(the_event) {
+            var code = the_event.keyCode;
+	    keys_down[code] = false;
+	    if(code === JUMP) playa.startJump();
+	}; } (key_down, this));
 
-	document.onkeyup = function(the_event) {
+	document.onkeydown = (function(keys_down, functions) {return function(event) {
+            var code = event.keyCode;
+            if (!!keys_down[code]) return;
+            if (!!game_keys[code]) game_keys[code]();
+            keys_down[code] = true;
+            console.log(code);
+        }; } (key_down, game_keys));
 
-	    switch(the_event.keyCode) {
-	    case 16: player.shift_key_down = false; break;
-	    case 39: player.right_key_down = false; break;
-	    case 37: player.left_key_down = false; break;
-	    case 38: // up
-		player.startJump();
-		player.jump_key_down = false;
-		break;
-	    default:
-		break;
-	    }
-	}
-
-	var v_distance = 3000;
-
-	document.onkeydown = (function() {
-
-            // contains closed functions mapped to game keys
-            var game_keys = {
-                16: (function(p) { return function() {
-                    p.shift_key_down = true;
-                }; }) (player),
-                // right
-                39: (function(p) { return function() {
-                    if(p.right_key_down === true) return;
-                    p.right_key_down = true;
-                    p.startRightMove();
-                }; }) (player),
-                // left
-                37: (function(p) { return function() {
-		    if(p.left_key_down === true) return;
-		    p.left_key_down = true;
-		    p.startLeftMove();
-		}; }) (player),
-                // up : begin jump
-                38: (function(p) { return function() {
-		if(p.jump_key_down === true) return;
-		p.jump_key_down = true;
-		p.startJump();
-		}; }) (player),
-                // down	: toggle a backward viewing matrix translation
-                40: (function(fnct) {
-                    var view_dist = -500;
-                    return function() {
-		        fnct([0, 0, view_dist]);
-		        view_dist = -view_dist;
-		    }; }) (theCanvas.matrix.vTranslate),
-                // a : toggle music logging
-                65: function(p) { audio.log_music = !(audio.log_music); },
-                // Spacebar
-                32: function(p) { audio.pause(); }
-	    };
-
-            // The function we set executes one of these.
-            return function(event) {
-                if (game_keys[event.keyCode]) game_keys[event.keyCode]();
-            }
-
-	}) ();
     };
 
     return this;
