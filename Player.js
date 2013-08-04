@@ -2,7 +2,7 @@
  * Creates and initializes a player. Very similar to quad.
  * Methods will be used by game.
  */
-function Player(gl_, grid_size) {  
+function Player(gl_, grid_size) {
 
     // Used in collision detection.
     var WALL_NONE = 0;
@@ -12,7 +12,7 @@ function Player(gl_, grid_size) {
     var WALL_E = 4;
 
     var i; // for init loop
-    
+
     // Setup player textures
     this.name = document.getElementById("player_name").value;
     this.movement = vec3.create();
@@ -143,7 +143,7 @@ function Player(gl_, grid_size) {
 
 	if (this.right_started === false) return;
 	var count = ++this.right_count;
-	if (count >= this.move_dist.length) { 
+	if (count >= this.move_dist.length) {
 	    this.in_right_move = false;
 	    if (this.right_key_down === true) this.startRightMove();
 	    return;
@@ -154,7 +154,7 @@ function Player(gl_, grid_size) {
     this.moveLeft = function () {
 
 	var count = (++this.left_count);
-	if (count >= this.move_dist.length) { 
+	if (count >= this.move_dist.length) {
 	    this.in_left_move = false;
 	    if (this.left_key_down === true) this.startLeftMove();
 	    return;
@@ -171,12 +171,12 @@ function Player(gl_, grid_size) {
 	// First, check vertical indexes. Next, check horizontal indexes.
 	if (this.movement[1] + this.height > object.y_min &&
 	    this.movement[1] <= object.y_max &&
-	    this.movement[0] - this.width < object.x_max && 
+	    this.movement[0] - this.width < object.x_max &&
 	    this.movement[0] + this.width > object.x_min) {
-	    
+
 	    // Which side of the box did we cross during the previous frame?
 	    if (this.movement_old[1] >= object.y_max ||
-		this.movement[1] >= object.y_max) { 
+		this.movement[1] >= object.y_max) {
 		object.collided = WALL_N;
 		on_wall = true;
 		// Here, just move to the top of the wall.
@@ -190,8 +190,8 @@ function Player(gl_, grid_size) {
 		this.movement[1] = object.y_min - this.height;
 		object.collided = WALL_S;
 		this.jump_count = 0;
-		this.jumping_up = false; 
-		this.jumping_down = true; 
+		this.jumping_up = false;
+		this.jumping_down = true;
 	    } else if (this.movement_old[0] - this.width >= object.x_max) {
 		object.collided = WALL_E;
 		// Convert to 1.0 scale, round to integer, convert back
@@ -205,7 +205,7 @@ function Player(gl_, grid_size) {
 		this.movement[0] = this.grid * Math.floor(this.movement[0] / this.grid);
 		this.in_right_move = false;
 		if (this.right_key_down === true) this.startRightMove();
-	    } else console.log("Collision error..?"); 
+	    } else console.log("Collision error..?");
 	} else {
 	    object.collided = WALL_NONE;
 	}
@@ -215,8 +215,8 @@ function Player(gl_, grid_size) {
 	if (on_wall === false && this.in_jump === false) {
 	    console.log("freefallin!");
 	    this.jump_count = 0;
-	    this.jumping_up = false; 
-	    this.jumping_down = true; 
+	    this.jumping_up = false;
+	    this.jumping_down = true;
 	    this.jump_started = false;
 	    this.in_jump = true;
 	}
@@ -235,12 +235,12 @@ function Player(gl_, grid_size) {
 
 	// Check whether it's time to initiate a move that's been triggered.
 	if (on_beat === true) {
-            if (this.in_right_move === true) { 
-		this.right_started = true; audio_method(1); } 
-            if (this.in_left_move === true && this.left_started === false) { 
-		this.left_started = true; audio_method(1); } 
-	    if (this.in_jump === true && this.jump_started === false) { 
-		this.jump_started = true; audio_method(2, 0.25); } 
+            if (this.in_right_move === true) {
+		this.right_started = true; audio_method(1); }
+            if (this.in_left_move === true && this.left_started === false) {
+		this.left_started = true; audio_method(1); }
+	    if (this.in_jump === true && this.jump_started === false) {
+		this.jump_started = true; audio_method(2, 0.25); }
 	}
 
 	// We may be 'changing a move' due to collision constraints.
@@ -252,9 +252,9 @@ function Player(gl_, grid_size) {
 	    if (this.jumping_up === true) {
 		var count = (++this.jump_count);
 		var up_dist = 15 - (count / 2);
-		if (up_dist <= 0) { 
-		    this.jumping_up = false; 
-		    this.jumping_down = true; 
+		if (up_dist <= 0) {
+		    this.jumping_up = false;
+		    this.jumping_down = true;
 		    this.jump_count = 0;
 		} else {
 		    this.movement[1] += up_dist;
@@ -267,6 +267,82 @@ function Player(gl_, grid_size) {
 	}
     };
 
+    /**
+     * Binds keys to document object.
+     * This should be done as part of initialization.
+     */
+    this.mapKeys = function() {
+
+        var SHIFT=16;
+        var RIGHT=39;
+        var LEFT=37;
+        var UP=38;
+
+        var key_down = {
+            ;
+
+	document.onkeyup = function(the_event) {
+
+	    switch(the_event.keyCode) {
+	    case 16: player.shift_key_down = false; break;
+	    case 39: player.right_key_down = false; break;
+	    case 37: player.left_key_down = false; break;
+	    case 38: // up
+		player.startJump();
+		player.jump_key_down = false;
+		break;
+	    default:
+		break;
+	    }
+	}
+
+	var v_distance = 3000;
+
+	document.onkeydown = (function() {
+
+            // contains closed functions mapped to game keys
+            var game_keys = {
+                16: (function(p) { return function() {
+                    p.shift_key_down = true;
+                }; }) (player),
+                // right
+                39: (function(p) { return function() {
+                    if(p.right_key_down === true) return;
+                    p.right_key_down = true;
+                    p.startRightMove();
+                }; }) (player),
+                // left
+                37: (function(p) { return function() {
+		    if(p.left_key_down === true) return;
+		    p.left_key_down = true;
+		    p.startLeftMove();
+		}; }) (player),
+                // up : begin jump
+                38: (function(p) { return function() {
+		if(p.jump_key_down === true) return;
+		p.jump_key_down = true;
+		p.startJump();
+		}; }) (player),
+                // down	: toggle a backward viewing matrix translation
+                40: (function(fnct) {
+                    var view_dist = -500;
+                    return function() {
+		        fnct([0, 0, view_dist]);
+		        view_dist = -view_dist;
+		    }; }) (theCanvas.matrix.vTranslate),
+                // a : toggle music logging
+                65: function(p) { audio.log_music = !(audio.log_music); },
+                // Spacebar
+                32: function(p) { audio.pause(); }
+	    };
+
+            // The function we set executes one of these.
+            return function(event) {
+                if (game_keys[event.keyCode]) game_keys[event.keyCode]();
+            }
+
+	}) ();
+    };
+
     return this;
 }
-

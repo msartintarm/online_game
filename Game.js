@@ -1,7 +1,7 @@
 /**
  * Creates and initializes a game.
  */
-function Game(gl_) {  
+function Game(gl_) {
 
     // Used in collision detection.
     var WALL_NONE = 0;
@@ -10,10 +10,11 @@ function Game(gl_) {
     var WALL_W = 3;
     var WALL_E = 4;
 
-    var theTexture2 = new GLtexture(theCanvas.gl, BRICK_NORMAL_TEXTURE);
-    var theTexture3 = new GLtexture(theCanvas.gl, HEAVEN_NORMAL_TEXTURE);
+    GLtexture.create(gl_, BRICK_NORMAL_TEXTURE);
+    GLtexture.create(gl_, HEAVEN_NORMAL_TEXTURE);
 
     var audio = new GLaudio();
+    var player = new Player(gl_, 50);
 
     // createAudio(origin URL, destination node, loop[, loop offset, loop time])
     // These are at 120 BPM: 1 sec = 2 beats
@@ -22,13 +23,10 @@ function Game(gl_) {
     // 2. Non-looping sound, which will be triggered by the above sample
     // 3. Rest of the song.
     audio.createAudio("music/beats.mp3", audio.low_pass, true, 1, 8);
-    audio.createAudio("music/electro_hat.wav", audio.web_audio.destination, false);
-    audio.createAudio("music/jump_open_hat.wav", audio.web_audio.destination, false);
+    audio.createAudio("music/Game_Hi Hat_2.wav", audio.web_audio.destination, false);
+    audio.createAudio("music/Game_keys_2.wav", audio.web_audio.destination, false);
     audio.createAudio("music/backing_beat.wav", audio.delay, true, 0, 8);
 
-    var i; // for init loop
-
-    var player = new Player(gl_, 50);
 
     // handles movement
     this.grid = 50;
@@ -53,9 +51,13 @@ function Game(gl_) {
     this.floor = [];
     this.push_button = [];
     this.three_dee = [];
+
+    // Map uniforms ourself
+    GLobject.draw_optimized = true;
+
     theCanvas.matrix.vTranslate([0,300,750]);
 
-    this.wallPiece = (function(arr) { 
+    this.wallPiece = (function(arr) {
 
     var w = floor_width;
     var h = floor_width;
@@ -70,7 +72,7 @@ function Game(gl_) {
 		     .setTexture(BRICK_TEXTURE).add2DCoords());
 	};
     }(this.push_button));
-	
+
 
     var wh = 1200;
     var l2= -20;
@@ -155,25 +157,14 @@ function Game(gl_) {
     }
 
     this.initBuffers = function(gl_) {
-	
-	this.mapKeys(); 
 
-	// Map uniforms ourself
-	GLobject.draw_optimized = true;
-	
 
 	player.initBuffers(gl_);
 	this.background.initBuffers(gl_);
 
-	for(i = 0; i < this.floor.length; ++i){
-	    this.floor[i].initBuffers(gl_);
-	}
-	for(i = 0; i < this.push_button.length; ++i){
-	    this.push_button[i].initBuffers(gl_);
-	}
-	for(i = 0; i < this.three_dee.length; ++i){
-	    this.three_dee[i].initBuffers(gl_);
-	}
+	this.floor.forEach(function(flo) { flo.initBuffers(gl_); });
+	this.push_button.forEach(function(but) { but.initBuffers(gl_); });
+	this.three_dee.forEach(function(cube) { cube.initBuffers(gl_); });
     };
 
     this.draw = function(gl_) {
@@ -224,7 +215,7 @@ function Game(gl_) {
 	this.background.draw(gl_);
 	theMatrix.pop();
 
-	
+
     };
 
     /**
@@ -250,44 +241,52 @@ function Game(gl_) {
 
 	var v_distance = 3000;
 
-	document.onkeydown = function(the_event) {
+	document.onkeydown = (function() {
 
-	    switch(the_event.keyCode) {
-	    case 16: // shift
-		if(player.shift_key_down === true) break;
-		player.shift_key_down = true;
-		break;
-	    case 39: // right
-		if(player.right_key_down === true) break;
-		player.right_key_down = true;
-		player.startRightMove();
-		break;
-	    case 37: // left
-		if(player.left_key_down === true) break;
-		player.left_key_down = true;
-		player.startLeftMove();
-		break;
-	    case 38: // up
-		if(player.jump_key_down === true) break;
-		player.jump_key_down = true;
-		player.startJump();
-		break;
-	    case 40: // down
-		theCanvas.matrix.vTranslate([0, 0, v_distance]);
-		v_distance = -v_distance;
+            // contains closed functions mapped to game keys
+            var game_keys = {
+                16: (function(p) { return function() {
+                    p.shift_key_down = true;
+                }; }) (player),
+                // right
+                39: (function(p) { return function() {
+                    if(p.right_key_down === true) return;
+                    p.right_key_down = true;
+                    p.startRightMove();
+                }; }) (player),
+                // left
+                37: (function(p) { return function() {
+		    if(p.left_key_down === true) return;
+		    p.left_key_down = true;
+		    p.startLeftMove();
+		}; }) (player),
+                // up : begin jump
+                38: (function(p) { return function() {
+		if(p.jump_key_down === true) return;
+		p.jump_key_down = true;
+		p.startJump();
+		}; }) (player),
+                // down	: toggle a backward viewing matrix translation
+                40: (function(fnct) {
+                    var view_dist = -500;
+                    return function() {
+		        fnct([0, 0, view_dist]);
+		        view_dist = -view_dist;
+		    }; }) (theCanvas.matrix.vTranslate),
+                // a : toggle music logging
+                65: function(p) { audio.log_music = !(audio.log_music); },
+                // Spacebar
+                32: function(p) { audio.pause(); }
+	    };
 
-		break;
-	    case 65: // a
-		audio.log_music = !(audio.log_music);
-		break;
-	    case 32: // Spacebar
-		audio.pause();
-		break;
-	    default:
-		break;
-	    }
-	};
+            // The function we set executes one of these.
+            return function(event) {
+                if (game_keys[event.keyCode]) game_keys[event.keyCode]();
+            }
+
+	}) ();
     };
+    this.mapKeys();
 
     this.startCameraLeftMove = function() {
 
@@ -328,7 +327,7 @@ function Game(gl_) {
 	var i;
 	var length1 = this.floor.length;
 
-	for(i = length1 + this.push_button.length - 1; i >= 0; --i) { 
+	for(i = length1 + this.push_button.length - 1; i >= 0; --i) {
 
 	    var object = (i < length1)? this.floor[i]: this.push_button[i - length1];
 	    player.detectCollision(object);
@@ -337,10 +336,10 @@ function Game(gl_) {
 	player.movePostCollision();
 
 
-	
+
 	if(this.push_button[0].collided === WALL_N) {
 	    if(triggered === false)     {
-		audio.createAudio("music/clav_3.mp3", audio.delay, true, 0, 16);
+		audio.createAudio("music/Game_bass_2.wav", audio.delay, true, 0, 16);
 		triggered = true;
 		this.push_button[1].magical = false;
 	    }
@@ -354,4 +353,3 @@ function Game(gl_) {
 
     return this;
 }
-
