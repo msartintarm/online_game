@@ -53,9 +53,45 @@
     <script src="Cagebox.js" type="application/javascript" async="async"></script>
     <script src="Game.js" type="application/javascript" async="async"></script>
     <script src="GameConfig.js" type="application/javascript" async="async"></script>
+    <script type="application/javascript">
+      // cool font animation
+
+      var i_count = 0;
+      var inputz;
+      var new_color = parseInt("890abc", 16);
+      var limit = parseInt("ffffff", 16);
+      var weak_color = parseInt("666666", 16);
+
+      var cool_color = 238 * 256 * 256 + 135 * 256 + 187;
+
+      window.initGLcanvas = function() {
+        if (!GLcanvas || !Game) {
+          window.setTimeout(window.initGLcanvas, 50);
+        } else if (!theCanvas){
+          theCanvas = new GLcanvas();
+          theCanvas.init();
+          window.setTimeout(window.initGLcanvas, 50);
+          inputz = document.getElementsByClassName("beginner");
+        } else if (!theCanvas.gl){
+          window.setTimeout(window.initGLcanvas, 150);
+
+          var izz = inputz[(++i_count) % inputz.length];
+          var new_thing = new_color.toString(16);
+          // append leading 0's if needed
+          for(var i=new_thing.length; i<6; ++i) new_thing = "0" + new_thing;
+          izz.style.color = "#" + new_thing;
+
+          // that should keep things interesting
+          new_color = (1487 * (new_color % 41)) * 23 + Math.abs(new_color - cool_color) % limit;
+          // color too bright, invert it
+          if ((new_color % 256) + (new_color / 256 % 256) + (new_color / (256 * 256) % 256) > 240)
+            new_color -= weak_color;
+        }
+      }
+    </script>
   </head>
 
-  <body>
+  <body onload="window.initGLcanvas();">
     <div id='header'>
       <div class='one_third'>WebGL:</div>
       <div class='one_third'>A</div>
@@ -73,13 +109,13 @@
 	    <div id="stadium_params" style="display:inline-block;">
 	      <div style="float:left;">Name:</div>
 	      <input id="player_name" type="text" style="float:right; width:60%;"
-		     class="start_button stadium_input" value="Oname"/>
+		     class="floating stadium_input" value="Oname"/>
 	      <br/>
 	      <div style="float:left;">Balls:</div>
 	      <input id="stadium_balls" type="text" style="float:right; width:60%;"
-		     value="20" class="start_button stadium_input"/>
+		     value="20" class="floating stadium_input"/>
 	      <input id="stadium_balls" type="button" style="float:left;"
-		     value="Play" class="start_button stadium_input" />
+		     value="Play" class="floating stadium_input" />
 	    </div>
 
 	  </div>
@@ -105,47 +141,47 @@
 		<input type="button"
 		       onclick="theCanvas.start('cylinder');"
 		       value="Cylinder"
-		       class="start_button"/>
+		       class="floating beginner"/>
 		<input type="button"
 		       onclick="theCanvas.start('skybox');"
 		       value="Skybox"
-		       class="start_button"/>
+		       class="floating beginner"/>
 		<input type="button"
 		       onclick="theCanvas.start('sphere');"
 		       value="Sphere"
-		       class="start_button"/>
+		       class="floating beginner"/>
 		<input type="button"
 		       onclick="theCanvas.start('stool');"
 		       value="Stool"
-		       class="start_button"/>
+		       class="floating beginner"/>
 		<input type="button"
 		       onclick="theCanvas.start('text');"
 		       value="Text"
-		       class="start_button"/>
+		       class="floating beginner"/>
 		<input type="button"
 		       onclick="theCanvas.start('torus');"
 		       value="Torus"
-		       class="start_button"/>
+		       class="floating beginner"/>
 	      </td>
 	      <td>
 		<input type="button"
 		       onclick="theCanvas.start('shadow');"
 		       value="Shadows"
-		       class="start_button"/>
+		       class="floating beginner"/>
 		<input type="button"
 		       onclick="theCanvas.start('jumbotron');"
 		       value="Jumbotron"
-		       class="start_button"/>
+		       class="floating beginner"/>
 		<input type="button"
 		       value="Maze (disabled)"
-		       class="start_button" style="color:#aa4455;font-size:22px;" disabled="disabled"/>
+		       class="floating beginner" style="color:#aa4455;font-size:22px;" disabled="disabled"/>
 		<input type="button"
 		       value="Stadium (disabled)"
-		       class="start_button" style="color:#aa4455;font-size:22px;" disabled="disabled"/>
+		       class="floating beginner" style="color:#aa4455;font-size:22px;" disabled="disabled"/>
 		<input type="button"
 		       onclick="theCanvas.start('game');"
 		       value="Game"
-		       class="start_button"/>
+		       class="floating beginner"/>
 	      </td>
 	  </tr></tbody>
 	</table>
@@ -162,7 +198,7 @@
     <div id="footer">
       <input type="button"
 	     value="(c) 2013 Batman and Robin"
-	     class="start_button" />
+	     class="floating" />
       <div class="title" id="title4" > </div>
     </div>
     <!-- Put this element one tag scope higher to hide it. -->

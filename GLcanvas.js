@@ -368,6 +368,3 @@ var theCanvas;
  * Object holding modelview and perspective matrices.
  */
 var theMatrix;
-
-theCanvas = new GLcanvas();
-theCanvas.init();

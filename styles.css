@@ -119,9 +119,9 @@ div.main {
     width:75%;
     text-align: justify;
     background-color: #112233;
-    color: #00aabb;
     font-size: 23px;
     text-align: center;
+    color: #5588dd;
 }
 
 table#button_table {
@@ -141,7 +141,7 @@ div.title {
     margin: 17px 17px;
 }
 
-input.start_button {
+input.floating {
     width:100%;
     background-color: transparent; /* make the button transparent */
     border: none;           /* assuming we don't want any borders */
@@ -152,7 +152,7 @@ input.start_button {
     color: inherit;
 }
 
-input.start_button:hover {
+input.floating:hover {
 color:#33aabb;
 }
 
