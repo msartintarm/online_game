@@ -22,13 +22,13 @@ function GLmatrix(gl_) {
     this.pMatrix = mat4.create();
     this.lightMatrix = mat4.create();
     mat4.translate(this.lightMatrix,
-		   this.lightMatrix, 
-		   [0,400,0]); 
+		   this.lightMatrix,
+		   [0,400,0]);
 
-    // Contains rotation or translation that is applied to 
+    // Contains rotation or translation that is applied to
     // viewing matrix upon next frame (set externally)
     this.vMatrixNew = mat4.create();
-    
+
     // Inverted viewing matrix, must be recomputed each
     // time the viewing matrix changes
 //    this.ivMatrix = mat4.create();
@@ -62,7 +62,7 @@ var lookDist = 1/10; //default to maze
    Writes a perspective view into internal perspective matrix
 */
 this.perspective = function(zoom, aRatio, zNear, zFar) {
-    mat4.perspective(this.pMatrix, zoom, aRatio, zNear, zFar); 
+    mat4.perspective(this.pMatrix, zoom, aRatio, zNear, zFar);
     this.pMatrixChanged = true;
 };
 
@@ -70,7 +70,7 @@ this.perspective = function(zoom, aRatio, zNear, zFar) {
    Writes an orthogonal view into internal perspective matrix
 */
 this.ortho = function(left, right, bottom, top, near, far) {
-    mat4.ortho(this.pMatrix, left, right, bottom, top, near, far); 
+    mat4.ortho(this.pMatrix, left, right, bottom, top, near, far);
     this.pMatrixChanged = true;
 };
 
@@ -80,28 +80,28 @@ this.viewMaze = function() {
 };
 
 this.translate = function(vector) {
-    mat4.translate(this.mMatrix, this.mMatrix, vector); 
+    mat4.translate(this.mMatrix, this.mMatrix, vector);
     this.mMatrixChanged = true;
 };
 
 this.rotate = function(angle, vector) {
-    mat4.rotate(this.mMatrix, this.mMatrix, angle, vector); 
+    mat4.rotate(this.mMatrix, this.mMatrix, angle, vector);
     this.mMatrixChanged = true;
 };
 
 this.vTranslate = function(vector) {
     mat4.translate(this.vMatrixNew,
-		   this.vMatrixNew, 
-		   vector); 
+		   this.vMatrixNew,
+		   vector);
     this.vMatrixNewChanged = true;
 };
 
 this.translateN = function(vector) {
-    mat4.translate(this.mMatrix, 
+    mat4.translate(this.mMatrix,
 		   this.mMatrix,
-		   [-vector[0], 
-		    -vector[1], 
-		    -vector[2]]); 
+		   [-vector[0],
+		    -vector[1],
+		    -vector[2]]);
     this.mMatrixChanged = true;
 };
 
@@ -116,16 +116,16 @@ this.vRotate = function(rads, vector) {
 };
 
 this.scale = function(vector) {
-    mat4.scale(this.mMatrix, this.mMatrix, vector); 
+    mat4.scale(this.mMatrix, this.mMatrix, vector);
     this.mMatrixChanged = true;
 };
 this.mul = function(m) {
-    mat4.multiply(this.mMatrix, this.mMatrix, m); 
+    mat4.multiply(this.mMatrix, this.mMatrix, m);
     this.mMatrixChanged = true;
 };
 
 this.vMul = function(v) {
-    mat4.multiply(this.vMatrix, this.vMatrix, v); 
+    mat4.multiply(this.vMatrix, this.vMatrix, v);
     this.vMatrixChanged = true;
 };
 
@@ -225,7 +225,7 @@ this.gradualMove = function() {
 };
 
 var rotateCount = 0;
-var radiansToRotate = 0; 
+var radiansToRotate = 0;
 var vectorRotation = [0,0,0];
 this.gradualRotate = function() {
     if(rotateCount > 0) {
@@ -251,7 +251,7 @@ this.update = function() {
     this.vMul(this.vMatrixNew);
     this.vMatrixChanged = true;
     mat4.identity(this.vMatrixNew);
-    return; 
+    return;
 };
 
 /**
@@ -263,7 +263,7 @@ this.setViewUniforms = function(shader_) {
     var gl_ = this.gl;
     var unis = shader_.unis;
     if (this.vMatrixChanged === true) {
-	// models and lights are transformed by 
+	// models and lights are transformed by
 	//  inverse of viewing matrix
 	mat4.invert(this.ivMatrix, this.vMatrix);
 	mat4.mul(this.ilMatrix, this.vMatrix, this.lightMatrix);
@@ -281,7 +281,7 @@ this.setViewUniforms = function(shader_) {
  */
 this.setVertexUniforms = function(shader_) {
 
-    if (this.mMatrixChanged === true) { 
+    if (this.mMatrixChanged === true) {
 	// perceived normals: (inverse of modelview
 	//  transposed) * object normals
 	mat4.mul(this.mvMatrix, this.ivMatrix, this.mMatrix);

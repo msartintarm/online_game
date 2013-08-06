@@ -278,26 +278,30 @@ function Player(gl_, grid_size) {
      */
     this.mapKeys = function() {
 
-	document.onkeyup = (function(keys_down, playa) { return function(the_event) {
-            var code = the_event.keyCode;
-	    keys_down[code] = false;
-	    if(code === UP) playa.startJump();
-	}; } (this.key_down, this));
+	document.onkeyup = (function(keys_down, playa) {
+            return function(the_event) {
+                var code = the_event.keyCode;
+	        keys_down[code] = false;
+	        if(code === UP) playa.startJump();
+	    };
+        } (this.key_down, this));
 
 	document.onkeydown = (function(keys_down, playa) {
 
-        // contains closed functions mapped to game keys
+            // contains closed functions mapped to game keys
             var functionz = {};
             functionz[RIGHT] = playa.startRightMove.bind(playa);
             functionz[LEFT] = playa.startLeftMove.bind(playa);
             functionz[UP] = playa.startJump.bind(playa);
-            functionz[DOWN] = ((function(fn) {
-                // toggle a backward viewing matrix translation
-                var view_dist = 3000;
+            functionz[DOWN] = ((function(gl_matrix) {
+
+                // here, toggle a backward viewing matrix translation
+                var view_dist = vec3.fromValues(0,0,3000);
                 return function() {
-		    fn([0, 0, view_dist]);
-		    view_dist = -view_dist;
-		}; }) (theCanvas.matrix.vTranslate));
+		    gl_matrix.vTranslate(view_dist);
+		    vec3.negate(view_dist, view_dist);
+		}; }) (window.theCanvas.matrix));
+
             functionz[_A] = function() { audio.log_music = !(audio.log_music); };
             functionz[SPACE] = function() { audio.pause(); };
 
@@ -305,11 +309,9 @@ function Player(gl_, grid_size) {
                 var code = event.keyCode;
                 if (!!keys_down[+code]) return;
                 if (!!functionz[+code]) functionz[+code]();
-                console.log(code + " " + functionz[+code]);
-                keys_down[code] = true;
-                console.log(code);
-
-            }; } (this.key_down, this));
+                keys_down[+code] = true;
+            };
+        } (this.key_down, this));
 
     };
 
