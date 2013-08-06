@@ -34,6 +34,11 @@ function GameConfig(game) {
         "start-position": ["0", "300", "750"]
     };
 
+    // Either op doesn't exist (val, is a '-' (= dec old), or is  a '+' (= inc old)
+    var newCoordVal = function(old, op, val) {
+        return (!op)? parseInt(val): (op === "-")? old - parseInt(val): old + parseInt(val);
+    };
+
     //          DIV SETUP
 
     // Define functions that construct the div elements, then call them.
@@ -45,14 +50,14 @@ function GameConfig(game) {
 
         var curr_div = config_div;
 
-        this.Break = function() {
+        var _Break = function() {
             var breakz = document.createElement("div");
             breakz.height = "1";
             breakz.style.clear = "both";
             curr_div.appendChild(breakz);
         };
 
-        this.TextBox = function(value, width) {
+        var _TextBox = function(value, width) {
             var text_x = document.createElement("textarea");
             text_x.value = value;
             text_x.style.width = width;
@@ -60,7 +65,7 @@ function GameConfig(game) {
             curr_div.appendChild(text_x);
         };
 
-        this.Square = function(color) {
+        var _Square = function(color) {
             var d = document.createElement("div");
             d.style.width = "4px";
             d.style.height = "4px";
@@ -82,7 +87,7 @@ function GameConfig(game) {
 
         // create div with title, and leave it open.
         // a button will be created that invokes it.
-        this.openDiv = function(title) {
+        var _openDiv = function(title) {
 
             curr_div = document.createElement("div");
 
@@ -105,39 +110,39 @@ function GameConfig(game) {
 
         };
 
-        this.closeDiv = function() {
+        var _closeDiv = function() {
             config_div.appendChild(curr_div);
             curr_div = config_div;
         };
 
-        this.initMiscDiv = function() {
-            this.openDiv("Misc");
+        var _initMiscDiv = function() {
+            _openDiv("Misc");
             if (config["start-position"]) {
                 config["start-position"].forEach(function(x, i) {
-                    this.TextBox(x, "30px");
+                    _TextBox(x, "30px");
                 }, this);
             }
-            this.closeDiv();
+            _closeDiv();
         };
 
-        this.initTexturesDiv = function() {
-            this.openDiv("Textures:");
+        var _initTexturesDiv = function() {
+            _openDiv("Textures:");
             config["textures"].forEach (function(texture) {
-                this.TextBox(texture, "100%");
+                _TextBox(texture, "100%");
             }, this);
-            this.closeDiv();
+            _closeDiv();
         };
 
-        this.initAudioDiv = function(gl_audio) {
-            this.openDiv("Music:");
-            config["audio"].forEach (function(sound) { this.TextBox(sound[0], "99%"); }, this);
-            this.closeDiv();
+        var _initAudioDiv = function(gl_audio) {
+            _openDiv("Music:");
+            config["audio"].forEach (function(sound) { _TextBox(sound[0], "99%"); }, this);
+            _closeDiv();
         };
 
-        this.initPieceDiv = function(piece_name) {
+        var _initPieceDiv = function(piece_name) {
 
             var p0 = config[piece_name];
-            this.openDiv("Piece '" + p0[0] + "':");
+            _openDiv("Piece '" + p0[0] + "':");
 
             var tex = p0[1];
             tex = (tex === "brick-texture")? BRICK_TEXTURE:
@@ -166,30 +171,27 @@ function GameConfig(game) {
                 //            this.TextBox(zzap[3], "20%");
 
                 for(var j = 0; j < loop; ++j) {
-                    // Either char doesn't exist, is a '-' (decrement), or is  a '+' (increment)
-                    x = (!zzap[2])? parseInt(zzap[3]):
-                        (zzap[2] === "-")? x - parseInt(zzap[3]): x + parseInt(zzap[3]);
-                    y = (!zzap[4])? parseInt(zzap[5]):
-                        (zzap[4] === "-")? y - parseInt(zzap[5]): y + parseInt(zzap[5]);
+                    x = newCoordVal(x, zzap[2], zzap[3]);
+                    y = newCoordVal(y, zzap[4], zzap[5]);
                     mark(x,y);
                 }
 
             }
             for(var b = 10; b > -3; --b) {
-                this.Break();
+                _Break();
                 for(var a = -8; a < 30; ++a) {
-                    if (locs[a] && locs[a][b]) this.Square("#66ff66");
-                    else this.Square("#ff4433");
+                    if (locs[a] && locs[a][b]) _Square("#66ff66");
+                    else _Square("#ff4433");
                 }
             }
-            this.closeDiv();
+            _closeDiv();
         };
 
-        this.initPieceDiv("piece-0");
-        this.initPieceDiv("piece-1");
-        this.initAudioDiv();
-        this.initTexturesDiv();
-        this.initMiscDiv();
+        _initPieceDiv("piece-0");
+        _initPieceDiv("piece-1");
+        _initAudioDiv();
+        _initTexturesDiv();
+        _initMiscDiv();
     };
 
     this.setupDivs();
@@ -281,10 +283,8 @@ function GameConfig(game) {
 
             for(var j = 0; j < loop; ++j) {
                 // Either char doesn't exist, is a '-' (decrement), or is  a '+' (increment)
-                x = (!zzap[2])? parseInt(zzap[3]):
-                    (zzap[2] === "-")? x - parseInt(zzap[3]): x + parseInt(zzap[3]);
-                y = (!zzap[4])? parseInt(zzap[5]):
-                    (zzap[4] === "-")? y - parseInt(zzap[5]): y + parseInt(zzap[5]);
+                x = newCoordVal(x, zzap[2], zzap[3]);
+                y = newCoordVal(y, zzap[4], zzap[5]);
                 create(x,y);
             }
 
