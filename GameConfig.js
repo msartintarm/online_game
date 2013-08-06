@@ -34,6 +34,7 @@ function GameConfig(game) {
     };
 
     var config_div = document.createElement("div");
+    config_div.style.fontSize = "20px";
     document.getElementById("banner").appendChild(config_div);
 
     var curr_div = config_div; //
@@ -80,6 +81,7 @@ function GameConfig(game) {
     };
 
     this.initMisc = function() {
+        this.openDiv("Misc");
         if (config["grid-size"]) game.grid = config["grid-size"];
         if (config["start-position"]) {
             var cf = config["start-position"];
@@ -90,6 +92,7 @@ function GameConfig(game) {
             }, this);
             game.matrix.vTranslate(vecz);
        }
+        this.closeDiv();
     };
 
     this.initTextures = function() {

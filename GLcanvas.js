@@ -152,9 +152,9 @@ GLcanvas.prototype.start = function(theScene) {
 	this.shader_source.cleanup();
 
 	// Set up mouse control.
-	document.onmousedown = handleMouseDown;
+	this.canvas.onmousedown = handleMouseDown;
 	document.onmouseup = handleMouseUp;
-	document.onmousemove = handleMouseMove;
+	this.canvas.onmousemove = handleMouseMove;
 
 	if(textures_loading !== 0)
 	    this.status.innerHTML +=
