@@ -20,19 +20,9 @@ function Game(gl_) {
     var audio = new GLaudio();
     var player = new Player(gl_, 50);
 
-    // createAudio(origin URL, destination node, loop[, loop offset, loop time])
-    // These are at 120 BPM: 1 sec = 2 beats
-    // 0. Low-pass input detects movement, occuring on the half-beat; slightly below 0.25s
-    // 1. Non-looping sound, which will be triggered by the above sample
-    // 2. Non-looping sound, which will be triggered by the above sample
-    // 3. Rest of the song.
+    var thah = [];
 
     config.initAudio(audio);
-//    audio.createAudio("music/beats.mp3", audio.low_pass, true, 1, 8);
-//    audio.createAudio("music/Game_Hi Hat_2.wav", audio.web_audio.destination, false);
-//    audio.createAudio("music/Game_keys_2.wav", audio.web_audio.destination, false);
-//    audio.createAudio("music/backing_beat.wav", audio.delay, true, 0, 8);
-
 
     // handles movement
     this.grid = 50;
@@ -55,6 +45,10 @@ function Game(gl_) {
 
     var floor_width = this.grid;
     this.floor = [];
+
+    config.initPiece(this.floor);
+
+
     this.push_button = [];
     this.three_dee = [];
 
@@ -91,27 +85,27 @@ function Game(gl_) {
 
     for(var i=-11; i<=10; ++i) {
 	var w_ = floor_width, h_ = -3 * floor_width, l_ = -1;
-	this.floor.push(new Quad(
-	    [-w_,  0, l_],
-	    [-w_, h_, l_],
-	    [ w_,  0, l_],
-	    [ w_, h_, l_])
-			.translate([i * 2 * w_, 0, 40])
-			.setTexture(RUG_TEXTURE)
-			.add2DCoords());
-	this.three_dee.push(new SixSidedPrism(
-	    [-w_,  0, l_],
-	    [-w_, h_, l_],
-	    [ w_, h_, l_],
-	    [ w_,  0, l_],
-	    [-w_,  0, l_ - floor_width],
-	    [-w_, h_, l_ - floor_width],
-	    [ w_, h_, l_ - floor_width],
-	    [ w_,  0, l_ - floor_width])
-			.translate([i * 2.0 * w_, 0, 40])
-			.setTexture(RUG_TEXTURE));
-	if(i === -11) { this.floor[0].translate([-12 * w_, 0, 0]).add2DCoords();
-			this.three_dee[0].translate([-12 * w_, 0, 0]); }
+//	this.floor.push(new Quad(
+//	    [-w_,  0, l_],
+//	    [-w_, h_, l_],
+//	    [ w_,  0, l_],
+//	    [ w_, h_, l_])
+//			.translate([i * 2 * w_, 0, 40])
+//			.setTexture(RUG_TEXTURE)
+//			.add2DCoords());
+//	this.three_dee.push(new SixSidedPrism(
+//	    [-w_,  0, l_],
+//	    [-w_, h_, l_],
+//	    [ w_, h_, l_],
+//	    [ w_,  0, l_],
+//	    [-w_,  0, l_ - floor_width],
+//	    [-w_, h_, l_ - floor_width],
+//	    [ w_, h_, l_ - floor_width],
+//	    [ w_,  0, l_ - floor_width])
+//			.translate([i * 2.0 * w_, 0, 40])
+//			.setTexture(RUG_TEXTURE));
+//	if(i === -11) { this.floor[0].translate([-12 * w_, 0, 0]).add2DCoords();
+//			this.three_dee[0].translate([-12 * w_, 0, 0]); }
     }
 
     l = -1;
