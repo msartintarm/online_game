@@ -93,6 +93,7 @@ GLcanvas.prototype.start = function(theScene) {
 	document.getElementById("button_table").style.display = "none";
 	document.getElementById("footer").style.display = "none";
 
+	this.status = document.getElementById("glcanvas_status");
 	this.canvas = document.getElementById("glcanvas");
 	this.canvas.style.display = "block";
 
@@ -144,7 +145,7 @@ GLcanvas.prototype.start = function(theScene) {
 	this.gl.useProgram(this.gl.shader);
 	this.active_shader = this.gl.shader;
 
-	document.getElementById("glcanvas_status").innerHTML =
+	this.status.innerHTML =
 	    "Shaders compiled.</br>";
 
 	// Get rid of unused JS  memory
@@ -156,7 +157,7 @@ GLcanvas.prototype.start = function(theScene) {
 	document.onmousemove = handleMouseMove;
 
 	if(textures_loading !== 0)
-	    document.getElementById("glcanvas_status").innerHTML +=
+	    this.status.innerHTML +=
 	    "" + textures_loading + " textures.</br>";
 	this.bufferModels();
 

@@ -103,23 +103,26 @@
 	<div class="wrap">
 
 	  <div id="display" style="padding-top:8px; width:100%;">
-	    <p id="glcanvas_status"></p>
-
+	    <input id="your_config" type="button"
+		   class="floating stadium_input" value="You"/>
 	    <!-- Toggled off when stadium loads -->
 	    <div id="stadium_params" style="display:inline-block;">
-	      <div style="float:left;">Name:</div>
-	      <input id="player_name" type="text" style="float:right; width:60%;"
-		     class="floating stadium_input" value="Oname"/>
+	      <div style="float:left;font-size:16px;">Name:</div>
+              <div style="float:right;width:55%;">
+	        <input id="player_name" type="text"
+		       class="floating stadium_input" value="Oname"/></div>
 	      <br/>
-	      <div style="float:left;">Balls:</div>
-	      <input id="stadium_balls" type="text" style="float:right; width:60%;"
+	      <div style="float:left;font-size:16px;">Balls:</div>
+	      <input id="stadium_balls" type="text" style="float:right; width:55%;"
 		     value="20" class="floating stadium_input"/>
-	      <input id="stadium_balls" type="button" style="float:left;"
-		     value="Play" class="floating stadium_input" />
 	    </div>
 
 	  </div>
 	</div>
+	<p id="glcanvas_status">
+	  <input id="stadium_balls" type="button" style="font-size:20px;"
+                 value="Play" class="floating stadium_input" />
+        </p>
 
 	<canvas id="textureCanvas"></canvas>
 

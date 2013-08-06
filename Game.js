@@ -24,8 +24,9 @@ function Game(gl_) {
 
     config.initAudio(audio);
 
+    this.matrix = theCanvas.matrix;
+
     // handles movement
-    this.grid = 50;
     this.bg_movement = vec3.create();
     this.cam_movement = vec3.create();
     this.cam_left_count = 0;
@@ -40,25 +41,22 @@ function Game(gl_) {
     // Jump distance is a vector of linear X values
     // When we increment y-pos by these array values, the effect is a parabolic jump
 
+    config.initMisc(); // this.grid and viewing translation
+
+    this.floor = [];
+    config.initPiece(this.floor, "piece-0");
     // new shader effect
     this.floor_effect = 0;
 
-    var floor_width = this.grid;
-    this.floor = [];
-
-    config.initPiece(this.floor, "piece-0");
-
-
     this.push_button = [];
+    config.initPiece(this.push_button, "piece-1");
+    this.push_button[1].magical = true;
+
+    // Placeholder for 3d blocks -- MST
     this.three_dee = [];
 
     // Map uniforms ourself
     GLobject.draw_optimized = true;
-
-    theCanvas.matrix.vTranslate([0,300,750]);
-
-    config.initPiece(this.push_button, "piece-1");
-    this.push_button[1].magical = true;
 
     var wh = 1200;
     var l2= -20;
@@ -71,7 +69,6 @@ function Game(gl_) {
 
 
     this.initBuffers = function(gl_) {
-
 
 	player.initBuffers(gl_);
 	this.background.initBuffers(gl_);
@@ -148,13 +145,13 @@ function Game(gl_) {
 	this.cam_right_count = 30;
 	this.cam_in_right_move = true;
     };
+
     var triggered = false;
     this.updateMovement = function() {
 
 	var x_ = player.xPos();
-	// TODO: restore functionality to these functions
-	if(player.xPos() < this.cam_movement[0] - 400) this.startCameraLeftMove();
-	else if(player.xPos() > this.cam_movement[0] + 400) this.startCameraRightMove();
+	if(x_ < this.cam_movement[0] - 400) this.startCameraLeftMove();
+	else if(x_ > this.cam_movement[0] + 400) this.startCameraRightMove();
 
 	// Handle camera natively as it doesn't need much logic.
 	if (this.cam_in_right_move === true) {

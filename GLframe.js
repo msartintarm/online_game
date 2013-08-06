@@ -3,7 +3,7 @@
  *
  * Does more than init its objects buffers - also
  * binds a GPU frame to a texture.
- * 
+ *
  * To draw, it renders the scene and updates the texture.
  */
 function GLframe(texture_num) {
@@ -37,34 +37,34 @@ GLframe.prototype.init = function(gl_) {
     gl_.activeTexture(gl_.TEXTURE0 + this.active);
 
     gl_.bindTexture(gl_.TEXTURE_2D, this.texture);
-    gl_.texParameteri(gl_.TEXTURE_2D, 
+    gl_.texParameteri(gl_.TEXTURE_2D,
 		      gl_.TEXTURE_MAG_FILTER, gl_.LINEAR);
-    gl_.texParameteri(gl_.TEXTURE_2D, 
-		      gl_.TEXTURE_MIN_FILTER, 
+    gl_.texParameteri(gl_.TEXTURE_2D,
+		      gl_.TEXTURE_MIN_FILTER,
 		      gl_.LINEAR_MIPMAP_LINEAR);
-    gl_.texImage2D(gl_.TEXTURE_2D, 0, gl_.RGBA, 
-		   this.frameBuff.width, this.frameBuff.height, 
+    gl_.texImage2D(gl_.TEXTURE_2D, 0, gl_.RGBA,
+		   this.frameBuff.width, this.frameBuff.height,
 		   0, gl_.RGBA, gl_.UNSIGNED_BYTE, null);
     gl_.generateMipmap(gl_.TEXTURE_2D);
 
     this.renderBuff = gl_.createRenderbuffer();
     gl_.bindRenderbuffer(gl_.RENDERBUFFER, this.renderBuff);
-    gl_.renderbufferStorage(gl_.RENDERBUFFER, 
-			    gl_.DEPTH_COMPONENT16, 
-			    this.frameBuff.width, 
+    gl_.renderbufferStorage(gl_.RENDERBUFFER,
+			    gl_.DEPTH_COMPONENT16,
+			    this.frameBuff.width,
 			    this.frameBuff.height);
 
     gl_.bindFramebuffer(gl_.FRAMEBUFFER, this.frameBuff);
-    gl_.framebufferTexture2D(gl_.FRAMEBUFFER, 
+    gl_.framebufferTexture2D(gl_.FRAMEBUFFER,
 			     gl_.COLOR_ATTACHMENT0,
-			     gl_.TEXTURE_2D, 
+			     gl_.TEXTURE_2D,
 			     this.texture, 0);
     gl_.framebufferRenderbuffer(gl_.FRAMEBUFFER,
 				gl_.DEPTH_ATTACHMENT,
 				gl_.RENDERBUFFER, this.renderBuff);
 
     // -- check to make sure everything is init'ed -- //
-    if(gl_.checkFramebufferStatus(gl_.FRAMEBUFFER) !== 
+    if(gl_.checkFramebufferStatus(gl_.FRAMEBUFFER) !==
        gl_.FRAMEBUFFER_COMPLETE) {
 	alert("yo, framebuffer not working dawg");
     }
@@ -79,13 +79,13 @@ GLframe.prototype.init = function(gl_) {
     gl_.uniform1i(gl_.getUniformLocation(
 	gl_.shader, "sampler" + sampler_num), this.active);
 
-    document.getElementById("glcanvas_status").innerHTML += 
+    theCanvas.status.innerHTML +=
     "frame: [" + this.active + "," + sampler_num + "," + this.num + "]</br>";
     console.log("frame: [" + this.active + "," + sampler_num + "," + this.num + "]");
 };
 
 /**
- * 1. Saves state of matrices 
+ * 1. Saves state of matrices
  * 2. Loads matrices specific to this framebuffer into GL
  * 3. Renders scene
  * 4. Loads state of matrices
@@ -100,13 +100,13 @@ GLframe.prototype.drawScene = function(gl_) {
     gl_.activeTexture(gl_.TEXTURE0 + this.active);
     gl_.viewport(0, 0, this.frameBuff.width, this.frameBuff.height);
     gl_.bindTexture(gl_.TEXTURE_2D, null);
-    gl_.bindFramebuffer(gl_.FRAMEBUFFER, 
+    gl_.bindFramebuffer(gl_.FRAMEBUFFER,
 			this.frameBuff);
-    gl_.clear(gl_.COLOR_BUFFER_BIT | 
+    gl_.clear(gl_.COLOR_BUFFER_BIT |
 	      gl_.DEPTH_BUFFER_BIT);
 
     GLframe.frame_draw = true;
-    
+
     // edit vMatrix here
     // theMatrix.vMatrixChanged = true;
 
@@ -118,7 +118,7 @@ GLframe.prototype.drawScene = function(gl_) {
     gl_.bindFramebuffer(gl_.FRAMEBUFFER, null);
     gl_.bindTexture(gl_.TEXTURE_2D, this.texture);
     gl_.generateMipmap(gl_.TEXTURE_2D);
-    gl_.viewport(0, 0, 
+    gl_.viewport(0, 0,
 		 gl_.drawingBufferWidth,
 		 gl_.drawingBufferHeight);
 

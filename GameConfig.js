@@ -33,8 +33,69 @@ function GameConfig(game) {
         "start-position": ["0", "300", "750"]
     };
 
+    var config_div = document.createElement("div");
+    document.getElementById("banner").appendChild(config_div);
+
+    var curr_div = config_div; //
+
+    this.TextBox = function(value, width) {
+        var text_x = document.createElement("textarea");
+        text_x.value = value;
+        text_x.style.width = width;
+        text_x.rows = 1;
+        curr_div.appendChild(text_x);
+    };
+
+    var swap_div;
+
+    // create div with title, and leave it open.
+    // a button will be created that invokes it.
+    this.openDiv = function(title) {
+
+        swap_div = document.createElement("div");
+
+        var button = document.createElement("input");
+        button.type = "button";
+        button.className = "floating";
+        button.value = title;
+        // Function sets div to be hidden by default,
+       //   then returns a function that toggles it on / off
+        button.onclick = (function(s) {
+            s.display = "none";
+            return function() {
+                if(s.display === "none")
+                    s.display = "inline-block";
+                else s.display = "none";
+            };
+        } (swap_div.style));
+
+        config_div.appendChild(button);
+
+        curr_div = swap_div;
+    };
+
+    this.closeDiv = function() {
+        config_div.appendChild(curr_div);
+        curr_div = config_div;
+    };
+
+    this.initMisc = function() {
+        if (config["grid-size"]) game.grid = config["grid-size"];
+        if (config["start-position"]) {
+            var cf = config["start-position"];
+            var vecz = [];
+            cf.forEach(function(x, i) {
+                vecz[i] = parseInt(x);
+                this.TextBox(x, "30px");
+            }, this);
+            game.matrix.vTranslate(vecz);
+       }
+    };
+
     this.initTextures = function() {
+        this.openDiv("Textures:");
         config["textures"].forEach (function(texture) {
+            this.TextBox(texture, "100%");
             var t =
                 (texture === "brick-texture")? BRICK_TEXTURE:
                 (texture === "heaven-texture")? HEAVEN_TEXTURE:
@@ -44,12 +105,13 @@ function GameConfig(game) {
                 (texture === "heaven-texture")? HEAVEN_NORMAL_TEXTURE: null;
             if (t) GLtexture.create(gl_, t);
             if (n) GLtexture.create(gl_, n);
-        });
+        }, this);
+        this.closeDiv();
     };
 
-    this.initAudio = function(gl_audio) {
-
-        config["audio"].forEach (function (sound) {
+    this.addAudio = function(gl_audio) {
+        return function(sound) {
+            this.TextBox(sound[0], "99%");
             var web_node =
                 (sound[1] === "audio-low-pass")? gl_audio.low_pass:
                 (sound[1] === "audio-output")? gl_audio.web_audio.destination:
@@ -63,13 +125,23 @@ function GameConfig(game) {
                 gl_audio.createAudio(sound[0], web_node, true,
                                      parseInt(sound[3]),  // Loop start beat
                                      parseInt(sound[4])); // Loop  repeat factor
-        });
+        };
+    };
+
+    this.initAudio = function(gl_audio) {
+
+        this.openDiv("Music:");
+        config["audio"].forEach (this.addAudio(gl_audio), this);
+        this.closeDiv();
     };
 
     this.initPiece = function(arr, piece_name) {
         var p0 = config[piece_name];
-        var w = 50 * parseInt(p0[2]);
-        var h = 50 * parseInt(p0[3]);
+
+        var w = game.grid * parseInt(p0[2]);
+        var h = game.grid * parseInt(p0[3]);
+
+        this.openDiv("Piece '" + p0[0] + "':");
 
         var tex = p0[1];
             tex = (tex === "brick-texture")? BRICK_TEXTURE:
@@ -94,26 +166,24 @@ function GameConfig(game) {
         for(var i = 0; i < coords.length; ++i) {
 
             var termA = /(?:([0-9]+)\*\()?([-+])*([0-9]+)\,([-+])*([0-9]+)\)?/;
-
             var zzap = termA.exec(coords[i]);
-
             // Index 1: loop count (opt); 2, 4: inc sign (opt); 3, 5: value (non-opt)
             var loop = (zzap[1])? zzap[1]: 1;
 
-            for(var j = 0; j < loop; ++j) {
 
+            if (zzap[2]) this.TextBox(zzap[2], "78%");
+            this.TextBox(zzap[3], "20%");
+
+            for(var j = 0; j < loop; ++j) {
                 // Either char doesn't exist, is a '-' (decrement), or is  a '+' (increment)
                 x = (!zzap[2])? parseInt(zzap[3]):
-                    (zzap[2] === "-")? x - parseInt(zzap[3]):
-                    x + parseInt(zzap[3]);
-
+                    (zzap[2] === "-")? x - parseInt(zzap[3]): x + parseInt(zzap[3]);
                 y = (!zzap[4])? parseInt(zzap[5]):
-                    (zzap[4] === "-")? y - parseInt(zzap[5]):
-                    y + parseInt(zzap[5]);
-
+                    (zzap[4] === "-")? y - parseInt(zzap[5]): y + parseInt(zzap[5]);
                 create(x,y);
             }
 
         }
+        this.closeDiv();
     };
 }
