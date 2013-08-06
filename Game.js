@@ -3,6 +3,8 @@
  */
 function Game(gl_) {
 
+    var config = new GameConfig(this);
+
     // Used in collision detection.
     var WALL_NONE = 0;
     var WALL_N = 1;
@@ -24,6 +26,8 @@ function Game(gl_) {
     // 1. Non-looping sound, which will be triggered by the above sample
     // 2. Non-looping sound, which will be triggered by the above sample
     // 3. Rest of the song.
+
+//    config.initAudio(audio);
     audio.createAudio("music/beats.mp3", audio.low_pass, true, 1, 8);
     audio.createAudio("music/Game_Hi Hat_2.wav", audio.web_audio.destination, false);
     audio.createAudio("music/Game_keys_2.wav", audio.web_audio.destination, false);

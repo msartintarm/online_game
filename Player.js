@@ -302,8 +302,8 @@ function Player(gl_, grid_size) {
 		    vec3.negate(view_dist, view_dist);
 		}; }) (window.theCanvas.matrix));
 
-            functionz[_A] = function() { audio.log_music = !(audio.log_music); };
-            functionz[SPACE] = function() { audio.pause(); };
+//            functionz[_A] = function() { audio.log_music = !(audio.log_music); };
+//            functionz[SPACE] = function() { audio.pause(); };
 
             return function(event) {
                 var code = event.keyCode;
