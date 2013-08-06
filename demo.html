@@ -82,26 +82,21 @@
 		     value="Play" class="start_button stadium_input" />
 	    </div>
 
-	    <!-- Toggled on when stadium loads -->
-
 	  </div>
 	</div>
 
-	<canvas id="textureCanvas" style="float:left;display:none;">
-	  I'm sorry your browser does not support the HTML5 canvas element.
-	</canvas>
+	<canvas id="textureCanvas"></canvas>
 
       </div>
 
-      <div id="keyboard" style="position:absolute; bottom: 0px; left: 0px; color: #ffffff;"></div>
-      <div class='main'>
-	<canvas id="glcanvas" width="1100"></canvas>
+      <div class="main">
 	<!--
 	     We use a table with 2x2 cells,
 	     lumping all the links into their own cells..
 	  -->
+        WebGL: A Demo
 	<table id="button_table" style="width:100%;">
-	  <thead><tr></tr><tr>
+	  <thead><tr>
 	      <th><u>Shapes</u></th>
 	      <th><u>Environments</u></th>
 	  </tr></thead>
@@ -154,8 +149,13 @@
 	      </td>
 	  </tr></tbody>
 	</table>
+	<canvas id="glcanvas"></canvas>
       </div>
-      <div style="clear:both;"></div>
+      <div id="land_down_under" style="clear:both;">
+        <!-- It's bad code to not specify cols, but
+             width in CSS lets browsers size it properly -->
+        <textarea class="keyboard" rows="1"></textarea>
+      </div>
     </div>
 
 

@@ -1,36 +1,3 @@
-thead { 
-    color: green; 
-    cursor: default;        /* make the cursor like hovering over an <a> element */
-    -moz-user-select: all;
-    -webkit-user-select: all;
-    -khtml-user-select: all;
-}
-tbody { color: blue; 
-    -moz-user-select: all;
-    -webkit-user-select: all;
-    -khtml-user-select: all;
-
-}
-
-a:link {text-decoration: none; 
-}
-a:visited {color: #880000; }
-a:active {color: red; }
-a:hover {text-decoration: underline; color: red;}
-
-p#glcanvas_status {
-    font-family: Tahoma, Geneva, sans-serif;
-    font-size: 12px;
-    font-weight:bold;
-}
-
-canvas#glcanvas {
-    position: absolute;
-    background:url(graphics/earth.jpg);
-    background-size:100% 100%;
-    display: none;
-}
-
 body:before, body:after {
     content: "";
     position: fixed;
@@ -69,38 +36,38 @@ div#banner{
 
 }
 
+div#header, div#footer {
+    width: 100%;
+    border-width: 3px;
+    border-bottom-style: solid;
+    border-right-style: solid;
+    border-color: #333333;
+    margin-bottom: 0px;
+    background: url('graphics/panorama.jpg') no-repeat;
+    background-color: #000000;
+    color: #123123;
+    text-align:right;
+}
+
+div#header {
+    height: 120px;
+    background-size: 105% 300%;
+    line-height:1px;
+    margin-left:8px;
+    padding-right:2px;
+}
+
 div.wrap {
     width:100%;
     height:100%;
-    border: 10px inset #666666;
+    border: 10px inset #555555;
     margin-left: -10px;
 }
 
-table#button_table {
-    border: 10px inset #666666;
-}
-
-div#wrap_all {
-    background: url(graphics/banner.gif) repeat-y;
-    background-size: 25%;
-    background-color: #23180d;
-}
-
-div.main {
-    margin-left: -10px;
-    float:right;
-    width:75%;
-    text-align: justify;
-    background-color: #aaaaaa;
-    color: #111144;
-    font-size: 23px;
-    text-align: center; 
-}
- 
-div.title { 
-    position: relative;
-    width:90%;
-    margin: 17px 17px;
+p#glcanvas_status {
+    font-family: Tahoma, Geneva, sans-serif;
+    font-size: 12px;
+    font-weight:bold;
 }
 
 div#stadium_params {
@@ -112,10 +79,66 @@ div#stadium_params {
 }
 
 input.stadium_input {
-    float:right; 
-    width:60%;  
+    float:right;
+    width:60%;
     font-family: Impact, fantasy;
     font-variant: small-caps;
+}
+
+thead {
+    color: green;
+    cursor: default;        /* make the cursor like hovering over an <a> element */
+    -moz-user-select: all;
+    -webkit-user-select: all;
+    -khtml-user-select: all;
+}
+tbody { color: blue;
+    -moz-user-select: all;
+    -webkit-user-select: all;
+    -khtml-user-select: all;
+
+}
+
+a:link {text-decoration: none;
+}
+a:visited {color: #880000; }
+a:active {color: red; }
+a:hover {text-decoration: underline; color: red;}
+
+canvas#glcanvas {
+/*    position: absolute; */
+    background:url(graphics/earth.jpg);
+    background-size:100% 100%;
+    display: none;
+}
+
+canvas#textureCanvas { float:left;display:none; }
+
+div.main {
+    float:right;
+    width:75%;
+    text-align: justify;
+    background-color: #112233;
+    color: #00aabb;
+    font-size: 23px;
+    text-align: center;
+}
+
+table#button_table {
+    background-color: #88aabb;
+    border: 10px inset #666666;
+}
+
+div#wrap_all {
+    background: url(graphics/banner.gif) repeat-y;
+    background-size: 25%;
+    background-color: #23180d;
+}
+
+div.title {
+    position: relative;
+    width:90%;
+    margin: 17px 17px;
 }
 
 input.start_button {
@@ -130,8 +153,9 @@ input.start_button {
 }
 
 input.start_button:hover {
-    color: #6677CC;
+color:#33aabb;
 }
+
 /*
 div.main:before, div.main:after {
     content: "";
@@ -150,36 +174,12 @@ div.main:after {
 }
 */
 
-div#header {
-    width: 100%;
-    height: 120px; 
-    border-width: 2px;
-    border-bottom-style: solid;
-    border-color: #333333;
-    margin-bottom: 0px;
-    background: url('graphics/panorama.jpg') no-repeat;
-    background-size: 105% 300%;
-    color: #123123; 
-    padding-left:-8px;
-    padding-right:10px;
-    text-align:right;
-    line-height:1px;
-}
-
 div#footer {
     clear:both;
-    width: 100%;
-    border-width: 10px;
-    border-left-style: solid;
-    border-right-style: solid;
-    border-color: #333333;
-    background: url('graphics/panorama.jpg') no-repeat;
     background-size: 105% 800%;
-    color: #123123; 
     height: 21px;
-    text-align:right;
-    margin: 0px;
-    background-color: #000000;
+    margin-left:-8px;
+    padding-right:18px;
 }
 
 
@@ -192,4 +192,12 @@ div.one_third{
     -moz-user-select: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
+}
+
+textarea.keyboard {
+    position:absolute; bottom: 8px; left:0px;
+    width:100%;
+    margin: 0px -4px;
+    background-color:#aaaaaa;
+    border-style:none;
 }

@@ -10,7 +10,7 @@ function GLcanvas() {
     this.frame_count = 0;
     this.gl = null;
     this.canvas = null;
-	
+
     // if we have errors, don't keep trying to draw the scene
     this.has_errors = false;
 
@@ -70,15 +70,15 @@ GLcanvas.prototype.createScene = function(objToDraw) {
 GLcanvas.prototype.bufferModels = function() {
     for(var i = 0, max = this.objects.length;
 	i < max; ++i) {
-	this.objects[i].initBuffers(this.gl); 
+	this.objects[i].initBuffers(this.gl);
     }
 };
 
 GLcanvas.prototype.drawModels = function() {
     for(var i = 0, max = this.objects.length;
 	i < max; ++i) {
-	this.objects[i].draw(this.gl); 
-    } 
+	this.objects[i].draw(this.gl);
+    }
 };
 
 /**
@@ -95,16 +95,12 @@ GLcanvas.prototype.start = function(theScene) {
 
 	this.canvas = document.getElementById("glcanvas");
 	this.canvas.style.display = "block";
-//	this.canvas.style.width = "100%";
-//	this.canvas.width = this.canvas.offsetWidth - 16;
-	// Same calcs the div's go through with padding, minus an additional five.
-	this.canvas.width = window.innerWidth * .75 - 25;
-	this.canvas.height = window.innerHeight - 25;
 
+	document.getElementById("land_down_under").style.display = "block";
 
 	if(this.initGL() !== 0) {
 	    var theWindow = window.open(
-		"GLerror.php", 
+		"GLerror.php",
 		"",
 		"height=110,width=220,location=no,scrollbars=no");
 	    theWindow.focus();
@@ -127,15 +123,15 @@ GLcanvas.prototype.start = function(theScene) {
 	   this.initShaders(this.gl.shader_canvas, "canvas",   "default") !== 0 ||
 	   this.initShaders(this.gl.shader_player, "player",   "player") !== 0 ||
 	   this.initShaders(this.gl.shader_color,  "color",    "color") !== 0) {
-	    
+
 	    var theWindow = window.open(
-		"GLerror_shader.php", 
+		"GLerror_shader.php",
 		"",
 		"height=110,width=260,location=no,scrollbars=no");
 	    theWindow.focus();
 	    return;
 	}
-	   
+
 	this.objects = [];
 
 	// start matrix models
@@ -148,7 +144,7 @@ GLcanvas.prototype.start = function(theScene) {
 	this.gl.useProgram(this.gl.shader);
 	this.active_shader = this.gl.shader;
 
-	document.getElementById("glcanvas_status").innerHTML = 
+	document.getElementById("glcanvas_status").innerHTML =
 	    "Shaders compiled.</br>";
 
 	// Get rid of unused JS  memory
@@ -159,12 +155,13 @@ GLcanvas.prototype.start = function(theScene) {
 	document.onmouseup = handleMouseUp;
 	document.onmousemove = handleMouseMove;
 
-	this.resize();
-
-	if(textures_loading !== 0) 
-	    document.getElementById("glcanvas_status").innerHTML += 
+	if(textures_loading !== 0)
+	    document.getElementById("glcanvas_status").innerHTML +=
 	    "" + textures_loading + " textures.</br>";
 	this.bufferModels();
+
+	// Needs calibration each time the HTML page changes. MST
+	this.resize();
 
 	// Set background color, clear everything, and
 	//  enable depth testing
@@ -172,7 +169,7 @@ GLcanvas.prototype.start = function(theScene) {
 	this.gl.clearDepth(1.0);
 	this.gl.enable(this.gl.DEPTH_TEST);
     } else {
-	// If we have started GL already, 
+	// If we have started GL already,
 	//  just add the new model.
 	this.createScene(theScene);
 	this.bufferModels();
@@ -183,10 +180,10 @@ GLcanvas.prototype.start = function(theScene) {
 
 };
 
-GLcanvas.prototype.done_loading = function(timeout) { 
+GLcanvas.prototype.done_loading = function(timeout) {
 
     // Wait 1.5 seconds for no reason
-    setTimeout(tick,timeout); 
+    setTimeout(tick,timeout);
 };
 
 
@@ -202,7 +199,7 @@ GLcanvas.prototype.initGL = function() {
     // If we don't have a GL context, give up now
     if (!this.gl) { return 1; }
 
-    this.gl.active = 0;	
+    this.gl.active = 0;
     // sets textures we have already loaded.
     // some of them don't have sources
     this.gl.tex_enum = [];
@@ -220,12 +217,12 @@ GLcanvas.prototype.initGL = function() {
 };
 
 GLcanvas.prototype.resize = function() {
-    this.canvas.width = window.innerWidth * .75 - 25;
-    this.canvas.height = window.innerHeight - 25;
-    this.gl.viewport(0, 0, this.canvas.width, 
+    this.canvas.width = this.canvas.parentElement.clientWidth - 12;
+    this.canvas.height = window.innerHeight - 105;
+    this.gl.viewport(0, 0, this.canvas.width,
 		     this.canvas.height);
 	theMatrix.perspective(45,
-			      this.canvas.width / 
+			      this.canvas.width /
 			      Math.max(1, this.canvas.height),
 			      0.1, 300000.0);
 
@@ -244,12 +241,12 @@ GLcanvas.prototype.resize = function() {
  *  Draw the scene.
  */
 GLcanvas.prototype.drawScene = function() {
-    
+
     // Don't check context for errors. This is expensive.
-    // Errors are evident in this stage as something 
+    // Errors are evident in this stage as something
     //  usually doesn't show up.
 
-    this.gl.clear(this.gl.COLOR_BUFFER_BIT | 
+    this.gl.clear(this.gl.COLOR_BUFFER_BIT |
 		  this.gl.DEPTH_BUFFER_BIT);
 
     // Draw all our objects
@@ -263,7 +260,7 @@ GLcanvas.prototype.drawScene = function() {
 	    this.resize();
 	}
     }
-    
+
     this.frame_count++;
 //    this.gl.clear(this.gl.STENCIL_BUFFER_BIT);
 
@@ -307,7 +304,7 @@ GLcanvas.prototype.initShaders = function(gl_shader, frag, vert) {
     // Perspective never changes, so is left out.
     // Another reason it makes sense to pack these is if one
     // changes, they all do.
-    this.initUniform(gl_shader, "mvnMatU"); 
+    this.initUniform(gl_shader, "mvnMatU");
 
     this.initUniform(gl_shader, "pMatU"); // Perspecctive matrix
 //    this.initUniform(gl_shader, "mMatU"); // Model matrix
@@ -315,18 +312,18 @@ GLcanvas.prototype.initShaders = function(gl_shader, frag, vert) {
 //    this.initUniform(gl_shader, "nMatU"); // Model's normal matrix
     this.initUniform(gl_shader, "lMatU"); // Lighting matrix
     this.initUniform(gl_shader, "lightPosU"); // Initial light's position
-    
+
     for(var i_ = 0; i_ < 11; ++i_) {
 	this.initUniform(gl_shader, "sampler" + i_);
     }
-    
+
     return 0;
 };
 
 /**
  * Some shaders won't have these attributes.
  *
- * If this is the case, they will not be added to the 
+ * If this is the case, they will not be added to the
  * shaders' associative attributes list.
  */
 GLcanvas.prototype.initAttribute = function(gl_shader, attr) {
