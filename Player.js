@@ -12,10 +12,10 @@ function Player(gl_, grid_size) {
     var DOWN=40;
     var _A=65;
 
-    var key_down = { SHIFT: false,
-                     RIGHT: false,
-                     LEFT: false,
-                     UP: false };
+    this.key_down = { SHIFT: false,
+                      RIGHT: false,
+                      LEFT: false,
+                      UP: false };
 
     // Used in collision detection.
     var WALL_NONE = 0;
@@ -48,11 +48,6 @@ function Player(gl_, grid_size) {
     this.jumping_down = false;
     this.in_left_move = false;
     this.in_right_move = false;
-
-    this.right_key_down = false;
-    this.left_key_down = false;
-    this.jump_key_down = false;
-    this.shift_key_down = false;
 
     var player_width = grid_size;
     this.grid = grid_size;
@@ -127,7 +122,7 @@ function Player(gl_, grid_size) {
 
     this.startLeftMove = function() {
 
-	dist = key_down[LEFT]? 3:1;
+	dist = this.key_down[SHIFT]? 3:1;
 	if (this.in_left_move === true) return;
 	left_string.initBuffers(theCanvas.gl);
 	this.left_count = -1;
@@ -141,7 +136,7 @@ function Player(gl_, grid_size) {
 
     this.startRightMove = function() {
 
-	dist = key_down[RIGHT]? 3:1;
+	dist = this.key_down[SHIFT]? 3:1;
 	if (this.in_right_move === true) return;
 	right_string.initBuffers(theCanvas.gl);
 	this.right_count = -1;
@@ -157,7 +152,7 @@ function Player(gl_, grid_size) {
 	var count = ++this.right_count;
 	if (count >= this.move_dist.length) {
 	    this.in_right_move = false;
-	    if (key_down[RIGHT]) this.startRightMove();
+	    if (this.key_down[RIGHT]) this.startRightMove();
 	    return;
 	}
 	this.movement[0] += this.move_dist[count] * player_width * dist;
@@ -168,7 +163,7 @@ function Player(gl_, grid_size) {
 	var count = (++this.left_count);
 	if (count >= this.move_dist.length) {
 	    this.in_left_move = false;
-	    if (key_down[LEFT]) this.startLeftMove();
+	    if (this.key_down[LEFT]) this.startLeftMove();
 	    return;
 	}
 	this.movement[0] -= this.move_dist[count] * player_width * dist;
@@ -283,37 +278,42 @@ function Player(gl_, grid_size) {
      */
     this.mapKeys = function() {
 
+	document.onkeyup = (function(keys_down, playa) { return function(the_event) {
+            var code = the_event.keyCode;
+	    keys_down[code] = false;
+	    if(code === UP) playa.startJump();
+	}; } (this.key_down, this));
+
+	document.onkeydown = (function(keys_down, playa) {
+
         // contains closed functions mapped to game keys
-        var game_keys = {
-            RIGHT: player.startRightMove,
-            LEFT: player.startLeftMove,
-            UP: player.startJump,
-            DOWN: (function(fn) {
+            var functionz = {};
+            functionz[RIGHT] = playa.startRightMove.bind(playa);
+            functionz[LEFT] = playa.startLeftMove.bind(playa);
+            functionz[UP] = playa.startJump.bind(playa);
+            functionz[DOWN] = ((function(fn) {
                 // toggle a backward viewing matrix translation
                 var view_dist = 3000;
                 return function() {
 		    fn([0, 0, view_dist]);
 		    view_dist = -view_dist;
-		}; }) (theCanvas.matrix.vTranslate),
-            _A: function() { audio.log_music = !(audio.log_music); },
-            SPACE: function() { audio.pause(); }
-	};
+		}; }) (theCanvas.matrix.vTranslate));
+            functionz[_A] = function() { audio.log_music = !(audio.log_music); };
+            functionz[SPACE] = function() { audio.pause(); };
 
-	document.onkeyup = (function(keys_down, playa) { return function(the_event) {
-            var code = the_event.keyCode;
-	    keys_down[code] = false;
-	    if(code === JUMP) playa.startJump();
-	}; } (key_down, this));
+            return function(event) {
+                var code = event.keyCode;
+                if (!!keys_down[+code]) return;
+                if (!!functionz[+code]) functionz[+code]();
+                console.log(code + " " + functionz[+code]);
+                keys_down[code] = true;
+                console.log(code);
 
-	document.onkeydown = (function(keys_down, functions) {return function(event) {
-            var code = event.keyCode;
-            if (!!keys_down[code]) return;
-            if (!!game_keys[code]) game_keys[code]();
-            keys_down[code] = true;
-            console.log(code);
-        }; } (key_down, game_keys));
+            }; } (this.key_down, this));
 
     };
+
+    this.mapKeys();
 
     return this;
 }
