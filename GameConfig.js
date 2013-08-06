@@ -9,6 +9,7 @@ function GameConfig(game) {
 
     // Figure out some way to convert this to document eventually
     var config = {
+        "grid-size": 50,
         "textures": ["brick-texture", "heaven-texture", "rug-texture"],
     // Origin URL, destination node, loop[, loop offset, loop time])
     // These are at 120 BPM: 1 sec = 2 beats
@@ -20,15 +21,15 @@ function GameConfig(game) {
                   ["music/Game_Hi Hat_2.wav", "audio-output"],
                   ["music/Game_keys_2.wav", "audio-output"],
                   ["music/backing_beat.wav", "audio-delay", "loop", "0", "8"]],
-        "grid-size": 50,
         // Syntax of pieces: name, texture, array of x-y coordinate strings
         // String values can either be absolute, or relative to prev. strings
         // Can also specify loops of continuous increments
-        "piece-0": ["floor", "rug-texture", ["-11,0", "20*(+1,0)"]],
-        "piece-1": ["wall", "brick-texture", ["3,12", "+1,+2", "+2,+1", "+2,+1", "12*(+2,+0)",
-                                      "-2,+4", "4*(+0,-2)",
-                                      "-2,+4", "4*(+0,-2)",
-                                      "-2,+4", "4*(+0,-2)"]],
+        "piece-0": ["floor", "rug-texture", "1", "3", ["-22,-1", "20*(+2,+0)"]],
+        "piece-1": ["wall", "brick-texture", "1", "1", ["12,3", "+2,+1", "+2,+1", "+2,+1", "12*(+2,+0)",
+                                      "+4,-2", "4*(+2,+0)",
+                                      "-4,+2", "4*(-2,+0)",
+                                      "+4,-2", "4*(+2,+0)",
+                                      "-4,+2", "4*(-2,+0)"]],
         "start-position": ["0", "300", "750"]
     };
 
@@ -53,7 +54,7 @@ function GameConfig(game) {
                 (sound[1] === "audio-low-pass")? gl_audio.low_pass:
                 (sound[1] === "audio-output")? gl_audio.web_audio.destination:
                 (sound[1] === "audio-delay")? gl_audio.delay: null;
-            console.log(web_node);
+
             if (!sound[2] || sound[2] === "")
                 gl_audio.createAudio(sound[0],  // URL (relative)
                                      web_node,  // Web Audio node (filter) type
@@ -64,17 +65,11 @@ function GameConfig(game) {
                                      parseInt(sound[4])); // Loop  repeat factor
         });
     };
-/*
-        "piece-0": ["floor", "rug", ["-11,0", "20*(+1,0)"]],
-        "piece-1": ["wall", "brick", ["3,12", "+1,+2", "+2,+1", "+2,+1", "12*(+2,+0)",
-                                      "-2,+4", "4*(+0,-2)",
-                                      "-2,+4", "4*(+0,-2)",
-                                      "-2,+4", "4*(+0,-2)"]],
-*/
-    this.initPiece = function(arr) {
-        var p0 = config["piece-0"];
-        var w = 50;
-        var h = -3 * 50;
+
+    this.initPiece = function(arr, piece_name) {
+        var p0 = config[piece_name];
+        var w = 50 * parseInt(p0[2]);
+        var h = 50 * parseInt(p0[3]);
 
         var tex = p0[1];
             tex = (tex === "brick-texture")? BRICK_TEXTURE:
@@ -82,10 +77,9 @@ function GameConfig(game) {
             (tex === "rug-texture")? RUG_TEXTURE: null;
 
         var create = function(x,y) {
-	    var x2 = x * 2 * w;
-	    var y2 = y * w;
+	    var x2 = x * w;
+	    var y2 = y * h;
             var l = -1;
-                console.log(x2 + "," + y2);
 	    arr.push(new Quad([x2-w,y2+h,l],
 			      [x2-w,  y2,l],
 			      [x2+w,y2+h,l],
@@ -93,22 +87,22 @@ function GameConfig(game) {
 		     .setTexture(tex).add2DCoords());
         };
 
-        var coords = p0[2];
-
+        var coords = p0[4];
 
         var x = 0;
-        var y = -3;
+        var y = 0;
         for(var i = 0; i < coords.length; ++i) {
 
             var termA = /(?:([0-9]+)\*\()?([-+])*([0-9]+)\,([-+])*([0-9]+)\)?/;
 
             var zzap = termA.exec(coords[i]);
 
-            // Index 1: loop count; 2, 4: inc sign; 3, 5: value
+            // Index 1: loop count (opt); 2, 4: inc sign (opt); 3, 5: value (non-opt)
             var loop = (zzap[1])? zzap[1]: 1;
 
             for(var j = 0; j < loop; ++j) {
 
+                // Either char doesn't exist, is a '-' (decrement), or is  a '+' (increment)
                 x = (!zzap[2])? parseInt(zzap[3]):
                     (zzap[2] === "-")? x - parseInt(zzap[3]):
                     x + parseInt(zzap[3]);
@@ -117,7 +111,6 @@ function GameConfig(game) {
                     (zzap[4] === "-")? y - parseInt(zzap[5]):
                     y + parseInt(zzap[5]);
 
-                console.log(x + "," + y);
                 create(x,y);
             }
 

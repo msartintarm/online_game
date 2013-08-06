@@ -46,7 +46,7 @@ function Game(gl_) {
     var floor_width = this.grid;
     this.floor = [];
 
-    config.initPiece(this.floor);
+    config.initPiece(this.floor, "piece-0");
 
 
     this.push_button = [];
@@ -57,22 +57,8 @@ function Game(gl_) {
 
     theCanvas.matrix.vTranslate([0,300,750]);
 
-    this.wallPiece = (function(arr) {
-
-    var w = floor_width;
-    var h = floor_width;
-
-	return function(x,y) {
-	    var x2 = x * w;
-	    var y2 = y * h;
-	    arr.push(new Quad([x2-w,y2+h,l],
-			      [x2-w,  y2,l],
-			      [x2+w,y2+h,l],
-			      [x2+w,  y2,l])
-		     .setTexture(BRICK_TEXTURE).add2DCoords());
-	};
-    }(this.push_button));
-
+    config.initPiece(this.push_button, "piece-1");
+    this.push_button[1].magical = true;
 
     var wh = 1200;
     var l2= -20;
@@ -83,78 +69,6 @@ function Game(gl_) {
 	.setTexture(HEAVEN_TEXTURE)
 	.setShader(theCanvas.gl.shader_canvas);
 
-    for(var i=-11; i<=10; ++i) {
-	var w_ = floor_width, h_ = -3 * floor_width, l_ = -1;
-//	this.floor.push(new Quad(
-//	    [-w_,  0, l_],
-//	    [-w_, h_, l_],
-//	    [ w_,  0, l_],
-//	    [ w_, h_, l_])
-//			.translate([i * 2 * w_, 0, 40])
-//			.setTexture(RUG_TEXTURE)
-//			.add2DCoords());
-//	this.three_dee.push(new SixSidedPrism(
-//	    [-w_,  0, l_],
-//	    [-w_, h_, l_],
-//	    [ w_, h_, l_],
-//	    [ w_,  0, l_],
-//	    [-w_,  0, l_ - floor_width],
-//	    [-w_, h_, l_ - floor_width],
-//	    [ w_, h_, l_ - floor_width],
-//	    [ w_,  0, l_ - floor_width])
-//			.translate([i * 2.0 * w_, 0, 40])
-//			.setTexture(RUG_TEXTURE));
-//	if(i === -11) { this.floor[0].translate([-12 * w_, 0, 0]).add2DCoords();
-//			this.three_dee[0].translate([-12 * w_, 0, 0]); }
-    }
-
-    l = -1;
-    var v = 3;
-    var d = 12;
-    this.wallPiece(d,v);
-    v += 1;
-    d += 2;
-    this.wallPiece(d,v);
-    this.push_button[1].magical = true;
-    d += 2;
-    v += 1;
-    this.wallPiece(d,v);
-    d += 2;
-    v += 1;
-    this.wallPiece(d,v);
-    d += 2;
-    v += 1;
-    this.wallPiece(d,v);
-
-    d += 1;
-    for(var j = 5; j < 16; ++j) {
-	d += 2;
-	this.wallPiece(d,v);
-    }
-    v -= 2;
-    d += 4;
-    for(var j = 16; j < 19; ++j) {
-	d -= 2;
-	this.wallPiece(d,v);
-    }
-    v += 2;
-    d -= 4;
-    for(var j = 19; j < 22; ++j) {
-	d += 2;
-	this.wallPiece(d,v);
-    }
-    v -= 2;
-    d += 4;
-    for(var j = 22; j < 25; ++j) {
-	d -= 2;
-	this.wallPiece(d,v);
-    }
-    v += 2;
-    d -= 4;
-    for(var j = 25; j < 28; ++j) {
-	d += 2;
-	this.wallPiece(d,v);
-    }
 
     this.initBuffers = function(gl_) {
 
