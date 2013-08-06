@@ -10,6 +10,8 @@ function Game(gl_) {
     var WALL_W = 3;
     var WALL_E = 4;
 
+    var s = true;
+
     GLtexture.create(gl_, BRICK_NORMAL_TEXTURE);
     GLtexture.create(gl_, HEAVEN_NORMAL_TEXTURE);
 

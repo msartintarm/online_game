@@ -7,14 +7,14 @@
     <title>WebGL Demo</title>
     <link rel='stylesheet' type="text/css" href="styles.css"/>
     <link rel='icon' type="image/x-icon" href="favicon.ico"/>
-    
+
     <!-- hello ->
-	 
+
     <!-- External JS libraries -->
-    <script src="libs/gl-matrix.js" type="application/javascript" async="async"></script> 
+    <script src="libs/gl-matrix.js" type="application/javascript" async="async"></script>
     <!-- Only used for RequestAnimFrame -->
     <script src="libs/webgl-utils.js" type="application/javascript" async="async"></script>
-    
+
     <!-- Global constants and functions -->
     <script src="functions.js" type="application/javascript"></script>
     <script src="constants.js" type="application/javascript" async="async"></script>
@@ -42,7 +42,7 @@
     <script src="Ball.js" type="application/javascript" async="async"></script>
     <script src="ThickCyl.js" type="application/javascript" async="async"></script>
     <script src="Player.js" type="application/javascript" async="async"></script>
-    
+
     <!-- Complex objects lv.2 -->
     <script src="StoolPyramid.js" type="application/javascript" async="async"></script>
     <script src="MazePiece.js" type="application/javascript" async="async"></script>
@@ -52,6 +52,7 @@
     <script src="Skybox.js" type="application/javascript" async="async"></script>
     <script src="Cagebox.js" type="application/javascript" async="async"></script>
     <script src="Game.js" type="application/javascript" async="async"></script>
+    <script src="GameConfig.js" type="application/javascript" async="async"></script>
   </head>
 
   <body>
@@ -62,7 +63,7 @@
     </div>
 
     <div class="wrap" id="wrap_all">
-      <div id="banner">       
+      <div id="banner">
 	<div class="wrap">
 
 	  <div id="display" style="padding-top:8px; width:100%;">
@@ -95,8 +96,8 @@
       <div id="keyboard" style="position:absolute; bottom: 0px; left: 0px; color: #ffffff;"></div>
       <div class='main'>
 	<canvas id="glcanvas" width="1100"></canvas>
-	<!-- 
-	     We use a table with 2x2 cells, 
+	<!--
+	     We use a table with 2x2 cells,
 	     lumping all the links into their own cells..
 	  -->
 	<table id="button_table" style="width:100%;">
@@ -106,49 +107,49 @@
 	  </tr></thead>
 	  <tbody><tr>
 	      <td>
-		<input type="button" 
-		       onclick="theCanvas.start('cylinder');" 
-		       value="Cylinder" 
+		<input type="button"
+		       onclick="theCanvas.start('cylinder');"
+		       value="Cylinder"
 		       class="start_button"/>
-		<input type="button" 
-		       onclick="theCanvas.start('skybox');" 
-		       value="Skybox" 
+		<input type="button"
+		       onclick="theCanvas.start('skybox');"
+		       value="Skybox"
 		       class="start_button"/>
-		<input type="button" 
-		       onclick="theCanvas.start('sphere');" 
-		       value="Sphere" 
+		<input type="button"
+		       onclick="theCanvas.start('sphere');"
+		       value="Sphere"
 		       class="start_button"/>
-		<input type="button" 
-		       onclick="theCanvas.start('stool');" 
-		       value="Stool" 
+		<input type="button"
+		       onclick="theCanvas.start('stool');"
+		       value="Stool"
 		       class="start_button"/>
-		<input type="button" 
-		       onclick="theCanvas.start('text');" 
-		       value="Text" 
+		<input type="button"
+		       onclick="theCanvas.start('text');"
+		       value="Text"
 		       class="start_button"/>
-		<input type="button" 
-		       onclick="theCanvas.start('torus');" 
-		       value="Torus" 
+		<input type="button"
+		       onclick="theCanvas.start('torus');"
+		       value="Torus"
 		       class="start_button"/>
 	      </td>
 	      <td>
-		<input type="button" 
-		       onclick="theCanvas.start('shadow');" 
-		       value="Shadows" 
+		<input type="button"
+		       onclick="theCanvas.start('shadow');"
+		       value="Shadows"
 		       class="start_button"/>
-		<input type="button" 
-		       onclick="theCanvas.start('jumbotron');" 
-		       value="Jumbotron" 
+		<input type="button"
+		       onclick="theCanvas.start('jumbotron');"
+		       value="Jumbotron"
 		       class="start_button"/>
-		<input type="button" 
-		       value="Maze (disabled)" 
+		<input type="button"
+		       value="Maze (disabled)"
 		       class="start_button" style="color:#aa4455;font-size:22px;" disabled="disabled"/>
-		<input type="button" 
-		       value="Stadium (disabled)" 
+		<input type="button"
+		       value="Stadium (disabled)"
 		       class="start_button" style="color:#aa4455;font-size:22px;" disabled="disabled"/>
-		<input type="button" 
-		       onclick="theCanvas.start('game');" 
-		       value="Game" 
+		<input type="button"
+		       onclick="theCanvas.start('game');"
+		       value="Game"
 		       class="start_button"/>
 	      </td>
 	  </tr></tbody>
@@ -156,13 +157,13 @@
       </div>
       <div style="clear:both;"></div>
     </div>
-    
-    
-    <div id="footer"> 
-      <input type="button" 
-	     value="(c) 2013 Batman and Robin" 
+
+
+    <div id="footer">
+      <input type="button"
+	     value="(c) 2013 Batman and Robin"
 	     class="start_button" />
-      <div class="title" id="title4" > </div>            
+      <div class="title" id="title4" > </div>
     </div>
     <!-- Put this element one tag scope higher to hide it. -->
     <div class="shaders" id="shader1" style="display:none;">
@@ -200,7 +201,7 @@
 	vec3 reflectionV2 = reflect(normalize(lightNorm), normalize(vertNorm));
 
 
-	float specularV2 = dot(normalize(reflectionV2), 
+	float specularV2 = dot(normalize(reflectionV2),
 	normalize(vModel.xyz));
 	if (specularV2 <= 0.) { specularV2 = 0.0; }
 			  specularV2 = specularV2 * specularV2;
@@ -211,9 +212,9 @@
 			  }
 			  </textarea>
       <textarea id="shader_decls" rows="20">
-	precision mediump float;  
+	precision mediump float;
 
-	// Vector Attributes      
+	// Vector Attributes
 	attribute vec3 vPosA;
 	attribute vec3 vNormA;
 	attribute vec3 vColA;
@@ -253,11 +254,11 @@
 	vec3 textureColor = texture2D(theSampler, textureV).xyz;
 
 	vec3 textureColorz = texture2D(sampler1, vec2(textureV.s, textureV.t)).xyz;
-	vec3 reflectionV2 = reflect(normalize(lightNorm), normalize(normalize(vertNorm) + 
+	vec3 reflectionV2 = reflect(normalize(lightNorm), normalize(normalize(vertNorm) +
           normalize(vec3(textureColorz.x, textureColorz.y, textureColorz.z))));
 	float diffuseV2 = dot(vertNorm, normalize(lightNorm));
 
-	float specularV2 = dot(normalize(reflectionV2), 
+	float specularV2 = dot(normalize(reflectionV2),
         normalize(vModel.xyz));
 	if (specularV2 <= 0.0) { specularV2 = 0.0; }
 			  specularV2 = specularV2 * specularV2;
@@ -283,7 +284,7 @@
 			  float yellow =  dot(max(vec2(actual_color.r, actual_color.g),0.0), vec2(0.75, 0.75));
 
 			  changedColor = vec3(yellow, yellow, actual_color.b / (yellow + 0.01));
-			  
+
 
 			  gl_FragColor = vec4((changedColor + 2.0 * normalize(changedColor)) / 3.0, background);
 			  }
@@ -308,12 +309,12 @@
 	float background = clamp(length(textureColor) * 5.0, 0.8, 1.0);
 
 	gl_FragColor = vec4(textureColor * 1.6, 1.0);
-	/*	if(background < 0.95 && the_beat > 0.9) gl_FragColor = 
+	/*	if(background < 0.95 && the_beat > 0.9) gl_FragColor =
 	  (20. - the_beat) / 20. * vec4(textureColor * 1.6, background) +
 	  the_beat / 20. * texture2D(theSampler, textureV);
 	  */	  }
 
-	  void main(void) { colorTexture(sampler1); 
+	  void main(void) { colorTexture(sampler1);
 
 	  }
       </textarea>
@@ -327,14 +328,14 @@
 
 	void colorTexture(sampler2D theSampler) {
 	vec3 textureColor = texture2D(theSampler, vec2(textureV.s, textureV.t)).xyz;
-	
+
 
 	vec3 textureColorz = texture2D(sampler1, vec2(textureV.s, textureV.t)).xyz;
 	vec3 reflectionV2 = reflect(normalize(lightNorm), normalize(
           normalize(vertNorm) + normalize(vec3(-textureColorz.x, -textureColorz.y, -textureColorz.z))));
 	float diffuseV2 = dot(vertNorm, normalize(lightNorm));
 
-	float specularV2 = dot(normalize(reflectionV2), 
+	float specularV2 = dot(normalize(reflectionV2),
         normalize(vModel.xyz));
 	if (specularV2 <= 0.0) { specularV2 = 0.0; }
 			  specularV2 = specularV2 * specularV2;
@@ -349,14 +350,14 @@
 			  vec3 normalColor = ambColor + diffColor + specColor;
 
 			  float wall_hit_coeff = wall_hit_u / 40.0;
-			  gl_FragColor = vec4(normalColor + ((ambColor + normalColor) * 
+			  gl_FragColor = vec4(normalColor + ((ambColor + normalColor) *
 			  wall_hit_coeff), 1.0);
 			  }
 
 
 			  void main(void) {
-			  //  if(dot(normalize(vertNorm), vec3(0.0, 0.0,-1.0)) < 0.0) {  
-										 //    discard; 
+			  //  if(dot(normalize(vertNorm), vec3(0.0, 0.0,-1.0)) < 0.0) {
+										 //    discard;
 										 colorTexture(sampler0);
 										 }
 										 </textarea>
