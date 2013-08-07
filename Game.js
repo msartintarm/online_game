@@ -3,7 +3,9 @@
  */
 function Game(gl_) {
 
-    var config = new GameConfig(this);
+    // The Singleton was already created previously,
+    //  but it needs an up-to-date Game reference.
+    var config = GameConfig(this);
 
     // Used in collision detection.
     var WALL_NONE = 0;

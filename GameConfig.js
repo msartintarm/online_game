@@ -6,10 +6,18 @@
  */
 function GameConfig(game) {
 
-    if (GameConfig.prototype._instance) return GameConfig.prototype._instance;
+    var singleton = GameConfig.prototype._instance;
+
+    if (singleton) {
+        singleton.setGame(game);
+        return singleton;
+    }
+
+    this.setGame = function(new_game) {
+        game = new_game;
+    };
 
     GameConfig.prototype._instance = this;
-
 
     //            CONFIGURATION
     // Figure out some way to convert this to document eventually
@@ -227,8 +235,6 @@ function GameConfig(game) {
         _initTexturesDiv();
         _initMiscDiv();
     };
-
-    this.setupDivs();
 
     this.initMisc = function() {
         if (config["grid-size"]) game.grid = config["grid-size"];

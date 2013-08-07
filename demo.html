@@ -68,6 +68,7 @@
         if (!GLcanvas || !Game) {
           window.setTimeout(window.initGLcanvas, 50);
         } else if (!theCanvas){
+          new GameConfig().setupDivs();
           theCanvas = new GLcanvas();
           theCanvas.init();
           window.setTimeout(window.initGLcanvas, 50);
