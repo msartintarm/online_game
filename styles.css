@@ -194,6 +194,10 @@ div.one_third{
     -khtml-user-select: none;
 }
 
+textarea {
+    background-color:#222222;
+    color:#dddddd;
+}
 textarea.keyboard {
     position:absolute; bottom: 8px; left:0px;
     width:100%;

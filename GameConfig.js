@@ -1,4 +1,3 @@
-
 /**
  * Three intended purposes:
  * 1. Given a config, load it into control panel
@@ -6,6 +5,11 @@
  * 3. Do '1' and '2' with text (file) input
  */
 function GameConfig(game) {
+
+    if (GameConfig.prototype._instance) return GameConfig.prototype._instance;
+
+    GameConfig.prototype._instance = this;
+
 
     //            CONFIGURATION
     // Figure out some way to convert this to document eventually
@@ -36,7 +40,9 @@ function GameConfig(game) {
 
     // Either op doesn't exist (val, is a '-' (= dec old), or is  a '+' (= inc old)
     var newCoordVal = function(old, op, val) {
-        return (!op)? parseInt(val): (op === "-")? old - parseInt(val): old + parseInt(val);
+        return (!op)? parseInt(val):
+            (op === "-")? old - parseInt(val):
+            (op === "+")? old + parseInt(val): -1;
     };
 
     //          DIV SETUP
@@ -57,6 +63,14 @@ function GameConfig(game) {
             curr_div.appendChild(breakz);
         };
 
+        var _CheckBox = function(value, selected) {
+            var text_x = document.createElement("textarea");
+            text_x.value = value;
+            text_x.style.width = "50px";
+            text_x.rows = 1;
+            curr_div.appendChild(text_x);
+        };
+
         var _TextBox = function(value, width) {
             var text_x = document.createElement("textarea");
             text_x.value = value;
@@ -67,8 +81,12 @@ function GameConfig(game) {
 
         var _Square = function(color) {
             var d = document.createElement("div");
-            d.style.width = "4px";
+            d.style.width = "3px";
             d.style.height = "4px";
+            d.style.borderLeftWidth = "1px";
+            d.style.borderLeftStyle = "solid";
+            d.style.borderBottomWidth = "1px";
+            d.style.borderBottomStyle = "solid";
             d.style.cssFloat = "left";
             d.onclick = (function(s, c) {
                 s.clicked = false;
@@ -128,18 +146,36 @@ function GameConfig(game) {
         var _initTexturesDiv = function() {
             _openDiv("Textures:");
             config["textures"].forEach (function(texture) {
-                _TextBox(texture, "100%");
+                _TextBox(texture, "96%");
             }, this);
             _closeDiv();
         };
 
         var _initAudioDiv = function(gl_audio) {
             _openDiv("Music:");
-            config["audio"].forEach (function(sound) { _TextBox(sound[0], "99%"); }, this);
+            config["audio"].forEach (function(sound) {
+                // audio-low-pass", "loop", "1", "8"
+                _TextBox(sound[0], "96%");
+                _CheckBox("loop?", sound[2]);
+                if (sound[2] === "loop") {
+                    _TextBox(sound[3], "30px");
+                    _TextBox(sound[4], "30px");
+                } else {
+                    _TextBox("n/a", "30px");
+                    _TextBox("n/a", "30px");
+                }
+
+            }, this);
             _closeDiv();
         };
 
+        var squares = {};
+
+        var div_piece_count = 0;
+
         var _initPieceDiv = function(piece_name) {
+
+            div_piece_count += 1;
 
             var p0 = config[piece_name];
             _openDiv("Piece '" + p0[0] + "':");
@@ -149,12 +185,6 @@ function GameConfig(game) {
                 (tex === "heaven-texture")? HEAVEN_TEXTURE:
                 (tex === "rug-texture")? RUG_TEXTURE: null;
 
-            var locs = {};
-
-            var mark = function(x,y) {
-                if(!locs[x]) { locs[x] = {}; }
-                locs[x][y] = 1;
-            };
 
             var coords = p0[4];
 
@@ -167,21 +197,25 @@ function GameConfig(game) {
                 // Index 1: loop count (opt); 2, 4: inc sign (opt); 3, 5: value (non-opt)
                 var loop = (zzap[1])? zzap[1]: 1;
 
-                //            if (zzap[2]) this.TextBox(zzap[2], "78%");
-                //            this.TextBox(zzap[3], "20%");
-
                 for(var j = 0; j < loop; ++j) {
                     x = newCoordVal(x, zzap[2], zzap[3]);
                     y = newCoordVal(y, zzap[4], zzap[5]);
-                    mark(x,y);
+                    // Two-level assoc map. Stored with 'y' first because that's
+                    // how we iterate over it to map
+                    if (!squares[y]) squares[y] = {};
+                    squares[y][x] = div_piece_count;
                 }
 
             }
+
             for(var b = 10; b > -3; --b) {
+
                 _Break();
                 for(var a = -8; a < 30; ++a) {
-                    if (locs[a] && locs[a][b]) _Square("#66ff66");
-                    else _Square("#ff4433");
+                    if (squares[b] && squares[b][a]) {
+                        if (squares[b][a] === div_piece_count) _Square("#66ff66");
+                        else _Square("#3333dd");
+                    } else _Square("#ff4433");
                 }
             }
             _closeDiv();

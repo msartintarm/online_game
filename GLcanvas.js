@@ -100,6 +100,7 @@ GLcanvas.prototype.start = function(theScene) {
 	document.getElementById("land_down_under").style.display = "block";
 
 	if(this.initGL() !== 0) {
+            document.getElementById("web_gl").style.color = "#ee5522";
 	    var theWindow = window.open(
 		"GLerror.php",
 		"",
@@ -193,6 +194,7 @@ GLcanvas.prototype.done_loading = function(timeout) {
  * WebGL isn't available or could not be initialized.
  */
 GLcanvas.prototype.initGL = function() {
+
     try {
 	this.gl = this.canvas.getContext("experimental-webgl");
     }
@@ -218,7 +220,7 @@ GLcanvas.prototype.initGL = function() {
 };
 
 GLcanvas.prototype.resize = function() {
-    this.canvas.width = this.canvas.parentElement.clientWidth - 12;
+    this.canvas.width = this.canvas.parentElement.clientWidth;
     this.canvas.height = window.innerHeight - 105;
     this.gl.viewport(0, 0, this.canvas.width,
 		     this.canvas.height);
