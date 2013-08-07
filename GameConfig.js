@@ -8,13 +8,11 @@ function GameConfig(game) {
 
     var singleton = GameConfig.prototype._instance;
 
-    if (singleton) {
-        singleton.setGame(game);
-        return singleton;
-    }
+    if (singleton) { return singleton.updateSelf(game); }
 
-    this.setGame = function(new_game) {
+    this.updateSelf = function(new_game) {
         game = new_game;
+        return this;
     };
 
     GameConfig.prototype._instance = this;
@@ -64,30 +62,30 @@ function GameConfig(game) {
 
         var curr_div = config_div;
 
-        var _Break = function() {
+        var _Break = function(curr_div) {
             var breakz = document.createElement("div");
             breakz.height = "1";
             breakz.style.clear = "both";
             curr_div.appendChild(breakz);
         };
 
-        var _CheckBox = function(value, selected) {
-            var text_x = document.createElement("textarea");
-            text_x.value = value;
-            text_x.style.width = "50px";
-            text_x.rows = 1;
-            curr_div.appendChild(text_x);
+        var _CheckBox = function(curr_div, value, selected) {
+            var t = document.createElement("textarea");
+            t.value = value;
+            t.style.width = "50px";
+            t.rows = 1;
+            curr_div.appendChild(t);
         };
 
-        var _TextBox = function(value, width) {
-            var text_x = document.createElement("textarea");
-            text_x.value = value;
-            text_x.style.width = width;
-            text_x.rows = 1;
-            curr_div.appendChild(text_x);
+        var _TextBox = function(curr_div, value, width) {
+            var t = document.createElement("textarea");
+            t.value = value;
+            t.style.width = width;
+            t.rows = 1;
+            curr_div.appendChild(t);
         };
 
-        var _Square = function(color) {
+        var _Square = function(curr_div, color) {
             var d = document.createElement("div");
             d.style.width = "3px";
             d.style.height = "4px";
@@ -115,62 +113,61 @@ function GameConfig(game) {
         // a button will be created that invokes it.
         var _openDiv = function(title) {
 
-            curr_div = document.createElement("div");
+            var d = document.createElement("div");
 
-            var button = document.createElement("input");
-            button.type = "button";
-            button.className = "floating";
-            button.value = title;
+            var b = document.createElement("input");
+            b.type = "button";
+            b.className = "floating";
+            b.value = title;
             // Function sets div to be hidden by default,
             //   then returns a function that toggles it on / off
-            button.onclick = (function(s) {
+            b.onclick = (function(s) {
                 s.display = "none";
                 return function() {
                     if(s.display === "none")
                         s.display = "inline-block";
                     else s.display = "none";
                 };
-            } (curr_div.style));
+            } (d.style));
 
-            config_div.appendChild(button);
+            config_div.appendChild(b);
+            config_div.appendChild(d);
 
+            return d;
         };
 
-        var _closeDiv = function() {
-            config_div.appendChild(curr_div);
-            curr_div = config_div;
-        };
+        var _closeDiv = function(curr_div) {};
 
         var _initMiscDiv = function() {
-            _openDiv("Misc");
+            var d = _openDiv("Misc");
             if (config["start-position"]) {
                 config["start-position"].forEach(function(x, i) {
-                    _TextBox(x, "30px");
+                    _TextBox(d, x, "30px");
                 }, this);
             }
             _closeDiv();
         };
 
         var _initTexturesDiv = function() {
-            _openDiv("Textures:");
-            config["textures"].forEach (function(texture) {
-                _TextBox(texture, "96%");
+            var d = _openDiv("Textures:");
+            config["textures"].forEach (function(t) {
+                _TextBox(d, t, "96%");
             }, this);
             _closeDiv();
         };
 
-        var _initAudioDiv = function(gl_audio) {
-            _openDiv("Music:");
-            config["audio"].forEach (function(sound) {
+        var _initAudioDiv = function() {
+            var d = _openDiv("Music:");
+            config["audio"].forEach (function(s) {
                 // audio-low-pass", "loop", "1", "8"
-                _TextBox(sound[0], "96%");
-                _CheckBox("loop?", sound[2]);
-                if (sound[2] === "loop") {
-                    _TextBox(sound[3], "30px");
-                    _TextBox(sound[4], "30px");
+                _TextBox(d, s[0], "96%");
+                _CheckBox(d, "loop?", s[2]);
+                if (s[2] === "loop") {
+                    _TextBox(d, s[3], "30px");
+                    _TextBox(d, s[4], "30px");
                 } else {
-                    _TextBox("n/a", "30px");
-                    _TextBox("n/a", "30px");
+                    _TextBox(d, "n/a", "30px");
+                    _TextBox(d, "n/a", "30px");
                 }
 
             }, this);
@@ -185,16 +182,15 @@ function GameConfig(game) {
 
             div_piece_count += 1;
 
-            var p0 = config[piece_name];
-            _openDiv("Piece '" + p0[0] + "':");
+            var p = config[piece_name];
+            var d = _openDiv("Piece '" + p[0] + "':");
 
-            var tex = p0[1];
-            tex = (tex === "brick-texture")? BRICK_TEXTURE:
-                (tex === "heaven-texture")? HEAVEN_TEXTURE:
-                (tex === "rug-texture")? RUG_TEXTURE: null;
+            var tex = (p[1] === "brick-texture")? BRICK_TEXTURE:
+                (p[1] === "heaven-texture")? HEAVEN_TEXTURE:
+                (p[1] === "rug-texture")? RUG_TEXTURE: null;
 
 
-            var coords = p0[4];
+            var coords = p[4];
 
             var x = 0;
             var y = 0;
@@ -218,12 +214,12 @@ function GameConfig(game) {
 
             for(var b = 10; b > -3; --b) {
 
-                _Break();
+                _Break(d);
                 for(var a = -8; a < 30; ++a) {
                     if (squares[b] && squares[b][a]) {
-                        if (squares[b][a] === div_piece_count) _Square("#66ff66");
-                        else _Square("#3333dd");
-                    } else _Square("#ff4433");
+                        if (squares[b][a] === div_piece_count) _Square(d, "#66ff66");
+                        else _Square(d, "#3333dd");
+                    } else _Square(d, "#ff4433");
                 }
             }
             _closeDiv();
@@ -284,15 +280,15 @@ function GameConfig(game) {
     };
 
     this.initPiece = function(arr, piece_name) {
-        var p0 = config[piece_name];
+        var p = config[piece_name];
 
-        var tex = p0[1];
+        var tex = p[1];
             tex = (tex === "brick-texture")? BRICK_TEXTURE:
             (tex === "heaven-texture")? HEAVEN_TEXTURE:
             (tex === "rug-texture")? RUG_TEXTURE: null;
 
-        var w = game.grid * parseInt(p0[2]); // actually, width / 2
-        var h = game.grid * parseInt(p0[3]);
+        var w = game.grid * parseInt(p[2]); // actually, width / 2
+        var h = game.grid * parseInt(p[3]);
 
         var create = function(x,y) {
 
@@ -306,7 +302,7 @@ function GameConfig(game) {
 		     .setTexture(tex).add2DCoords());
         };
 
-        var coords = p0[4];
+        var coords = p[4];
 
         var x = 0;
         var y = 0;
