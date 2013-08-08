@@ -76,7 +76,7 @@ function GameConfig(game) {
                         recursive_printer(target.childNodes[i]);
                     }
                     s += "],";
-                } else if (target.value) {
+                } else if (target.value && (!target.type || target.type !== "button")) {
                     s += "\"" + target.value + "\"" + ", ";
                 }
             };
@@ -113,6 +113,7 @@ function GameConfig(game) {
             t.style.width = "50px";
             t.rows = 1;
             curr_div.appendChild(t);
+            return t;
         };
 
         var _TextBox = function(curr_div, value, width) {
@@ -121,6 +122,7 @@ function GameConfig(game) {
             t.style.width = width;
             t.rows = 1;
             curr_div.appendChild(t);
+            return t;
         };
 
         // We want this to execute press function AND click function
@@ -240,15 +242,16 @@ function GameConfig(game) {
             div_piece_count += 1;
 
             var p = config[piece_name];
-            var d = _openDiv("Piece '" + p[0] + "':", piece_name);
+            var c = _openDiv("Piece '" + p[0] + "':", piece_name);
 
-            _TextBox(d, p[1], "96%");
-            d.appendChild(document.createTextNode(" x: "));
-            _TextBox(d, p[2], "20px");
-            d.appendChild(document.createTextNode(" y: "));
-            _TextBox(d, p[3], "20px");
+            _TextBox(c, p[0], "96%").style.display = "none";
+            _TextBox(c, p[1], "96%");
+            c.appendChild(document.createTextNode(" x: "));
+            _TextBox(c, p[2], "20px");
+            c.appendChild(document.createTextNode(" y: "));
+            _TextBox(c, p[3], "20px");
 
-            _openDiv("Coordinates");
+            var d = _openDiv("Coordinates");
 
             var coords = p[4];
 
