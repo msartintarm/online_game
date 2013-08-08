@@ -6,16 +6,16 @@
  */
 function GameConfig(game) {
 
-    var singleton = GameConfig.prototype._instance;
+    if (GameConfig.prototype._singleton !== undefined) {
+        return GameConfig.prototype._singleton.updatedVersion(game);
+    }
 
-    if (singleton) { return singleton.updateSelf(game); }
-
-    this.updateSelf = function(new_game) {
+    this.updatedVersion = function(new_game) {
         game = new_game;
         return this;
     };
 
-    GameConfig.prototype._instance = this;
+    GameConfig.prototype._singleton = this;
 
     //            CONFIGURATION
     // Figure out some way to convert this to document eventually
@@ -52,15 +52,55 @@ function GameConfig(game) {
     };
 
     //          DIV SETUP
+    var config_div = document.createElement("div");
 
     // Define functions that construct the div elements, then call them.
     this.setupDivs = function() {
 
-        var config_div = document.createElement("div");
         config_div.style.fontSize = "20px";
         document.getElementById("banner").appendChild(config_div);
 
-        var curr_div = config_div;
+        // Let's start with the printer.
+        var p = document.createElement("input");
+        p.type = "button";
+        p.className = "floating";
+        p.value = "Print Config!";
+        // Returns a function that toggles it on / off
+        // Also sets it up to be 'none' by default
+        p.onclick = function() {
+
+            var s = "";
+            // If object is an array, recursively call itself. Otherwise, print contents (assume String)
+            var recursive_printer = function(target) {
+//                console.log(target);
+                if (target.childNodes && target.childNodes.length > 0) { // defined and non-zero
+                    s += "[";
+                    for (var i = 0; i < target.childNodes.length; ++i) {
+                        recursive_printer(target.childNodes[i]);
+                    }
+                    s += "],";
+                } else if (target.value) {
+                    s += "\"" + target.value + "\"" + ", ";
+                }
+            };
+
+            s = "var config = {\n";
+
+            console.log(config_div);
+
+            for(var i = 0; i < config_div.childNodes.length; ++i) {
+                var d = config_div.childNodes[i];
+                if (d.id) {
+                    s += "\"" + d.id + "\": ";
+                    recursive_printer(d);
+                    console.log(s); s = ""; // new-line...
+                }
+            };
+
+            s +=("};\n");
+            console.log(s);
+        };
+        config_div.appendChild(p);
 
         var _Break = function(curr_div) {
             var breakz = document.createElement("div");
@@ -107,25 +147,27 @@ function GameConfig(game) {
                 };
             } (d.style, color));
             curr_div.appendChild(d);
+            return d;
         };
 
-        // create div with title, and leave it open.
-        // a button will be created that invokes it.
-        var _openDiv = function(title) {
+        // create div with title, and return it.
+        // a button will be created that shows / hides it.
+        var _openDiv = function(title, div_id) {
 
             var d = document.createElement("div");
+            if (div_id) d.id = div_id;
 
             var b = document.createElement("input");
             b.type = "button";
             b.className = "floating";
             b.value = title;
-            // Function sets div to be hidden by default,
-            //   then returns a function that toggles it on / off
+
+            // Returns a function that toggles it on / off
+            // Also sets it up to be 'none' by default
             b.onclick = (function(s) {
                 s.display = "none";
                 return function() {
-                    if(s.display === "none")
-                        s.display = "inline-block";
+                    if(s.display === "none") s.display = "inline-block";
                     else s.display = "none";
                 };
             } (d.style));
@@ -139,7 +181,7 @@ function GameConfig(game) {
         var _closeDiv = function(curr_div) {};
 
         var _initMiscDiv = function() {
-            var d = _openDiv("Misc");
+            var d = _openDiv("Misc", "start-position");
             if (config["start-position"]) {
                 config["start-position"].forEach(function(x, i) {
                     _TextBox(d, x, "30px");
@@ -149,7 +191,7 @@ function GameConfig(game) {
         };
 
         var _initTexturesDiv = function() {
-            var d = _openDiv("Textures:");
+            var d = _openDiv("Textures:", "textures");
             config["textures"].forEach (function(t) {
                 _TextBox(d, t, "96%");
             }, this);
@@ -157,7 +199,7 @@ function GameConfig(game) {
         };
 
         var _initAudioDiv = function() {
-            var d = _openDiv("Music:");
+            var d = _openDiv("Music:", "audio");
             config["audio"].forEach (function(s) {
                 // audio-low-pass", "loop", "1", "8"
                 _TextBox(d, s[0], "96%");
@@ -183,7 +225,7 @@ function GameConfig(game) {
             div_piece_count += 1;
 
             var p = config[piece_name];
-            var d = _openDiv("Piece '" + p[0] + "':");
+            var d = _openDiv("Piece '" + p[0] + "':", piece_name);
 
             var tex = (p[1] === "brick-texture")? BRICK_TEXTURE:
                 (p[1] === "heaven-texture")? HEAVEN_TEXTURE:
@@ -194,6 +236,7 @@ function GameConfig(game) {
 
             var x = 0;
             var y = 0;
+
             for(var i = 0; i < coords.length; ++i) {
 
                 var termA = /(?:([0-9]+)\*\()?([-+])*([0-9]+)\,([-+])*([0-9]+)\)?/;
@@ -204,22 +247,37 @@ function GameConfig(game) {
                 for(var j = 0; j < loop; ++j) {
                     x = newCoordVal(x, zzap[2], zzap[3]);
                     y = newCoordVal(y, zzap[4], zzap[5]);
+                    if ((!x && x !== 0) ||
+                        (!y && y !== 0))
+                        console.log("Error parsing string for " + zzap[0] +
+                                    " w/ nums " + zzap[3] + " and " + zzap[5]);
                     // Two-level assoc map. Stored with 'y' first because that's
                     // how we iterate over it to map
-                    if (!squares[y]) squares[y] = {};
-                    squares[y][x] = div_piece_count;
+                    if (squares[y] === undefined) squares[y] = {};
+                    squares[y][x] = (j == 0)?
+                        "s" + div_piece_count + "-" + zzap.input:
+                        "s" + div_piece_count;
+                    if(j == 0) console.log ("yeaa." + zzap.input);
                 }
 
             }
 
             for(var b = 10; b > -3; --b) {
-
                 _Break(d);
-                for(var a = -8; a < 30; ++a) {
-                    if (squares[b] && squares[b][a]) {
-                        if (squares[b][a] === div_piece_count) _Square(d, "#66ff66");
-                        else _Square(d, "#3333dd");
-                    } else _Square(d, "#ff4433");
+                var y = parseInt(b);
+                if (squares[y] === undefined) for(var a = -8; a < 30; ++a) _Square(d, "#ff4433");
+
+                else for(var a = -8; a < 30; ++a) {
+
+                    var x = parseInt(a);
+                    if (squares[y][x] === undefined) _Square(d, "#ff4433");
+
+                    // No type checking here (let type conversion do its thing)
+                    else if (squares[y][x].charAt(1) == div_piece_count) {
+                        if (squares[y][x].length > 2)
+                            _Square(d, "#99ff66").value = squares[y][x].substr(3);
+                        else _Square(d, "#33bb33");
+                    } else _Square(d, "#3333dd");
                 }
             }
             _closeDiv();
