@@ -52,27 +52,24 @@ function GameConfig(game) {
     };
 
     //          DIV SETUP
-    var config_div = document.createElement("div");
+    var parent_div = document.createElement("div");
 
     // Define functions that construct the div elements, then call them.
     this.setupDivs = function() {
 
-        config_div.style.fontSize = "20px";
-        document.getElementById("banner").appendChild(config_div);
+        parent_div.style.fontSize = "20px";
+        document.getElementById("banner").appendChild(parent_div);
 
         // Let's start with the printer.
         var p = document.createElement("input");
         p.type = "button";
         p.className = "floating";
         p.value = "Print Config!";
-        // Returns a function that toggles it on / off
-        // Also sets it up to be 'none' by default
         p.onclick = function() {
 
             var s = "";
             // If object is an array, recursively call itself. Otherwise, print contents (assume String)
             var recursive_printer = function(target) {
-//                console.log(target);
                 if (target.childNodes && target.childNodes.length > 0) { // defined and non-zero
                     s += "[";
                     for (var i = 0; i < target.childNodes.length; ++i) {
@@ -86,10 +83,10 @@ function GameConfig(game) {
 
             s = "var config = {\n";
 
-            console.log(config_div);
+            console.log(parent_div);
 
-            for(var i = 0; i < config_div.childNodes.length; ++i) {
-                var d = config_div.childNodes[i];
+            for(var i = 0; i < parent_div.childNodes.length; ++i) {
+                var d = parent_div.childNodes[i];
                 if (d.id) {
                     s += "\"" + d.id + "\": ";
                     recursive_printer(d);
@@ -100,7 +97,8 @@ function GameConfig(game) {
             s +=("};\n");
             console.log(s);
         };
-        config_div.appendChild(p);
+
+        parent_div.appendChild(p);
 
         var _Break = function(curr_div) {
             var breakz = document.createElement("div");
@@ -125,27 +123,40 @@ function GameConfig(game) {
             curr_div.appendChild(t);
         };
 
+        // We want this to execute press function AND click function
+        // , so we pass click function as a closure argument
+        var pressMouse = function(other_funct) {
+            return function() { mouse_down = !mouse_down; other_funct(); };
+        };
+
+        var mouse_down = false;
+
         var _Square = function(curr_div, color) {
             var d = document.createElement("div");
-            d.style.width = "3px";
-            d.style.height = "4px";
-            d.style.borderLeftWidth = "1px";
-            d.style.borderLeftStyle = "solid";
-            d.style.borderBottomWidth = "1px";
-            d.style.borderBottomStyle = "solid";
-            d.style.cssFloat = "left";
-            d.onclick = (function(s, c) {
-                s.clicked = false;
-                s.backgroundColor = c;
+            d.className = "square";
+
+            d.onmouseover = (function(style, color1) {
+                var is_c1 = false;
+                var color2 = "#4455ff";
+                style.backgroundColor = color1;
                 return function() {
-                    console.log(s.backgroundColor + " " + c);
-                    if (s.clicked === false) {
-                        s.backgroundColor = "#4455ff";
-                    }
-                    else s.backgroundColor = c;
-                    s.clicked = !s.clicked;
+                    if (mouse_down === false) return;
+                    console.log("over! " + style.backgroundColor);
+                    style.backgroundColor = (is_c1)? color1: color2;
+                    is_c1 = !is_c1;
                 };
             } (d.style, color));
+
+            d.onmousedown = (function(click_funct, div_style) {
+                // We want this to execute press function AND click function
+                // , so we pass click function as a closure argument
+                var the_color = div_style.color;
+                return function() {
+                    mouse_down = !mouse_down;
+                    div_style.color = (mouse_down)? "#123456": the_color;
+                    click_funct(); };
+            } (d.onmouseover, curr_div.style));
+
             curr_div.appendChild(d);
             return d;
         };
@@ -172,13 +183,17 @@ function GameConfig(game) {
                 };
             } (d.style));
 
-            config_div.appendChild(b);
-            config_div.appendChild(d);
+            parent_div.appendChild(b);
+            parent_div.appendChild(d);
+
+            parent_div = d;
 
             return d;
         };
 
-        var _closeDiv = function(curr_div) {};
+        var _closeDiv = function(curr_div) {
+            parent_div = parent_div.parentElement;
+        };
 
         var _initMiscDiv = function() {
             var d = _openDiv("Misc", "start-position");
@@ -227,10 +242,13 @@ function GameConfig(game) {
             var p = config[piece_name];
             var d = _openDiv("Piece '" + p[0] + "':", piece_name);
 
-            var tex = (p[1] === "brick-texture")? BRICK_TEXTURE:
-                (p[1] === "heaven-texture")? HEAVEN_TEXTURE:
-                (p[1] === "rug-texture")? RUG_TEXTURE: null;
+            _TextBox(d, p[1], "96%");
+            d.appendChild(document.createTextNode(" x: "));
+            _TextBox(d, p[2], "20px");
+            d.appendChild(document.createTextNode(" y: "));
+            _TextBox(d, p[3], "20px");
 
+            _openDiv("Coordinates");
 
             var coords = p[4];
 
@@ -280,6 +298,7 @@ function GameConfig(game) {
                     } else _Square(d, "#3333dd");
                 }
             }
+            _closeDiv();
             _closeDiv();
         };
 

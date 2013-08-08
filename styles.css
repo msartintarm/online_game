@@ -85,6 +85,16 @@ input.stadium_input {
     font-variant: small-caps;
 }
 
+div.square {
+    width:3px;
+    height:4px;
+    border-left-width:1px;
+    border-left-style:solid;
+    border-bottom-width:1px;
+    border-bottom-style:solid;
+    float:left;
+}
+
 thead {
     color: green;
     cursor: default;        /* make the cursor like hovering over an <a> element */
