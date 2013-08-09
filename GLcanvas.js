@@ -88,6 +88,35 @@ GLcanvas.prototype.start = function(theScene) {
 
     if (this.gl === null) {
 
+        (function(width, height, callback, origin, domain) {
+            var e=document.getElementById("u_0_0");
+            if (e && width !== -1)
+                e.style.width = width + 'px';
+            var w = (width === -1)? e.offsetWidth: width;
+            var h = (height === -1)? e.offsetHeight: height;
+            var message = 'type=resize&cb=' + callback + '&width=' + w + '&height=' + h;
+            document.domain = 'facebook.com';
+            (function() {
+                var a = window.opener || window.parent;
+                var b='fb_xdm_frame_' + location.protocol.replace(':','');
+                function c(){
+                    try{
+                        a.frames[b].proxyMessage(message,origin);
+                    } catch (e) {
+                        setTimeout(c,100);
+                    }
+                }
+                function d() {
+                    __fbNative.postMessage(message,origin);
+                }
+                if (window == top && (/FBAN\/\w+;/i).test(navigator.userAgent)) {
+                    if(window.__fbNative && __fbNative.postMessage) {
+                        d();
+                    } else window.addEventListener('fbNativeReady',d);
+                }else c();
+            })();
+        })(450, -1, "f14b999d0c", "http:\/\/localhost:8000", "localhost:8000");
+
 	// One-time display methods
 	document.getElementById("header").style.display = "none";
 	document.getElementById("button_table").style.display = "none";

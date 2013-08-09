@@ -44,6 +44,9 @@ function GameConfig(game) {
         "start-position": ["0", "300", "750"]
     };
 
+    // Follows configuration and stores associated HTML DOM objects
+    var config_shadow = {};
+
     // Either op doesn't exist (val, is a '-' (= dec old), or is  a '+' (= inc old)
     var newCoordVal = function(old, op, val) {
         return (!op)? parseInt(val):
@@ -120,7 +123,13 @@ function GameConfig(game) {
             var t = document.createElement("textarea");
             t.value = value;
             t.style.width = width;
+            t.style.height = "17px";
             t.rows = 1;
+
+            if (!!config_shadow[curr_div.id]) config_shadow[curr_div.id].push(t);
+            else config_shadow[curr_div.id] = [t];
+
+            console.log(curr_div.id + ": " + value);
             curr_div.appendChild(t);
             return t;
         };
@@ -241,15 +250,18 @@ function GameConfig(game) {
             div_piece_count += 1;
 
             var p = config[piece_name];
+            // name, texture, array of x-y coordinate strings
             var c = _openDiv("Piece '" + p[0] + "':", piece_name);
 
+            c.style.fontSize = "9pt";
             _TextBox(c, p[0], "96%").style.display = "none";
             _TextBox(c, p[1], "96%");
-            c.appendChild(document.createTextNode(" x: "));
+            c.appendChild(document.createTextNode(" Width:"));
             _TextBox(c, p[2], "20px");
-            c.appendChild(document.createTextNode(" y: "));
+            c.appendChild(document.createTextNode(", height:"));
             _TextBox(c, p[3], "20px");
 
+            c.style.color = "#ff2200";
             var d = _openDiv("Coordinates");
 
             var coords = p[4];

@@ -8,54 +8,59 @@
     <link rel='stylesheet' type="text/css" href="styles.css"/>
     <link rel='icon' type="image/x-icon" href="favicon.ico"/>
 
-    <!-- hello ->
+    <!-- hello -->
+    <!-- Facebook API - See
+         developers.facebook.com/docs/reference/plugins/like/ -->
+
+    <script async="async" id="facebook-jssdk" src="\
+//connect.facebook.net/en_IN/all.js#xfbml=1&appId=497409006971163"></script>
 
     <!-- External JS libraries -->
-    <script src="libs/gl-matrix.js" type="application/javascript" async="async"></script>
+    <script async="async" async="async" src="libs/gl-matrix.js"></script>
     <!-- Only used for RequestAnimFrame -->
-    <script src="libs/webgl-utils.js" type="application/javascript" async="async"></script>
+    <script async="async" src="libs/webgl-utils.js"></script>
 
     <!-- Global constants and functions -->
-    <script src="functions.js" type="application/javascript"></script>
-    <script src="constants.js" type="application/javascript" async="async"></script>
+    <script async="async" src="functions.js"></script>
+    <script async="async" src="constants.js"></script>
 
     <!-- GL classes -->
-    <script src="GLobject.js" type="application/javascript" async="async"></script>
-    <script src="GLmatrix.js" type="application/javascript" async="async"></script>
-    <script src="GLtexture.js" type="application/javascript" async="async"></script>
-    <script src="GLframe.js" type="application/javascript" async="async"></script>
-    <script src="GLshader.js" type="application/javascript" async="async"></script>
-    <script src="GLcanvas.js" type="application/javascript" async="async"></script>
-    <script src="GLstring.js" type="application/javascript" async="async"></script>
-    <script src="GLaudio.js" type="application/javascript" async="async"></script>
+    <script async="async" src="GLobject.js"></script>
+    <script async="async" src="GLmatrix.js"></script>
+    <script async="async" src="GLtexture.js"></script>
+    <script async="async" src="GLframe.js"></script>
+    <script async="async" src="GLshader.js"></script>
+    <script async="async" src="GLcanvas.js"></script>
+    <script async="async" src="GLstring.js"></script>
+    <script async="async" src="GLaudio.js"></script>
 
     <!-- Simple objects -->
-    <script src="Cylinder.js" type="application/javascript" async="async"></script>
-    <script src="Sphere.js" type="application/javascript" async="async"></script>
-    <script src="Torus.js" type="application/javascript" async="async"></script>
-    <script src="Disk.js" type="application/javascript" async="async"></script>
-    <script src="Quad.js" type="application/javascript" async="async"></script>
+    <script async="async" src="Cylinder.js"></script>
+    <script async="async" src="Sphere.js"></script>
+    <script async="async" src="Torus.js"></script>
+    <script async="async" src="Disk.js"></script>
+    <script async="async" src="Quad.js"></script>
 
     <!-- Complex objects lv.1 -->
-    <script src="Stool.js" type="application/javascript" async="async"></script>
-    <script src="SixSidedPrism.js" type="application/javascript" async="async"></script>
-    <script src="Ball.js" type="application/javascript" async="async"></script>
-    <script src="ThickCyl.js" type="application/javascript" async="async"></script>
-    <script src="Player.js" type="application/javascript" async="async"></script>
+    <script async="async" src="Stool.js"></script>
+    <script async="async" src="SixSidedPrism.js"></script>
+    <script async="async" src="Ball.js"></script>
+    <script async="async" src="ThickCyl.js"></script>
+    <script async="async" src="Player.js"></script>
 
     <!-- Complex objects lv.2 -->
-    <script src="StoolPyramid.js" type="application/javascript" async="async"></script>
-    <script src="MazePiece.js" type="application/javascript" async="async"></script>
-    <script src="Jumbotron.js" type="application/javascript" async="async"></script>
+    <script async="async" src="StoolPyramid.js"></script>
+    <script async="async" src="MazePiece.js"></script>
+    <script async="async" src="Jumbotron.js"></script>
 
     <!-- Environments -->
-    <script src="Skybox.js" type="application/javascript" async="async"></script>
-    <script src="Cagebox.js" type="application/javascript" async="async"></script>
-    <script src="Game.js" type="application/javascript" async="async"></script>
-    <script src="GameConfig.js" type="application/javascript" async="async"></script>
+    <script async="async" src="Skybox.js"></script>
+    <script async="async" src="Cagebox.js"></script>
+    <script async="async" src="Game.js"></script>
+    <script async="async" src="GameConfig.js"></script>
     <script type="application/javascript">
-      // cool font animation
-
+    // cool font animation
+    (function() {
       var i_count = 0;
       var inputz;
       var new_color = parseInt("890abc", 16);
@@ -83,12 +88,13 @@
           izz.style.color = "#" + new_thing;
 
           // that should keep things interesting
-          new_color = (1487 * (new_color % 41)) * 23 + Math.abs(new_color - cool_color) % limit;
+          new_color = (1487 * (new_color % 557)) * 23 + Math.abs(new_color - cool_color) % limit;
           // color too bright, invert it
           if ((new_color % 256) + (new_color / 256 % 256) + (new_color / (256 * 256) % 256) > 240)
             new_color -= weak_color;
         }
-      }
+      };
+    })();
     </script>
   </head>
 
@@ -455,5 +461,7 @@
 		       </textarea>
     </div>
 
+    <div id="fb-root"></div>
+<!--    <div class="fb-like" data-href="http://msartintarm.github.io/online_game/demo.html" data-width="450" data-show-faces="true" data-send="false" colorscheme="dark"></div>-->
   </body>
 </html>
