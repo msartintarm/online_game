@@ -96,7 +96,7 @@ div.square {
 
 thead {
     color: green;
-    cursor: default;        /* make the cursor like hovering over an <a> element */
+    cursor: default;
     -moz-user-select: all;
     -webkit-user-select: all;
     -khtml-user-select: all;
@@ -152,16 +152,16 @@ div.title {
 
 input.floating {
     width:100%;
-    background-color: transparent; /* make the button transparent */
-    border: none;           /* assuming we don't want any borders */
-    cursor: pointer;        /* make the cursor like hovering over an <a> element */
-    vertical-align: middle; /* align the text vertically centered */
+    background-color: transparent;
+    border: none;
+    vertical-align: middle;
     font-size: inherit;
     text-align: inherit;
     color: inherit;
 }
 
 input.floating:hover {
+    cursor: default;
 color:#33aabb;
 }
 
