@@ -1,11 +1,19 @@
 /**
  * Creates and initializes GLaudio.
- * This serves as a wrapper to control a WebGL AudioContext and 
+ * This serves as a wrapper to control a WebGL AudioContext and
  * associated JS file loads.
  *
- * Has a 
+ * Has a
  */
-function GLaudio() {  
+function GLaudio() {
+
+    var SHIFT=16;
+    var SPACE=32;
+    var LEFT=37;
+    var UP=38;
+    var RIGHT=39;
+    var DOWN=40;
+    var _A=65;
 
     const NUM_LOOP_BUFFERS = 6;
 
@@ -41,48 +49,54 @@ function GLaudio() {
     var triggered = false;
     var log_string = "";
 
-    this.analyze = function() {
+    this.analyze = (function(analyser, log_output) {
 
-	// Analyse whether sound is above a certain threshhold.
-	var analyser = this.analyser, size = analyser.frequencyBinCount;
+        var size = analyser.frequencyBinCount;
 	var FFTData = new Uint8Array(size);
-	this.analyser.getByteFrequencyData(FFTData);
-	
-	var sum = 0;
-	for(var x = size - 1; x >= 0; --x) {
-	    sum += Math.abs(FFTData[x]);
-	}
+        return function() {
+	    analyser.getByteFrequencyData(FFTData);
 
-	if (this.log_music) log_string += " " + sum;
-	
-	if(triggered === false) {
-	    if (sum > 8) { 
-		if (this.log_music) log_string += "! ";
-		triggered = true;
-		return true;
+	    var sum = 0;
+	    for(var x = size - 1; x >= 0; --x) {
+	        sum += Math.abs(FFTData[x]);
 	    }
-	} else {
-	    if (sum < 2) {
-		if (this.log_music) console.log(log_string + "."), log_string = ""; 
-		triggered = false;
-	    }
-	}
 
-    };
+	    if (this.log_music) log_string += " " + sum;
+
+	    if(triggered === false) {
+	        // Analyse whether sound is above a certain threshhold.
+	        if (sum > 8) {
+		    if (log_output) log_string += "! ";
+		    triggered = true;
+		    return true;
+	        }
+	    } else {
+	        if (sum < 2) {
+		    if (log_output) console.log(log_string + "."), log_string = "";
+		    triggered = false;
+	        }
+	    }
+        };
+    } (this.analyser, this.log_music));
 
     // Close out function context to the world.
-    this.playSound = (function(web_audio, sounds) { 
+    this.playSound = (function(web_audio, sounds) {
+
+        var sound_map = {};
+        sound_map[LEFT] = 1;
+        sound_map[RIGHT] = 1;
+        sound_map[UP] = 2;
 
 	return function(num, length) {
 	    var source = web_audio.createBufferSource();
-	    source.buffer = sounds[num].buffer;
+	    source.buffer = sounds[sound_map[num]].buffer;
 	    source.connect(web_audio.destination);
 	    if (!length) source.start(0, 0);
 	    else source.start(0, length);
 	};
     } (this.web_audio, this.audio));
-    
-    this.handleAudioRequest = function(web, gl_audio, request, auto_start) { 
+
+    this.handleAudioRequest = function(web, gl_audio, request, auto_start) {
 
 	return function() {
 	    web.decodeAudioData(
@@ -97,7 +111,7 @@ function GLaudio() {
 		    }
 		}
 	    );
-	}; 
+	};
     };
 
     /**
@@ -122,11 +136,11 @@ function GLaudio() {
 	request.responseType = "arraybuffer"; // Does this work for any MIME request?
 	// Once request has loaded, load and start audio buffer
 	request.onload = this.handleAudioRequest(this.web_audio, new_audio, request, auto_start);
-	try { 
-	    request.send(); 
+	try {
+	    request.send();
 	    this.audio.push(new_audio);
-	} catch (e) { 
-	    console.log(e.toString()); 
+	} catch (e) {
+	    console.log(e.toString());
 	    return null;
 	}
     };
@@ -135,23 +149,23 @@ function GLaudio() {
     /**
      * Create and start self-calling, closed function to play audio[] elements.
      */
-    var playBuffer = (function(web, audio) { 
-	
+    var playBuffer = (function(web, audio) {
+
 	// Use Web Audio's super-accurate internal clock to sync elements
 	var start_time = web.currentTime + 0.250; // 250 ms
 	// Increments each time playBuffer is called. Use % for specific time domains
 	var beat_count = 0;
-	
+
 	// Actual function! Is isolated within its own scope.
 	return function() {
 	    beat_count ++;
 	    for(var i = 0; i < audio.length; ++i) {
 		var gl_audio = audio[i];
-		if(gl_audio.auto_start === true && 
+		if(gl_audio.auto_start === true &&
 		   (beat_count % gl_audio.loop_length) === gl_audio.delay) {
-		    
-		    // set up new source 
-		    var new_source = gl_audio.source[(++(gl_audio.source_num)) % 
+
+		    // set up new source
+		    var new_source = gl_audio.source[(++(gl_audio.source_num)) %
 						     gl_audio.source.length];
 		    new_source = web.createBufferSource(),
 		    new_source.connect(gl_audio.dest),
@@ -165,10 +179,9 @@ function GLaudio() {
 	    window.setTimeout(playBuffer, new_timeout);
 	};
     }) (this.web_audio, this.audio);
-    
+
     // 50-ms cushion to figure out things above
     window.setTimeout(playBuffer, 200); // 200 ms
 
     return this;
 }
-

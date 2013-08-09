@@ -241,11 +241,11 @@ function Player(gl_, grid_size) {
 	// Check whether it's time to initiate a move that's been triggered.
 	if (on_beat === true) {
             if (this.in_right_move === true) {
-		this.right_started = true; audio_method(1); }
+		this.right_started = true; audio_method(RIGHT); }
             if (this.in_left_move === true && this.left_started === false) {
-		this.left_started = true; audio_method(1); }
+		this.left_started = true; audio_method(LEFT); }
 	    if (this.in_jump === true && this.jump_started === false) {
-		this.jump_started = true; audio_method(2, 0.25); }
+		this.jump_started = true; audio_method(UP, 0.25); }
 	}
 
 	// We may be 'changing a move' due to collision constraints.

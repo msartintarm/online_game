@@ -29,9 +29,9 @@ function GameConfig(game) {
         // 2. Non-looping sound, which will be triggered by the above sample
         // 3. Rest of the song.
         "audio": [["music/beats.mp3", "audio-low-pass", "loop", "1", "8"],
-                  ["music/Game_Hi Hat_2.wav", "audio-output"],
-                  ["music/Game_keys_2.wav", "audio-output"],
-                  ["music/backing_beat.wav", "audio-delay", "loop", "0", "8"]],
+                  ["music/move.wav", "audio-output"],
+                  ["music/jump2.wav", "audio-output"],
+                  ["music/background.wav", "audio-delay", "loop", "0", "8"]],
         // Syntax of pieces: name, texture, array of x-y coordinate strings
         // String values can either be absolute, or relative to prev. strings
         // Can also specify loops of continuous increments

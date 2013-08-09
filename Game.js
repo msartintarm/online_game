@@ -183,7 +183,7 @@ function Game(gl_) {
 
 	if(this.push_button[0].collided === WALL_N) {
 	    if(triggered === false)     {
-		audio.createAudio("music/Game_bass_2.wav", audio.delay, true, 0, 16);
+		audio.createAudio("music/trigger.wav", audio.delay, true, 0, 16);
 		triggered = true;
 		this.push_button[1].magical = false;
 	    }
