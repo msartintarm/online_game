@@ -296,8 +296,8 @@ function GameConfig(game) {
                     // No type checking here (let type conversion do its thing)
                     else if (squares[y][x].charAt(1) == div_piece_count) {
                         if (squares[y][x].length > 2)
-                            _Square("#99ff66").value = squares[y][x].substr(3);
-                        else _Square("#33bb33");
+                            _Square("#99ff66").value = String(x + "," + y);
+                        else _Square("#33bb33").value = String(x + "," + y);
                     } else _Square("#3333dd");
                 }
             }
