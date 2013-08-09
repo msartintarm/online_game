@@ -133,7 +133,7 @@ function GameConfig(game) {
 
         var mouse_down = false;
 
-        var _Square = function(curr_div, color) {
+        var _Square = function(color) {
             var d = document.createElement("div");
             d.className = "square";
 
@@ -157,9 +157,8 @@ function GameConfig(game) {
                     mouse_down = !mouse_down;
                     div_style.color = (mouse_down)? "#123456": the_color;
                     click_funct(); };
-            } (d.onmouseover, curr_div.style));
-
-            curr_div.appendChild(d);
+            } (d.onmouseover, parent_div.style));
+            parent_div.appendChild(d);
             return d;
         };
 
@@ -286,19 +285,20 @@ function GameConfig(game) {
             for(var b = 10; b > -3; --b) {
                 _Break(d);
                 var y = parseInt(b);
-                if (squares[y] === undefined) for(var a = -8; a < 30; ++a) _Square(d, "#ff4433");
+                if (squares[y] === undefined) for(var a = -8; a < 30; ++a)
+                    _Square("#ff4433");
 
                 else for(var a = -8; a < 30; ++a) {
 
                     var x = parseInt(a);
-                    if (squares[y][x] === undefined) _Square(d, "#ff4433");
+                    if (squares[y][x] === undefined) _Square("#ff4433");
 
                     // No type checking here (let type conversion do its thing)
                     else if (squares[y][x].charAt(1) == div_piece_count) {
                         if (squares[y][x].length > 2)
-                            _Square(d, "#99ff66").value = squares[y][x].substr(3);
-                        else _Square(d, "#33bb33");
-                    } else _Square(d, "#3333dd");
+                            _Square("#99ff66").value = squares[y][x].substr(3);
+                        else _Square("#33bb33");
+                    } else _Square("#3333dd");
                 }
             }
             _closeDiv();
