@@ -5,8 +5,8 @@
   <head>
     <meta charset="UTF-8"/>
     <title>WebGL Demo</title>
-    <link rel='stylesheet' type="text/css" href="styles.css"/>
-    <link rel='icon' type="image/x-icon" href="favicon.ico"/>
+    <link rel="stylesheet" type="text/css" href="styles.css"/>
+    <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 
     <!-- hello -->
     <!-- Facebook API - See
@@ -16,7 +16,7 @@
 //connect.facebook.net/en_IN/all.js#xfbml=1&appId=497409006971163"></script>
     -->
     <!-- External JS libraries -->
-    <script async="async" async="async" src="libs/gl-matrix.js"></script>
+    <script async="async" src="libs/gl-matrix.js"></script>
     <!-- Only used for RequestAnimFrame -->
     <script async="async" src="libs/webgl-utils.js"></script>
 
@@ -59,7 +59,7 @@
     <script async="async" src="Game.js"></script>
     <script async="async" src="GameConfig.js"></script>
     <script type="application/javascript">
-    var the_scene = "";
+    var the_scene = ""; // global object that is monitored
     // cool font animation
     (function() {
       var i_count = 0;

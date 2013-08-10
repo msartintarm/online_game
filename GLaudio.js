@@ -15,7 +15,10 @@ function GLaudio() {
     var DOWN=40;
     var _A=65;
 
-    const NUM_LOOP_BUFFERS = 6;
+    // Increments each time playBuffer is called. Use % for specific time domains
+    var beat_count = 0;
+
+    var NUM_LOOP_BUFFERS = 6;
 
     if (typeof AudioContext !== "undefined") this.web_audio = new AudioContext();
     else if (typeof webkitAudioContext !== "undefined") this.web_audio = new webkitAudioContext();
@@ -81,14 +84,15 @@ function GLaudio() {
     // Close out function context to the world.
     this.playSound = (function(web_audio, sounds) {
 
-        var sound_map = {};
-        sound_map[LEFT] = 1;
-        sound_map[RIGHT] = 1;
-        sound_map[UP] = 2;
+        var sound_map = function(num) {
+            if (num == LEFT) return 1;
+            if (num == RIGHT) return 1;
+            if (num == UP)  return 2 + (Math.floor(beat_count / 4) % 4);
+        };
 
 	return function(num, length) {
 	    var source = web_audio.createBufferSource();
-	    source.buffer = sounds[sound_map[num]].buffer;
+	    source.buffer = sounds[sound_map(num)].buffer;
 	    source.connect(web_audio.destination);
 	    if (!length) source.start(0, 0);
 	    else source.start(0, length);
@@ -151,8 +155,6 @@ function GLaudio() {
 
 	// Use Web Audio's super-accurate internal clock to sync elements
 	var start_time = web.currentTime + 0.250; // 250 ms
-	// Increments each time playBuffer is called. Use % for specific time domains
-	var beat_count = 0;
 
 	// Actual function! Is isolated within its own scope.
 	return function() {

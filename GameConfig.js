@@ -30,7 +30,10 @@ function GameConfig(game) {
         // 3. Rest of the song.
         "audio": [["music/beats.mp3", "audio-low-pass", "loop", "1", "8"],
                   ["music/move.wav", "audio-output"],
+                  ["music/jump1.wav", "audio-output"],
                   ["music/jump2.wav", "audio-output"],
+                  ["music/jump3.wav", "audio-output"],
+                  ["music/jump4.wav", "audio-output"],
                   ["music/background.wav", "audio-delay", "loop", "0", "8"]],
         // Syntax of pieces: name, texture, array of x-y coordinate strings
         // String values can either be absolute, or relative to prev. strings
@@ -147,12 +150,12 @@ function GameConfig(game) {
             d.className = "square";
 
             d.onmouseover = (function(style, color1) {
-                var is_c1 = false;
+                var is_c1 = true;
                 var color2 = "#4455ff";
                 style.backgroundColor = color1;
                 return function() {
                     if (mouse_down === false) return;
-                    console.log("over! " + style.backgroundColor);
+                    console.log(style.backgroundColor);
                     style.backgroundColor = (is_c1)? color1: color2;
                     is_c1 = !is_c1;
                 };
@@ -173,6 +176,12 @@ function GameConfig(game) {
 
         // create div with title, and return it.
         // a button will be created that shows / hides it.
+        //
+        //    [ button with title ]  |
+        //   ------------------------|
+        //   --initially hidden div--|
+        //   ------------------------|
+
         var _openDiv = function(title, div_id) {
 
             var d = document.createElement("div");
@@ -193,6 +202,17 @@ function GameConfig(game) {
                 };
             } (d.style));
 
+            var brake = document.createElement("div");
+            brake.style.borderBottomStyle = "solid";
+            brake.style.borderBottomWidth = "2px";
+            brake.style.borderTopStyle = "solid";
+            brake.style.borderTopWidth = "2px";
+            brake.style.height = "1px";
+            brake.style.width = "95%";
+            brake.style.borderBottomColor = "#662211";
+            brake.style.backgroundColor = "#33110a";
+            brake.style.borderTopColor = "#130a08";
+            parent_div.appendChild(brake);
             parent_div.appendChild(b);
             parent_div.appendChild(d);
 
