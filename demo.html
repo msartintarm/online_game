@@ -10,11 +10,11 @@
 
     <!-- hello -->
     <!-- Facebook API - See
-         developers.facebook.com/docs/reference/plugins/like/ -->
+         developers.facebook.com/docs/reference/plugins/like/
 
     <script async="async" id="facebook-jssdk" src="\
 //connect.facebook.net/en_IN/all.js#xfbml=1&appId=497409006971163"></script>
-
+    -->
     <!-- External JS libraries -->
     <script async="async" async="async" src="libs/gl-matrix.js"></script>
     <!-- Only used for RequestAnimFrame -->
@@ -130,6 +130,8 @@
 	  <input id="stadium_balls" type="button" style="font-size:20px;"
                  value="Play" class="floating stadium_input" />
         </p>
+
+        <textarea id="error-log" rows="10" cols="10" style="width:95%;font-size:10px;display:none;overflow:hidden;"></textarea>
 
 	<canvas id="textureCanvas"></canvas>
 
@@ -460,7 +462,6 @@
 		       }
 		       </textarea>
     </div>
-
     <div id="fb-root"></div>
 <!--    <div class="fb-like" data-href="http://msartintarm.github.io/online_game/demo.html" data-width="450" data-show-faces="true" data-send="false" colorscheme="dark"></div>-->
   </body>

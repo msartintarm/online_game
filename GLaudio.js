@@ -159,8 +159,7 @@ function GLaudio() {
 	// Actual function! Is isolated within its own scope.
 	return function() {
 	    beat_count ++;
-	    for(var i = 0; i < audio.length; ++i) {
-		var gl_audio = audio[i];
+            audio.forEach(function (gl_audio) {
 		if(gl_audio.auto_start === true &&
 		   (beat_count % gl_audio.loop_length) === gl_audio.delay) {
 
@@ -172,13 +171,13 @@ function GLaudio() {
 		    new_source.buffer = gl_audio.buffer;
 		    new_source.start(start_time - web.currentTime, 0);
 		}
-	    }
+	    });
 	    // Elements will play 250 ms after this call
 	    start_time += 0.250;
 	    var new_timeout = (start_time - 0.050 - web.currentTime) * 1000;
 	    window.setTimeout(playBuffer, new_timeout);
-	};
-    }) (this.web_audio, this.audio);
+        };
+    } (this.web_audio, this.audio));
 
     // 50-ms cushion to figure out things above
     window.setTimeout(playBuffer, 200); // 200 ms

@@ -97,7 +97,39 @@ GLcanvas.prototype.start = function(theScene) {
 	this.canvas = document.getElementById("glcanvas");
 	this.canvas.style.display = "block";
 
-	document.getElementById("land_down_under").style.display = "block";
+        // Initialize Error Division Log
+        // re-write console.log to show within the window itself
+        console.log = (function(old_function, div_log) {
+            var d = document.getElementById(div_log);
+            d.style.display = "block";
+            var c = d.cols;
+            var r = d.rows;
+            d.onclick = function() {
+                if (d.cols === c) {
+                    d.rows = "40";
+                    d.cols = "50";
+                } else {
+                    d.rows = c;
+                    d.cols = r;
+                }
+            };
+
+            return function(text) {
+                old_function(text);
+                d.value += text + "\n";
+                d.scrollTop = d.scrollHeight;
+            };
+        } (console.log.bind(console), "error-log"));
+
+        console.error = (function(old_function, div_log) {
+            var d = document.getElementById(div_log);
+            return function(text) {
+                old_function(text);
+                d.value = text + "\n";
+                d.scrollTop = d.scrollHeight;
+            };
+        } (console.error.bind(console), "error-log"));
+
 
 	if(this.initGL() !== 0) {
             document.getElementById("web_gl").style.color = "#ee5522";
@@ -140,14 +172,19 @@ GLcanvas.prototype.start = function(theScene) {
 	theMatrix = new GLmatrix(this.gl);
 	this.matrix = theMatrix;
 
+        var compiled_text = document.createTextNode("Shaders compiled.");
+        var break1 = document.createElement("br");
+        var loading_2 = document.createTextNode(" textures.");
+        var break2 = break1.cloneNode(false); // shallow
+
 	// Instantiate models
 	this.createScene(theScene);
 
 	this.gl.useProgram(this.gl.shader);
 	this.active_shader = this.gl.shader;
 
-	this.status.innerHTML =
-	    "Shaders compiled.</br>";
+	this.status.appendChild(compiled_text);
+	this.status.appendChild(break1);
 
 	// Get rid of unused JS  memory
 	this.shader_source.cleanup();
@@ -157,9 +194,12 @@ GLcanvas.prototype.start = function(theScene) {
 	document.onmouseup = handleMouseUp;
 	this.canvas.onmousemove = handleMouseMove;
 
-	if(textures_loading !== 0)
-	    this.status.innerHTML +=
-	    "" + textures_loading + " textures.</br>";
+	if(textures_loading !== 0) {
+            var loading_1 = document.createTextNode(textures_loading);
+	    this.status.appendChild(loading_1);
+	    this.status.appendChild(loading_2);
+	    this.status.appendChild(break2);
+        }
 	this.bufferModels();
 
 	// Needs calibration each time the HTML page changes. MST
