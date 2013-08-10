@@ -59,6 +59,7 @@
     <script async="async" src="Game.js"></script>
     <script async="async" src="GameConfig.js"></script>
     <script type="application/javascript">
+    var the_scene = "";
     // cool font animation
     (function() {
       var i_count = 0;
@@ -69,6 +70,17 @@
 
       var cool_color = 238 * 256 * 256 + 135 * 256 + 187;
 
+      var started = false;
+
+      var check_start = function() {
+        if (started === true) return true;
+        if (the_scene.length > 0) {
+          theCanvas.start(the_scene);
+          started = true;
+        }
+        return started;
+      };
+
       window.initGLcanvas = function() {
         if (!GLcanvas || !Game) {
           window.setTimeout(window.initGLcanvas, 50);
@@ -78,23 +90,26 @@
           theCanvas.init();
           window.setTimeout(window.initGLcanvas, 50);
           inputz = document.getElementsByClassName("beginner");
-        } else if (!theCanvas.gl){
-          window.setTimeout(window.initGLcanvas, 150);
+        } else if (!check_start()) {
+            window.setTimeout(check_start,  50);
+            window.setTimeout(check_start, 100);
+            window.setTimeout(window.initGLcanvas, 150);
 
-          var izz = inputz[(++i_count) % inputz.length];
-          var new_thing = new_color.toString(16);
-          // append leading 0's if needed
-          for(var i=new_thing.length; i<6; ++i) new_thing = "0" + new_thing;
-          izz.style.color = "#" + new_thing;
+            var izz = inputz[(++i_count) % inputz.length];
+            var new_thing = new_color.toString(16);
+            // append leading 0's if needed
+            for(var i=new_thing.length; i<6; ++i) new_thing = "0" + new_thing;
+            izz.style.color = "#" + new_thing;
 
-          // that should keep things interesting
-          new_color = (1487 * (new_color % 557)) * 23 + Math.abs(new_color - cool_color) % limit;
-          // color too bright, invert it
-          if ((new_color % 256) + (new_color / 256 % 256) + (new_color / (256 * 256) % 256) > 240)
-            new_color -= weak_color;
-        }
+            // that should keep things interesting
+            new_color = (1487 * (new_color % 557)) * 23 + Math.abs(new_color - cool_color) % limit;
+            // color too bright, invert it
+            if ((new_color % 256) + (new_color / 256 % 256) + (new_color / (256 * 256) % 256) > 240)
+              new_color -= weak_color;
+          }
+
       };
-    })();
+    } ());
     </script>
   </head>
 
@@ -127,11 +142,10 @@
 	  </div>
 	</div>
 	<p id="glcanvas_status">
-	  <input id="stadium_balls" type="button" style="font-size:20px;"
-                 value="Play" class="floating stadium_input" />
+	  <input id="stadium_balls" type="button" style="font-size:20px;" onclick="the_scene='game';" value="Play" class="floating stadium_input" />
         </p>
 
-        <textarea id="error-log" rows="10" cols="10" style="width:95%;font-size:10px;display:none;overflow:hidden;"></textarea>
+        <textarea id="error-log" rows="10" cols="10" style="position:relative;width:95%;font-size:10px;display:none;overflow:hidden;"></textarea>
 
 	<canvas id="textureCanvas"></canvas>
 
@@ -154,37 +168,37 @@
 	  <tbody><tr>
 	      <td>
 		<input type="button"
-		       onclick="theCanvas.start('cylinder');"
+		       onclick="the_scene='cylinder';"
 		       value="Cylinder"
 		       class="floating beginner"/>
 		<input type="button"
-		       onclick="theCanvas.start('skybox');"
+		       onclick="the_scene='skybox';"
 		       value="Skybox"
 		       class="floating beginner"/>
 		<input type="button"
-		       onclick="theCanvas.start('sphere');"
+		       onclick="the_scene='sphere';"
 		       value="Sphere"
 		       class="floating beginner"/>
 		<input type="button"
-		       onclick="theCanvas.start('stool');"
+		       onclick="the_scene='stool';"
 		       value="Stool"
 		       class="floating beginner"/>
 		<input type="button"
-		       onclick="theCanvas.start('text');"
+		       onclick="the_scene='text';"
 		       value="Text"
 		       class="floating beginner"/>
 		<input type="button"
-		       onclick="theCanvas.start('torus');"
+		       onclick="the_scene='torus';"
 		       value="Torus"
 		       class="floating beginner"/>
 	      </td>
 	      <td>
 		<input type="button"
-		       onclick="theCanvas.start('shadow');"
+		       onclick="the_scene='shadow';"
 		       value="Shadows"
 		       class="floating beginner"/>
 		<input type="button"
-		       onclick="theCanvas.start('jumbotron');"
+		       onclick="the_scene='jumbotron';"
 		       value="Jumbotron"
 		       class="floating beginner"/>
 		<input type="button"
@@ -194,7 +208,7 @@
 		       value="Stadium (disabled)"
 		       class="floating beginner" style="color:#aa4455;font-size:22px;" disabled="disabled"/>
 		<input type="button"
-		       onclick="theCanvas.start('game');"
+		       onclick="the_scene='game';"
 		       value="Game"
 		       class="floating beginner"/>
 	      </td>

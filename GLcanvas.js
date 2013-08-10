@@ -100,17 +100,18 @@ GLcanvas.prototype.start = function(theScene) {
         // Initialize Error Division Log
         // re-write console.log to show within the window itself
         console.log = (function(old_function, div_log) {
+
             var d = document.getElementById(div_log);
             d.style.display = "block";
-            var c = d.cols;
             var r = d.rows;
+            var w = d.style.width;
             d.onclick = function() {
-                if (d.cols === c) {
-                    d.rows = "40";
-                    d.cols = "50";
+                if (d.rows === r) {
+                    d.style.width = "325%";
+                    d.rows = "50";
                 } else {
-                    d.rows = c;
-                    d.cols = r;
+                    d.rows = r;
+                    d.style.width = w;
                 }
             };
 

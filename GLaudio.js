@@ -35,7 +35,6 @@ function GLaudio() {
     this.low_pass.connect(this.analyser);
 
     this.audio = [];
-    var i; // for init loop
 
     // Env variable(s) - do not change during execution.
     this.log_music = false;
@@ -46,13 +45,13 @@ function GLaudio() {
 
     this.pause = function() { console.err("Pause not supported."); }; // Need to re-implement
 
-    var triggered = false;
-    var log_string = "";
-
     this.analyze = (function(analyser, log_output) {
 
+        var triggered = false;
         var size = analyser.frequencyBinCount;
 	var FFTData = new Uint8Array(size);
+        var log_string = "";
+
         return function() {
 	    analyser.getByteFrequencyData(FFTData);
 
@@ -96,55 +95,54 @@ function GLaudio() {
 	};
     } (this.web_audio, this.audio));
 
-    this.handleAudioRequest = function(web, gl_audio, request, auto_start) {
-
-	return function() {
-	    web.decodeAudioData(
-		request.response,
-		function(the_buffer) {
-		    gl_audio.buffer = the_buffer;
-		    gl_audio.auto_start = auto_start;
-		    if (auto_start === true) {
-			console.log("new music set up to play. ");
-		    } else {
-			console.log("new music set up, not to play. ");
-		    }
-		}
-	    );
-	};
-    };
-
     /**
      * Makes an audio object, sets it up, and starts it.
      * Uses the following as a ref:
      * http://chromium.googlecode.com/svn/trunk/samples/audio/index.html
      */
-    this.createAudio = function(url, destination, auto_start, loop_delay, loop_length) {
+    this.createAudio = (function(web) {
 
-	// Will be decremented once it's loaded
-	var new_audio = {
-	    dest: destination,
-	    auto_start: false,
-	    loop_length: (loop_length)? loop_length: 0,
-	    delay: (loop_delay)? loop_delay: 0,
-	    source_num: 0, // number of buffers to rotate between
-	    source: new Array(NUM_LOOP_BUFFERS)
-	};
+        var createAudioRequest = function(audio_url, audio_load_fn, auto_start) {
 
-	var request = new XMLHttpRequest();
-	request.open("GET", url, true);
-	request.responseType = "arraybuffer"; // Does this work for any MIME request?
-	// Once request has loaded, load and start audio buffer
-	request.onload = this.handleAudioRequest(this.web_audio, new_audio, request, auto_start);
-	try {
-	    request.send();
-	    this.audio.push(new_audio);
-	} catch (e) {
-	    console.log(e.toString());
-	    return null;
-	}
-    };
+	    var r = new XMLHttpRequest();
+	    r.open("GET", audio_url, true);
+	    r.responseType = "arraybuffer"; // Does this work for any MIME request?
 
+	    // Once request has loaded, load and start audio buffer
+	    r.onload =  function() { web.decodeAudioData(r.response, audio_load_fn); };
+	    try { r.send();
+                  return true;
+                } catch (e) {
+                    console.log(e.toString());
+	            return false;
+                }
+        };
+
+        return function(url, destination, auto_start, loop_delay, loop_length) {
+	    var new_audio = {
+	        dest: destination,
+	        auto_start: false,
+	        loop_length: (loop_length)? loop_length: 0,
+	        delay: (loop_delay)? loop_delay: 0,
+	        source_num: 0, // number of buffers to rotate between
+	        source: new Array(NUM_LOOP_BUFFERS)
+	    };
+
+            var audio_load_f = function(the_buffer) {
+		new_audio.buffer = the_buffer;
+		new_audio.auto_start = auto_start;
+		if (auto_start === true) {
+		    console.log("new music set up to play. ");
+		} else {
+		    console.log("new music set up, not to play. ");
+		}
+	    };
+
+            if (createAudioRequest(url, audio_load_f, auto_start) === true)
+	        this.audio.push(new_audio);
+
+        };
+    } (this.web_audio));
 
     /**
      * Create and start self-calling, closed function to play audio[] elements.
