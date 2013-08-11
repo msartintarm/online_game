@@ -87,7 +87,7 @@ function GLaudio() {
         var sound_map = function(num) {
             if (num == LEFT) return 1;
             if (num == RIGHT) return 1;
-            if (num == UP)  return 2 + (Math.floor(beat_count / 4) % 4);
+            if (num == UP)  return 1;
         };
 
 	return function(num, length) {

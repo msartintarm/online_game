@@ -148,7 +148,9 @@ function Game(gl_) {
 	this.cam_in_right_move = true;
     };
 
-    var triggered = false;
+    var triggered1 = false;
+    var triggered2 = false;
+    var triggered3 = false;
     this.updateMovement = function() {
 
 	var x_ = player.xPos();
@@ -179,19 +181,35 @@ function Game(gl_) {
 
 	player.movePostCollision();
 
-	var checker = audio.triggerAudio(
-            "music/trigger.wav", audio.delay, 16,
-            (function(button) {
+	var checker1 = audio.triggerAudio("music/trigger1.wav", audio.delay, 16, (function(button) {
                 return function() { return (button.collided == WALL_N); };
             } (this.push_button[0]))
         );
+	var checker2 = audio.triggerAudio("music/trigger2.wav", audio.delay, 16, (function(button) {
+                return function() { return (button.collided == WALL_N); };
+            } (this.push_button[10]))
+        );
+	var checker3 = audio.triggerAudio("music/trigger3.wav", audio.delay, 16, (function(button) {
+                return function() { return (button.collided == WALL_N); };
+            } (this.push_button[20]))
+        );
 
-	if(triggered === false) {
-            if (checker()) {
-                triggered = true;
+	if(triggered1 === false) {
+            if (checker1()) {
+                triggered1 = true;
 		this.push_button[1].magical = false;
 	        if (this.floor_effect !== 75) this.floor_effect ++;
 	        else console.log("Max Power!");
+            }
+        }
+	if(triggered2 === false) {
+            if (checker2()) {
+                triggered2 = true;
+            }
+        }
+	if(triggered3 === false) {
+            if (checker3()) {
+                triggered3 = true;
             }
         }
     };

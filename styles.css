@@ -108,11 +108,15 @@ tbody { color: blue;
 
 }
 
+tbody:hover {text-decoration: underline; color: red; background-color:#123456;}
+
+input.beginner:hover {text-decoration: underline; }
+
 a:link {text-decoration: none;
 }
 a:visited {color: #880000; }
 a:active {color: red; }
-a:hover {text-decoration: underline; color: red;}
+a:hover {text-decoration: underline; color: red; }
 
 canvas#glcanvas {
 /*    position: absolute; */
