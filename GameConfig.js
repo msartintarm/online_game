@@ -107,10 +107,10 @@ function GameConfig(game) {
         parent_div.appendChild(p);
 
         var _Break = function(curr_div) {
-            var breakz = document.createElement("div");
-            breakz.height = "1";
-            breakz.style.clear = "both";
-            curr_div.appendChild(breakz);
+            var b = document.createElement("div");
+            b.height = "1";
+            b.style.clear = "both";
+            curr_div.appendChild(b);
         };
 
         var _CheckBox = function(curr_div, value, selected) {
@@ -137,29 +137,28 @@ function GameConfig(game) {
             return t;
         };
 
+
+        var mouse_down = false;
+
         // We want this to execute press function AND click function
         // , so we pass click function as a closure argument
         var pressMouse = function(other_funct) {
             return function() { mouse_down = !mouse_down; other_funct(); };
         };
 
-        var mouse_down = false;
-
-        var _Square = function(color) {
+        var _Square = function(bg_color) {
             var d = document.createElement("div");
             d.className = "square";
+            d.style.backgroundColor = bg_color;
 
-            d.onmouseover = (function(style, color1) {
+            d.onmouseover = (function(style, color1, color2) {
                 var is_c1 = true;
-                var color2 = "#4455ff";
-                style.backgroundColor = color1;
                 return function() {
                     if (mouse_down === false) return;
-                    console.log(style.backgroundColor);
-                    style.backgroundColor = (is_c1)? color1: color2;
                     is_c1 = !is_c1;
+                    style.backgroundColor = (is_c1)? color1: color2;
                 };
-            } (d.style, color));
+            } (d.style, bg_color, "#4455ff"));
 
             d.onmousedown = (function(click_funct, div_style) {
                 // We want this to execute press function AND click function

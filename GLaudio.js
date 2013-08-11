@@ -101,7 +101,7 @@ function GLaudio() {
 
     /**
      * Makes an audio object, sets it up, and starts it.
-     * Uses the following as a ref:
+     * The following was used as a ref:
      * http://chromium.googlecode.com/svn/trunk/samples/audio/index.html
      */
     this.createAudio = (function(web) {
@@ -147,6 +147,21 @@ function GLaudio() {
 
         };
     } (this.web_audio));
+
+    /**
+     * Create audio that is triggered by a specific event.
+     * Returns funct to play the audio..?
+     */
+    this.triggerAudio = function (url, dest, length, condition_f) {
+        var whoami = this;
+        return function() {
+            if(condition_f() === true) {
+                whoami.createAudio(url, dest, true, 0, length);
+                return true;
+            }
+            else return false;
+        };
+    };
 
     /**
      * Create and start self-calling, closed function to play audio[] elements.

@@ -179,20 +179,21 @@ function Game(gl_) {
 
 	player.movePostCollision();
 
+	var checker = audio.triggerAudio(
+            "music/trigger.wav", audio.delay, 16,
+            (function(button) {
+                return function() { return (button.collided == WALL_N); };
+            } (this.push_button[0]))
+        );
 
-
-	if(this.push_button[0].collided === WALL_N) {
-	    if(triggered === false)     {
-		audio.createAudio("music/trigger.wav", audio.delay, true, 0, 16);
-		triggered = true;
+	if(triggered === false) {
+            if (checker()) {
+                triggered = true;
 		this.push_button[1].magical = false;
-	    }
-	    if (this.floor_effect !== 75) this.floor_effect ++;
-	    else console.log("Max Power!");
-	} else {
-	    if (this.floor_effect > 0) this.floor_effect --;
-	}
-
+	        if (this.floor_effect !== 75) this.floor_effect ++;
+	        else console.log("Max Power!");
+            }
+        }
     };
 
     return this;
