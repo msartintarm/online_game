@@ -57,6 +57,7 @@ div#header {
 }
 
 div.wrap {
+    background-color: #23180d;
     width:100%;
     height:100%;
     border: 10px inset #555555;
@@ -105,10 +106,14 @@ tbody { color: blue;
     -moz-user-select: all;
     -webkit-user-select: all;
     -khtml-user-select: all;
-
+    background-color:#234567;
 }
 
-tbody:hover {text-decoration: underline; color: red; background-color:#123456;}
+tbody:hover {
+    text-decoration: underline;
+    color: red;
+    background-color:#123456;
+}
 
 input.beginner:hover {text-decoration: underline; }
 
@@ -140,12 +145,6 @@ div.main {
 table#button_table {
     background-color: #88aabb;
     border: 10px inset #666666;
-}
-
-div#wrap_all {
-    background: url(graphics/banner.gif) repeat-y;
-    background-size: 25%;
-    background-color: #23180d;
 }
 
 div.title {
