@@ -169,4 +169,4 @@ pip-log.txt
 *#
 
 # Server-Generated Files
-*.js.gz
+*.gz

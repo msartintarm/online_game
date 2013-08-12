@@ -28,7 +28,7 @@ div#banner{
     width:25%;
     float:left;
     text-align:center;
-    margin-top:2%;
+    padding-top:2%;
     color: #FF0000;
     background: url(graphics/banner.gif) repeat-y;
     background-size: 100%;
@@ -62,6 +62,10 @@ div.wrap {
     height:100%;
     border: 10px inset #555555;
     margin-left: -10px;
+}
+
+div#display {
+    background: url('graphics/brushed_metal.jpg') repeat-y;
 }
 
 p#glcanvas_status {
