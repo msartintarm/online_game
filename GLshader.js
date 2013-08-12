@@ -11,6 +11,10 @@ function GLshader() {
             f.contentWindow.document:
             f.contentDocument;
 
+//        if (!f.onclick) f.onclick = (function() {
+
+
+
         return f.getElementById(shader_id).value;
     };
 

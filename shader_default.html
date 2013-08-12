@@ -6,7 +6,7 @@
     <meta charset="UTF-8"/>
     <link rel="stylesheet" type="text/css" href="styles.css"/>
   </head>
-<textarea id="f_decls" rows="3" cols="25" style="width:100%;overflow:hidden;">
+<textarea id="f_decls" rows="3" cols="25" class="shader">
   precision mediump float;
 
   uniform float ambient_coeff_u;
@@ -50,7 +50,7 @@
 		    return specularV2;
 		    }
                     </textarea>
-<textarea id="v_decls" rows="3" cols="25" style="width:100%;overflow:hidden;">
+<textarea id="v_decls" rows="3" cols="25" class="shader">
   precision mediump float;
 
   // Vector Attributes
@@ -81,7 +81,7 @@
   varying vec3 lightNorm;
   varying vec3 vertNorm;
 </textarea>
-<textarea id="frag" rows="3" cols="25" style="width:100%;overflow:hidden;">
+<textarea id="frag" rows="3" cols="25"class="shader">
   void colorize() {
   vec3 ambColor = colorV / 3.0 * ambient_coeff_u;
   vec3 diffColor = colorV / 3.0 * diffuseV * diffuse_coeff_u;
@@ -124,7 +124,7 @@
 									   colorTexture(sampler0);
 									   }
 									   </textarea>
-<textarea id="vert" rows="3" cols="25" style="width:100%;oveflow:hidden;">
+<textarea id="vert" rows="3" cols="25" class="shader">
   void main(void) {
   // -- Position -- //
   gl_Position = pMatU * mvnMatU[1] * mvnMatU[0] * vec4(vPosA, 1.0);

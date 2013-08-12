@@ -19,72 +19,58 @@ function GLcanvas() {
     return this;
 }
 
-GLcanvas.prototype.init = function() {
-
-    // Any command line params specified?
-    var params = window.location.search;
-    if(params.length > 1) this.start(params.substring(1));
-    return this;
-}
-
-GLcanvas.prototype.createScene = function(objToDraw) {
-
-    if(objToDraw == "cylinder") {
-	this.objects.push(new Cylinder(1, 4, 5, 8, 3));
-    } else if(objToDraw == "sphere") {
-	this.objects.push(new Sphere(2));
-    } else if(objToDraw == "skybox") {
-	this.objects.push(new Skybox());
-    } else if(objToDraw == "stool") {
-	this.objects.push(new Stool());
-    } else if(objToDraw == "jumbotron") {
-	this.objects.push(new Jumbotron());
-	this.objects.push(new Skybox());
-    } else if(objToDraw == "shadow") {
-	this.objects.push(new MazePiece(5, NO_LEFT, TILE_TEXTURE));
-	this.objects.push(new Stool());
-    } else if(objToDraw == "game") {
-	this.objects.push(new Game(this.gl));
-    } else if(objToDraw == "text") {
-	this.string1 = new GLstring("testing 1.", TEXT_TEXTURE);
-	this.string2 = new GLstring("testing 2.", TEXT_TEXTURE2);
-	this.objects.push(this.string1);
-	this.objects.push(this.string2);
-	this.objects.push(new Skybox());
-	this.objects.push(new Quad(
-	    [ 1.5, 0.8,-4.0],
-	    [ 1.5,-0.8,-4.0],
-	    [-1.5, 0.8,-4.0],
-	    [-1.5,-0.8,-4.0]).setTexture(TEXT_TEXTURE).setShader(this.gl.shader_canvas));
-	this.objects.push(new Quad(
-	    [ 1.5, 2.4,-4.0],
-	    [ 1.5, 0.8,-4.0],
-	    [-1.5, 2.4,-4.0],
-	    [-1.5, 0.8,-4.0]).setTexture(TEXT_TEXTURE2).setShader(this.gl.shader_player));
-
-    } else if(objToDraw == "torus") {
-	this.objects.push(new Torus(0.2, 2));
-    }
-};
-
-GLcanvas.prototype.bufferModels = function() {
-    for(var i = 0, max = this.objects.length;
-	i < max; ++i) {
-	this.objects[i].initBuffers(this.gl);
-    }
-};
-
-GLcanvas.prototype.drawModels = function() {
-    for(var i = 0, max = this.objects.length;
-	i < max; ++i) {
-	this.objects[i].draw(this.gl);
-    }
-};
-
 /**
  * Begins the canvas.
  */
 GLcanvas.prototype.start = function(theScene) {
+
+    // TODO: use closure instead! (Not binding)
+    var createScene = function(objToDraw) {
+
+        if(objToDraw == "cylinder") {
+	    this.objects.push(new Cylinder(1, 4, 5, 8, 3));
+        } else if(objToDraw == "sphere") {
+	    this.objects.push(new Sphere(2));
+        } else if(objToDraw == "skybox") {
+	    this.objects.push(new Skybox());
+        } else if(objToDraw == "stool") {
+	    this.objects.push(new Stool());
+        } else if(objToDraw == "jumbotron") {
+	    this.objects.push(new Jumbotron());
+	    this.objects.push(new Skybox());
+        } else if(objToDraw == "shadow") {
+	    this.objects.push(new MazePiece(5, NO_LEFT, TILE_TEXTURE));
+	    this.objects.push(new Stool());
+        } else if(objToDraw == "game") {
+	    this.objects.push(new Game(this.gl));
+        } else if(objToDraw == "text") {
+	    this.string1 = new GLstring("testing 1.", TEXT_TEXTURE);
+	    this.string2 = new GLstring("testing 2.", TEXT_TEXTURE2);
+	    this.objects.push(this.string1);
+	    this.objects.push(this.string2);
+	    this.objects.push(new Skybox());
+	    this.objects.push(new Quad(
+	        [ 1.5, 0.8,-4.0],
+	        [ 1.5,-0.8,-4.0],
+	        [-1.5, 0.8,-4.0],
+	        [-1.5,-0.8,-4.0]).setTexture(TEXT_TEXTURE).setShader(this.gl.shader_canvas));
+	    this.objects.push(new Quad(
+	        [ 1.5, 2.4,-4.0],
+	        [ 1.5, 0.8,-4.0],
+	        [-1.5, 2.4,-4.0],
+	        [-1.5, 0.8,-4.0]).setTexture(TEXT_TEXTURE2).setShader(this.gl.shader_player));
+
+        } else if(objToDraw == "torus") {
+	    this.objects.push(new Torus(0.2, 2));
+        }
+    }.bind(this);
+
+    var bufferModels = function() {
+        for(var i = 0, max = this.objects.length;
+	    i < max; ++i) {
+	    this.objects[i].initBuffers(this.gl);
+        }
+    }.bind(this);
 
     if (this.gl === null) {
 
@@ -179,7 +165,7 @@ GLcanvas.prototype.start = function(theScene) {
         var break2 = break1.cloneNode(false); // shallow
 
 	// Instantiate models
-	this.createScene(theScene);
+	createScene(theScene);
 
 	this.gl.useProgram(this.gl.shader);
 	this.active_shader = this.gl.shader;
@@ -201,7 +187,7 @@ GLcanvas.prototype.start = function(theScene) {
 	    this.status.appendChild(loading_2);
 	    this.status.appendChild(break2);
         }
-	this.bufferModels();
+	bufferModels();
 
 	// Needs calibration each time the HTML page changes. MST
 	this.resize();
@@ -214,8 +200,8 @@ GLcanvas.prototype.start = function(theScene) {
     } else {
 	// If we have started GL already,
 	//  just add the new model.
-	this.createScene(theScene);
-	this.bufferModels();
+	createScene(theScene);
+	bufferModels();
     }
     // After the scene is complete, see if we have textures to load..?
     // If not, let's draw right away
@@ -295,7 +281,12 @@ GLcanvas.prototype.drawScene = function() {
 
     // Draw all our objects
     theMatrix.push();
-    this.drawModels();
+
+    for(var i = 0, max = this.objects.length;
+	i < max; ++i) {
+	this.objects[i].draw(this.gl);
+    }
+
     theMatrix.pop();
 
     // filter so we don't resize every frame

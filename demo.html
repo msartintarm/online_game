@@ -72,6 +72,10 @@
 
       var started = false;
 
+      var params = window.location.search;
+      if(params.length > 1) the_scene = params.substring(1);
+
+
       var check_start = function() {
         if (started === true) return true;
         if (the_scene.length > 0) {
@@ -87,7 +91,6 @@
         } else if (!theCanvas){
           new GameConfig().setupDivs();
           theCanvas = new GLcanvas();
-          theCanvas.init();
           window.setTimeout(window.initGLcanvas, 50);
           inputz = document.getElementsByClassName("beginner");
         } else if (!check_start()) {
@@ -214,11 +217,11 @@
     </div>
     <!-- Put this element one tag scope higher to hide it. -->
     <div class="shaders" id="shader1" >
-      <iframe id="shader_default" src="shader_default.html"></iframe>
-      <iframe id="shader_canvas" src="shader_canvas.html"></iframe>
-      <iframe id="shader_player" src="shader_player.html"></iframe>
-      <iframe id="shader_color" src="shader_color.html"></iframe>
-      <iframe id="shader_frame" src="shader_frame.html"></iframe>
+      <iframe class="shader" id="shader_default" src="shader_default.html"></iframe>
+      <iframe class="shader" id="shader_canvas" src="shader_canvas.html"></iframe>
+      <iframe class="shader" id="shader_player" src="shader_player.html"></iframe>
+      <iframe class="shader" id="shader_color" src="shader_color.html"></iframe>
+      <iframe class="shader" id="shader_frame" src="shader_frame.html"></iframe>
     </div>
     <div id="fb-root"></div>
 <!--    <div class="fb-like" data-href="http://msartintarm.github.io/online_game/demo.html" data-width="450" data-show-faces="true" data-send="false" colorscheme="dark"></div>-->

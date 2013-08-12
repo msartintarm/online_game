@@ -24,6 +24,17 @@ body {
     padding-right: 25px;
 }
 
+iframe.shader {
+    border-style: none;
+    width:32%;
+    float:left;
+    margin-right:1%;
+    margin-bottom:1%;
+    height:200px;
+}
+
+iframe.shader:hover { height:600px; }
+
 div#banner{
     width:25%;
     float:left;
@@ -214,6 +225,16 @@ textarea {
     background-color:#222222;
     color:#dddddd;
 }
+
+textarea.shader {
+    width:100%;
+    overflow:hidden;
+}
+
+textarea.shader:hover {
+    height:500px;
+}
+
 textarea.keyboard {
     position:absolute; bottom: 8px; left:0px;
     width:100%;
