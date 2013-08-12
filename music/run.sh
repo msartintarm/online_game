@@ -16,5 +16,5 @@ $SOX $WAVS/Game_keys.wav jump4.wav trim 19 2
 echo 4
 $SOX $WAVS/Game_keys.wav trigger1.wav trim 16.0 4.04
 $SOX $WAVS/Game_bass.wav trigger2.wav trim 16.0 4.01
-$SOX $WAVS/Game_brasshigh.wav trigger3.wav trim 32.0 4.01
+$SOX $WAVS/Game_brasshigh.wav trigger3.wav trim 32.0 4.01 gain -2
 popd

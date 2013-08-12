@@ -17,61 +17,16 @@ function GLshader() {
     this.f_decls = frameFn("shader_default", "f_decls");
     this.v_decls = frameFn("shader_default", "v_decls");
 
-
-
-
-
-    this.fragment["color"] = "\
-void colorize() {\n\
-  vec3 ambColor = colorV / 3.0 * ambient_coeff_u;\n\
-  vec3 diffColor = colorV / 3.0 * diffuseV * diffuse_coeff_u;\n\
-  vec3 specColor = specular_color_u * specular();\n\
-  gl_FragColor = vec4(ambColor + diffColor + specColor, 1.0);\n\
-}\n\
-\n\
-void main(void) {\n\
-  colorize();\n\
-}\n\
-";
-
+    this.fragment["color"] = frameFn("shader_color", "frag");
     this.fragment["canvas"] = frameFn("shader_canvas", "frag");
     this.fragment["player"] = frameFn("shader_player", "frag");
 
-    this.fragment["default"] = document.getElementById("shader_frag_default").value;
-    this.fragment["frame"] = "\
-void main(void) {\n\
-\n\
-  gl_FragColor = vec4(colorV * vec3(2.0, 0.0, 0.5) * specular(), 1.0);\n\
-}\n\
-";
+    this.fragment["default"] = frameFn("shader_default", "frag");
+    this.vertex["default"] = frameFn("shader_default", "vert");
+    this.fragment["frame"] = frameFn("shader_frame", "frag");
 
-    this.vertex["color"] = "\
-void main(void) {\n\
-\n\
-// Viewing space coordinates of light / vertex\n\
-vModel = (mvnMatU[1] * mvnMatU[0]  * vec4(vPosA, 1.0)).xyz;\n\
-lModel = mvnMatU[1] * lMatU * vec4(lightPosU, 1.0);\n\
-\n\
-  // -- Position -- //\n\
-\n\
-  gl_Position = pMatU * mvnMatU[1] * mvnMatU[0] * vec4(vPosA, 1.0);\n\
-\n\
-  // -- Lighting -- //\n\
-\n\
-  // Ambient components we'll leave until frag shader\n\
-  colorV = vColA;\n\
-\n\
-  // Diffuse component\n\
-  lightNorm = normalize(lModel.xyz - vModel.xyz);\n\
-\n\
-  vertNorm = normalize((mvnMatU[2] * vec4(vNormA,1.0)).xyz);\n\
-  diffuseV = dot(vertNorm, lightNorm);\n\
-  if (diffuseV < 0.0) { diffuseV = 0.0; }\n\
-}       \n\
-";
-
-    this.vertex["default"] = document.getElementById("shader_vert_default").value;
-    this.vertex["player"] = document.getElementById("shader_vert_player").value;
+    this.vertex["color"] = frameFn("shader_color", "vert");
+    this.vertex["player"] = frameFn("shader_player", "vert");
 }
 
 
