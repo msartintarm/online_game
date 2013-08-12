@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<!-- All text on this page is property of Michael Sartin-Tarm. (c) 2013. -->
+<!-- License pending.. -->
+<html>
+  <head>
+    <meta charset="UTF-8"/>
+    <link rel="stylesheet" type="text/css" href="styles.css"/>
+  </head>
+  <textarea id="frag" rows="3" cols="25" style="width:100%;overflow:hidden;">
+void colorize() {
+  vec3 ambColor = colorV / 3.0 * ambient_coeff_u;
+  vec3 diffColor = colorV / 3.0 * diffuseV * diffuse_coeff_u;
+  vec3 specColor = specular_color_u * specular();
+  gl_FragColor = vec4(ambColor + diffColor + specColor, 1.0);
+}
+
+void main(void) {
+  colorize();
+}
+  </textarea>
+  <textarea id="vert" rows="3" cols="25" style="width:100%;overflow:hidden;">
+void main(void) {
+
+// Viewing space coordinates of light / vertex
+vModel = (mvnMatU[1] * mvnMatU[0]  * vec4(vPosA, 1.0)).xyz;
+lModel = mvnMatU[1] * lMatU * vec4(lightPosU, 1.0);
+
+  // -- Position -- //
+
+  gl_Position = pMatU * mvnMatU[1] * mvnMatU[0] * vec4(vPosA, 1.0);
+
+  // -- Lighting -- //
+
+  // Ambient components we'll leave until frag shader
+  colorV = vColA;
+
+  // Diffuse component
+  lightNorm = normalize(lModel.xyz - vModel.xyz);
+
+  vertNorm = normalize((mvnMatU[2] * vec4(vNormA,1.0)).xyz);
+  diffuseV = dot(vertNorm, lightNorm);
+  if (diffuseV < 0.0) { diffuseV = 0.0; }
+}
+  </textarea>
+</html>
