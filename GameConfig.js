@@ -63,46 +63,41 @@ function GameConfig(game) {
     // Adds all properties in the object to element, and returns it.
     var createElementMST = function(tag_type, props) {
         var e = document.createElement(tag_type);
-        for (var p in props) { e[p] = props[p]; }
+        for (var p in props) {
+            if (p === "style") { // recursion would also work
+                for (var s in props[p]) e[p][s] = props[p][s];
+            }
+            else e[p] = props[p];
+        }
         return e;
     };
 
     var parent_div = document.createElement("div");
 
-    var wrap = document.createElement("div");
-    wrap.className = "wrap";
-    var disp = document.createElement("div");
-    disp.id = "display";
-    disp.style.paddingTop = "8px";
-    disp.style.width = "100%";
+    var wrap = createElementMST("div", { className: "wrap" });
+    parent_div.appendChild(wrap);
+
+   var disp = createElementMST("div",
+        { id: "display", style: { paddingTop: "8px", width: "100%" }});
     wrap.appendChild(disp);
 
-    var params = document.createElement("div");
-    params.id = "game_params";
-    params.style.display = "inline-block";
+    var params = createElementMST("div", { id: "game_params",
+    style: { display: "inline-block" }});
     disp.appendChild(params);
 
-    var name = document.createElement("div");
-    name.style.cssFloat = "left";
-    name.style.width = "45%";
-    name.style.fontSize = "16px";
+    var name = createElementMST("div", { style: {
+        cssFloat: "left", width: "45%", fontSize: "16px"}});
     name.appendChild(document.createTextNode("Name:"));
     params.appendChild(name);
 
-    var entry = document.createElement("div");
-    entry.style.cssFloat = "right";
-    entry.style.width = "55%";
+    var entry = createElementMST("div", { style: {
+        cssFloat: "right", width: "55%" }});
+    entry.appendChild(createElementMST("input", {
+        type: "text", className: "floating stadium_input",
+        id: "player_name", value: "Noname" }));
     params.appendChild(entry);
 
-    var inputz = createElementMST("input", {
-        type: "text", className: "floating stadium_input",
-        id: "player_name", value: "Noname" });
-
-    entry.appendChild(inputz);
-
     params.appendChild(document.createElement("br"));
-
-    parent_div.appendChild(wrap);
 
     // Define functions that construct the div elements, then call them.
     this.setupDivs = function() {
@@ -176,7 +171,6 @@ function GameConfig(game) {
             if (!!config_shadow[curr_div.id]) config_shadow[curr_div.id].push(t);
             else config_shadow[curr_div.id] = [t];
 
-            console.log(curr_div.id + ": " + value);
             curr_div.appendChild(t);
             return t;
         };
@@ -352,7 +346,6 @@ function GameConfig(game) {
                     squares[y][x] = (j == 0)?
                         "s" + div_piece_count + "-" + zzap.input:
                         "s" + div_piece_count;
-                    if(j == 0) console.log ("yeaa." + zzap.input);
                 }
 
             }

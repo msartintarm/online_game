@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<!-- All text on this page is property of Michael Sartin-Tarm. (c) 2013. -->
+<!-- License pending.. -->
+<html>
+  <head>
+    <meta charset="UTF-8"/>
+    <link rel="stylesheet" type="text/css" href="styles.css"/>
+  </head>
+<textarea id="f_decls" rows="3" cols="25" style="width:100%;overflow:hidden;">
+  precision mediump float;
+
+  uniform float ambient_coeff_u;
+  uniform float frames_elapsed_u;
+  uniform float hi_hat_u;
+  uniform float wall_hit_u;
+  uniform float diffuse_coeff_u;
+  uniform float specular_coeff_u;
+  uniform vec3 specular_color_u;
+
+  varying vec3 distanceV;
+  varying float diffuseV;
+  varying float specularV;
+  varying vec3 colorV;
+
+  varying vec3 reflectionV;
+  varying vec3 viewPosV;
+  varying vec3 vModel;
+  varying vec4 lModel;
+  varying vec3 lightNorm;
+  varying vec3 vertNorm;
+
+  varying vec2 textureV;
+
+  uniform sampler2D sampler0;
+  uniform sampler2D sampler1;
+
+  //Specular function
+  float specular() {
+
+  vec3 reflectionV2 = reflect(normalize(lightNorm), normalize(vertNorm));
+
+
+  float specularV2 = dot(normalize(reflectionV2),
+  normalize(vModel.xyz));
+  if (specularV2 <= 0.) { specularV2 = 0.0; }
+		    specularV2 = specularV2 * specularV2;
+		    specularV2 = specularV2 * specularV2;
+		    specularV2 = specularV2 * specularV2;
+		    specularV2 = specularV2 * specularV2;
+		    return specularV2;
+		    }
+                    </textarea>
+<textarea id="v_decls" rows="3" cols="25" style="width:100%;overflow:hidden;">
+  precision mediump float;
+
+  // Vector Attributes
+  attribute vec3 vPosA;
+  attribute vec3 vNormA;
+  attribute vec3 vColA;
+  attribute vec2 textureA;
+
+  // Matrixes
+  uniform mat4 pMatU; // Position
+  uniform mat4 mvnMatU[3]; // Model, View, Normal
+  uniform mat4 lMatU; // Lighting
+
+  // Position attributes
+  uniform vec3 lightPosU;
+  uniform vec3 viewPosU;
+  uniform float hi_hat_u;
+
+  // Passed to the fragment shader
+  varying vec3 distanceV;
+  varying float diffuseV;
+  varying vec3 colorV;
+  varying vec2 textureV;
+
+  varying vec3 viewPosV;
+  varying vec3 vModel;
+  varying vec4 lModel;
+  varying vec3 lightNorm;
+  varying vec3 vertNorm;
+</textarea>
+</html>

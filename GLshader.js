@@ -4,8 +4,21 @@ function GLshader() {
     this.fragment = [];
     this.vertex = [];
 
-    this.f_decls = document.getElementById("shader_frag_decls").value;
-    this.v_decls = document.getElementById("shader_decls").value;
+    var frameFn = function(frame_id, shader_id) {
+        var f = document.getElementById(frame_id);
+        if (f === null) console.error(frame_id + " is null!");
+        f = f.contentWindow ?
+            f.contentWindow.document:
+            f.contentDocument;
+
+        return f.getElementById(shader_id).value;
+    };
+
+    this.f_decls = frameFn("shader_default", "f_decls");
+    this.v_decls = frameFn("shader_default", "v_decls");
+
+
+
 
 
     this.fragment["color"] = "\
@@ -21,8 +34,8 @@ void main(void) {\n\
 }\n\
 ";
 
-    this.fragment["canvas"] = document.getElementById("shader_frag_canvas").value;
-    this.fragment["player"] = document.getElementById("shader_frag_player").value;
+    this.fragment["canvas"] = frameFn("shader_canvas", "frag");
+    this.fragment["player"] = frameFn("shader_player", "frag");
 
     this.fragment["default"] = document.getElementById("shader_frag_default").value;
     this.fragment["frame"] = "\
@@ -59,7 +72,7 @@ lModel = mvnMatU[1] * lMatU * vec4(lightPosU, 1.0);\n\
 
     this.vertex["default"] = document.getElementById("shader_vert_default").value;
     this.vertex["player"] = document.getElementById("shader_vert_player").value;
-}    
+}
 
 
 /*
@@ -78,7 +91,7 @@ GLshader.prototype.init = function(gl_, gl_shader, frag_name, vert_name) {
     gl_.attachShader(gl_shader, v_shader);
     gl_.attachShader(gl_shader, f_shader);
 
-    // Firefox says macs behave poorly if 
+    // Firefox says macs behave poorly if
     // an unused attribute is bound to index 0
     // So we specify 'position' before the link.
     gl_.bindAttribLocation(gl_shader, 0, "vPosA");
@@ -99,4 +112,3 @@ GLshader.prototype.cleanup = function() {
     this.f_decls = null;
     this.v_decls = null;
 };
-
