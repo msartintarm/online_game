@@ -10,12 +10,9 @@ function GLshader() {
         f = f.contentWindow ?
             f.contentWindow.document:
             f.contentDocument;
+        f = f.getElementById(shader_id);
 
-//        if (!f.onclick) f.onclick = (function() {
-
-
-
-        return f.getElementById(shader_id).value;
+        return f.value;
     };
 
     this.f_decls = frameFn("shader_default", "f_decls");
@@ -33,6 +30,14 @@ function GLshader() {
     this.vertex["player"] = frameFn("shader_player", "vert");
 }
 
+/**
+ *Passed the ID of the calling button.
+ * Hides both the shader, and the callling button.
+ */
+GLshader.close = function(button_id) {
+    document.getElementById(button_id).style.display = "none";
+    document.getElementById("shader1").style.display = "none";
+};
 
 /*
  * http://dev.opera.com/articles/view/raw-webgl-part1-getting-started/

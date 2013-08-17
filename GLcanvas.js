@@ -93,6 +93,7 @@ GLcanvas.prototype.start = function(theScene) {
 	document.getElementById("header").style.display = "none";
 	document.getElementById("button_table").style.display = "none";
 	document.getElementById("footer").style.display = "none";
+	document.getElementById("shader1").style.display = "none";
 
 	this.status = document.getElementById("glcanvas_status");
 	this.canvas = document.getElementById("glcanvas");

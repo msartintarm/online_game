@@ -168,19 +168,21 @@ div.title {
     margin: 17px 17px;
 }
 
-input.floating {
+input.floating, input.floating2 {
     width:100%;
     background-color: transparent;
     border: none;
     vertical-align: middle;
     font-size: inherit;
     text-align: inherit;
-    color: inherit;
 }
 
-input.floating:hover {
+input.floating { color: inherit; }
+input.floating2 { color:#abcdef; }
+
+input.floating:hover, input.floating2:hover {
     cursor: default;
-color:#33aabb;
+    color:#33aabb;
 }
 
 /*
