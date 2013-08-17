@@ -8,17 +8,15 @@
     <link rel="stylesheet" type="text/css" href="styles.css"/>
     <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 
-    <!-- hello -->
     <!-- Facebook API - See
          developers.facebook.com/docs/reference/plugins/like/
-
+         Disconnected for  now (takes too many liberties with its permissions)
     <script async="async" id="facebook-jssdk" src="\
 //connect.facebook.net/en_IN/all.js#xfbml=1&appId=497409006971163"></script>
     -->
+
     <!-- External JS libraries -->
     <script async="async" src="libs/gl-matrix.js"></script>
-    <!-- Only used for RequestAnimFrame -->
-    <script async="async" src="libs/webgl-utils.js"></script>
 
     <!-- Global constants and functions -->
     <script async="async" src="functions.js"></script>
@@ -216,7 +214,7 @@
       <div class="title" id="title4" > </div>
     </div>
     <!-- Put this element one tag scope higher to hide it. -->
-    <div class="shaders" id="shader1" >
+    <div class="shaders" id="shader1" style="display:none;">
       <iframe class="shader" id="shader_default" src="shader_default.html"></iframe>
       <iframe class="shader" id="shader_canvas" src="shader_canvas.html"></iframe>
       <iframe class="shader" id="shader_player" src="shader_player.html"></iframe>
