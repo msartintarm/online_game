@@ -6,55 +6,57 @@
     <meta charset="UTF-8"/>
     <link rel="stylesheet" type="text/css" href="styles.css"/>
   </head>
-  <textarea id="frag" rows="3" cols="25" style="width:100%;overflow:hidden;">
+  <body>
+    <textarea id="frag" rows="3" cols="25" style="width:100%;overflow:hidden;">
 
-	void colorTexture(sampler2D theSampler) {
+      void colorTexture(sampler2D theSampler) {
 
-	float delta = 1.0 / 512.0;
-	float sway = sin((frames_elapsed_u + 60.0) / 100.0) / 2.0;
-	float sway2 = cos((frames_elapsed_u + 60.0) / 110.0) / 2.0;
-	float the_beat = hi_hat_u;
+      float delta = 1.0 / 512.0;
+      float sway = sin((frames_elapsed_u + 60.0) / 100.0) / 2.0;
+      float sway2 = cos((frames_elapsed_u + 60.0) / 110.0) / 2.0;
+      float the_beat = hi_hat_u;
 
-	vec3 textureColor = texture2D(theSampler, textureV).xyz;
-	textureColor[0] *= 4.0 * sway;
-	textureColor[1] *= -4.0 * sway2;
-	textureColor[2] *= abs((sway * sway2));
+      vec3 textureColor = texture2D(theSampler, textureV).xyz;
+      textureColor[0] *= 4.0 * sway;
+      textureColor[1] *= -4.0 * sway2;
+      textureColor[2] *= abs((sway * sway2));
 
-	float background = clamp(length(textureColor) * 5.0, 0.8, 1.0);
+      float background = clamp(length(textureColor) * 5.0, 0.8, 1.0);
 
-	gl_FragColor = vec4(textureColor * 1.6, 1.0);
-	/*	if(background < 0.95 && the_beat > 0.9) gl_FragColor =
-	  (20. - the_beat) / 20. * vec4(textureColor * 1.6, background) +
-	  the_beat / 20. * texture2D(theSampler, textureV);
-	  */	  }
+      gl_FragColor = vec4(textureColor * 1.6, 1.0);
+      /*	if(background < 0.95 && the_beat > 0.9) gl_FragColor =
+	(20. - the_beat) / 20. * vec4(textureColor * 1.6, background) +
+	the_beat / 20. * texture2D(theSampler, textureV);
+	*/	  }
 
-	  void main(void) { colorTexture(sampler1);
+	void main(void) { colorTexture(sampler1);
 
-	  }
-  </textarea>
-  <textarea id="vert" rows="3" cols="25" style="width:100%;overflow:hidden;">
-	void main(void) {
+	}
+    </textarea>
+    <textarea id="vert" rows="3" cols="25" style="width:100%;overflow:hidden;">
+      void main(void) {
 
-	// -- Position -- //
-	gl_Position = pMatU * mvnMatU[1] * mvnMatU[0] * vec4(vPosA * (1.0 + (hi_hat_u / 110.0)), 1.0);
-	//  gl_Position = pMatU * mvnMatU[1] * mvnMatU[0] * vec4(vPosA, 1.0);
+      // -- Position -- //
+      gl_Position = pMatU * mvnMatU[1] * mvnMatU[0] * vec4(vPosA * (1.0 + (hi_hat_u / 110.0)), 1.0);
+      //  gl_Position = pMatU * mvnMatU[1] * mvnMatU[0] * vec4(vPosA, 1.0);
 
-	// Viewing space coordinates of light / vertex
-	vModel = (mvnMatU[1] * mvnMatU[0]  * vec4(vPosA, 1.0)).xyz;
-	lModel = mvnMatU[1] * lMatU * mvnMatU[0] * vec4(lightPosU, 1.0);
+      // Viewing space coordinates of light / vertex
+      vModel = (mvnMatU[1] * mvnMatU[0]  * vec4(vPosA, 1.0)).xyz;
+      lModel = mvnMatU[1] * lMatU * mvnMatU[0] * vec4(lightPosU, 1.0);
 
 
-	// -- Lighting -- //
-	distanceV = vModel.xyz - lModel.xyz;
-	lightNorm = normalize(distanceV);
-	vertNorm = (mvnMatU[2] * vec4(vNormA,1.0)).xyz;
+      // -- Lighting -- //
+      distanceV = vModel.xyz - lModel.xyz;
+      lightNorm = normalize(distanceV);
+      vertNorm = (mvnMatU[2] * vec4(vNormA,1.0)).xyz;
 
-	// Ambient components we'll leave until frag shader
-	colorV = vColA;
-	textureV = textureA;
-	// Diffuse component
-	diffuseV = dot(vertNorm, lightNorm);
-	if (diffuseV < 0.0) { diffuseV = 0.0; }
-		       }
-  </textarea>
+      // Ambient components we'll leave until frag shader
+      colorV = vColA;
+      textureV = textureA;
+      // Diffuse component
+      diffuseV = dot(vertNorm, lightNorm);
+      if (diffuseV < 0.0) { diffuseV = 0.0; }
+		     }
+                     </textarea>
+  </body>
 </html>

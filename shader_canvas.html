@@ -6,57 +6,59 @@
     <meta charset="UTF-8"/>
     <link rel="stylesheet" type="text/css" href="styles.css"/>
   </head>
-  <textarea id="frag" rows="3" cols="25" style="width:100%;overflow:hidden;">
+  <body>
+    <textarea id="frag" rows="3" cols="25" style="width:100%;overflow:hidden;">
 
-	void colorTexture(sampler2D theSampler) {
+      void colorTexture(sampler2D theSampler) {
 
-	float delta = 1.0 / 512.0;
-	float sway = sin(frames_elapsed_u / 100.0) / 2.0;
-	float sway2 = cos(frames_elapsed_u / 110.0) / 2.0;
-	float the_beat = hi_hat_u;
+      float delta = 1.0 / 512.0;
+      float sway = sin(frames_elapsed_u / 100.0) / 2.0;
+      float sway2 = cos(frames_elapsed_u / 110.0) / 2.0;
+      float the_beat = hi_hat_u;
 
-	vec3 textureColor = texture2D(theSampler, textureV).xyz;
+      vec3 textureColor = texture2D(theSampler, textureV).xyz;
 
-	vec3 textureColorz = texture2D(sampler1, vec2(textureV.s, textureV.t)).xyz;
-	vec3 reflectionV2 = reflect(normalize(lightNorm), normalize(normalize(vertNorm) +
-          normalize(vec3(textureColorz.x, textureColorz.y, textureColorz.z))));
-	float diffuseV2 = dot(vertNorm, normalize(lightNorm));
+      vec3 textureColorz = texture2D(sampler1, vec2(textureV.s, textureV.t)).xyz;
+      vec3 reflectionV2 = reflect(normalize(lightNorm), normalize(normalize(vertNorm) +
+      normalize(vec3(textureColorz.x, textureColorz.y, textureColorz.z))));
+      float diffuseV2 = dot(vertNorm, normalize(lightNorm));
 
-	float specularV2 = dot(normalize(reflectionV2),
-        normalize(vModel.xyz));
-	if (specularV2 <= 0.0) { specularV2 = 0.0; }
-			  specularV2 = specularV2 * specularV2;
-			  specularV2 = specularV2 * specularV2;
-			  specularV2 = specularV2 * specularV2;
-			  specularV2 = specularV2 * specularV2;
+      float specularV2 = dot(normalize(reflectionV2),
+      normalize(vModel.xyz));
+      if (specularV2 <= 0.0) { specularV2 = 0.0; }
+			specularV2 = specularV2 * specularV2;
+			specularV2 = specularV2 * specularV2;
+			specularV2 = specularV2 * specularV2;
+			specularV2 = specularV2 * specularV2;
 
-			  vec3 ambColor = textureColor / 3.0;
-			  vec3 diffColor = textureColor * diffuseV2 * 0.6;
-			  vec3 specColor = textureColor * specularV2;
+			vec3 ambColor = textureColor / 3.0;
+			vec3 diffColor = textureColor * diffuseV2 * 0.6;
+			vec3 specColor = textureColor * specularV2;
 
-			  vec3 blendColor = mod(distanceV, 50.0) / 50.0;
-			  vec3 normalColor = ambColor + diffColor + specColor;
-			  vec3 changedColor = ambColor + diffColor + specColor;
+			vec3 blendColor = mod(distanceV, 50.0) / 50.0;
+			vec3 normalColor = ambColor + diffColor + specColor;
+			vec3 changedColor = ambColor + diffColor + specColor;
 
-			  changedColor[0] *= sway;
-			  changedColor[1] *= -sway2;
-			  changedColor[2] *= abs((sway * sway2));
+			changedColor[0] *= sway;
+			changedColor[1] *= -sway2;
+			changedColor[2] *= abs((sway * sway2));
 
-			  float background = clamp(length(changedColor) * 5.0, 0.8, 1.0);
+			float background = clamp(length(changedColor) * 5.0, 0.8, 1.0);
 
-			  vec3 actual_color = changedColor * 1.6;
-			  float yellow =  dot(max(vec2(actual_color.r, actual_color.g),0.0), vec2(0.75, 0.75));
+			vec3 actual_color = changedColor * 1.6;
+			float yellow =  dot(max(vec2(actual_color.r, actual_color.g),0.0), vec2(0.75, 0.75));
 
-			  changedColor = vec3(yellow, yellow, actual_color.b / (yellow + 0.01));
+			changedColor = vec3(yellow, yellow, actual_color.b / (yellow + 0.01));
 
 
-			  gl_FragColor = vec4((changedColor + 2.0 * normalize(changedColor)) / 3.0, background);
-			  }
+			gl_FragColor = vec4((changedColor + 2.0 * normalize(changedColor)) / 3.0, background);
+			}
 
-			  void main(void) {
-			  colorTexture(sampler0);
-			  }
-			  </textarea>
-  <textarea id="v_decls" rows="3" cols="25" style="width:100%;overflow:hidden;">
-  </textarea>
+			void main(void) {
+			colorTexture(sampler0);
+			}
+			</textarea>
+    <textarea id="v_decls" rows="3" cols="25" style="width:100%;overflow:hidden;">
+    </textarea>
+  </body>
 </html>
