@@ -55,7 +55,10 @@
     <script async="async" src="Skybox.js"></script>
     <script async="async" src="Cagebox.js"></script>
     <script async="async" src="Game.js"></script>
-    <script async="async" src="GameConfig.js"></script>
+    <script async="async" src="GameLevel.js"></script>
+
+    <!-- The purpose of this inline script is to monitor
+         whether the WebGL JS has been loaded. -->
     <script type="application/javascript">
     var the_scene = ""; // global object that is monitored
     // cool font animation
@@ -87,7 +90,7 @@
         if (!GLcanvas || !Game) {
           window.setTimeout(window.initGLcanvas, 50);
         } else if (!theCanvas){
-          new GameConfig().setupDivs();
+          new GameLevel().setupDivs();
           theCanvas = new GLcanvas();
           window.setTimeout(window.initGLcanvas, 50);
           inputz = document.getElementsByClassName("beginner");

@@ -1,13 +1,13 @@
 /**
  * Three intended purposes:
- * 1. Given a config, load it into control panel
+ * 1. Given a config for a level, load it into control panel
  * 2. Given a control-panel config, init game with it
  * 3. Do '1' and '2' with text (file) input
  */
-function GameConfig(game) {
+function GameLevel(game) {
 
-    if (GameConfig.prototype._singleton !== undefined) {
-        return GameConfig.prototype._singleton.updatedVersion(game);
+    if (GameLevel.prototype._singleton !== undefined) {
+        return GameLevel.prototype._singleton.updatedVersion(game);
     }
 
     this.updatedVersion = function(new_game) {
@@ -15,7 +15,7 @@ function GameConfig(game) {
         return this;
     };
 
-    GameConfig.prototype._singleton = this;
+    GameLevel.prototype._singleton = this;
 
     //            CONFIGURATION
     // Figure out some way to convert this to document eventually
