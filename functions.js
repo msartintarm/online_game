@@ -129,7 +129,7 @@ function _objsDraw(gl_) {
     return this;
 }
 
-/** 
+/**
  *  Functions for low-level objects
  *  that contain single shapes
  */
@@ -197,32 +197,32 @@ function _oInvertNorms() {
 //
 function getShader(gl_, id) {
     var shaderScript = document.getElementById(id);
-    
+
     // Didn't find an element with the specified ID; abort.
-    
+
     if (!shaderScript) {
 	return null;
     }
-    
+
     // Walk through the source element's children, building the
     // shader source string.
-    
+
     var theSource = "";
     var currentChild = shaderScript.firstChild;
-    
+
     while(currentChild) {
 	if (currentChild.nodeType == 3) {
 	    theSource += currentChild.textContent;
 	}
-	
+
 	currentChild = currentChild.nextSibling;
     }
-    
+
     // Now figure out what type of shader script we have,
     // based on its MIME type.
-    
+
     var shader;
-    
+
     if (shaderScript.type == "x-shader/x-fragment") {
 	shader = gl_.createShader(gl_.FRAGMENT_SHADER);
     } else if (shaderScript.type == "x-shader/x-vertex") {
@@ -230,20 +230,20 @@ function getShader(gl_, id) {
     } else {
 	return null;  // Unknown shader type
     }
-    
+
     // Send the source to the shader object
     gl_.shaderSource(shader, theSource);
-    
+
     // Compile the shader program
     gl_.compileShader(shader);
-    
+
     // See if it compiled successfully
-    
+
     if (!gl_.getShaderParameter(shader, gl_.COMPILE_STATUS)) {
-	alert("An error occurred compiling the shaders: " + 
+	alert("An error occurred compiling the shaders: " +
 	      gl_.getShaderInfoLog(shader));
 	return null;
-    }    
+    }
     return shader;
 }
 
@@ -267,36 +267,10 @@ function handleMouseMove(event) {
 
     var move_x = event.clientX - click_x;
     var move_y = event.clientY - click_y;
-    
+
     if((move_x < -0.2) || (move_x > 0.2))
 	theMatrix.lookRight(Math.PI / 180 * 2 * ((move_x) / 3));
 
     if(move_y < -0.1) theMatrix.moveForward();
     else if(move_y > 0.1) theMatrix.moveBack();
-}
-
-function tick() {
-    requestAnimFrame(tick2);
-    theCanvas.drawScene();
-    // Update viewer's matrix
-    theMatrix.update();
-    if(theCanvas.resizeCounter > 0) {
-	theCanvas.resizeCounter -= 1;
-	if(theCanvas.resizeCounter === 0) {
-	    theCanvas.resize();
-	}
-    }
-}
-
-function tick2() {
-    requestAnimFrame(tick);
-    theCanvas.drawScene();
-    // Update viewer's matrix
-    theMatrix.update();
-    if(theCanvas.resizeCounter > 0) {
-	theCanvas.resizeCounter -= 1;
-	if(theCanvas.resizeCounter === 0) {
-	    theCanvas.resize();
-	}
-    }
 }
