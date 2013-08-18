@@ -12,6 +12,10 @@ function GLshader() {
             f.contentDocument;
         f = f.getElementById(shader_id);
 
+        if (!f.onclick) f.onclick = (function() {
+            f.height = "200";
+            return function() { f.height = (f.height === "200")? "600": 200; };
+        } ())
         return f.value;
     };
 

@@ -33,8 +33,6 @@ iframe.shader {
     height:200px;
 }
 
-iframe.shader:hover { height:600px; }
-
 div#banner{
     width:25%;
     float:left;

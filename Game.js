@@ -3,9 +3,41 @@
  */
 function Game(gl_) {
 
-    // The Singleton was already created previously,
-    //  but it needs an up-to-date Game reference.
-    var config = GameLevel(this);
+    this.grid = 50;
+
+    var level0 = new GameLevel(this, {
+
+        //            CONFIGURATION
+        // Figure out some way to document this eventually
+        "grid-size": this.grid,
+        "textures": ["brick-texture", "heaven-texture", "rug-texture"],
+        // Origin URL, destination node, loop[, loop offset, loop time])
+        // These are at 120 BPM: 1 sec = 2 beats
+        // 0. Low-pass input detects movement, occuring on the half-beat; slightly below 0.25s
+        // 1. Non-looping sound, which will be triggered by the above sample
+        // 2. Non-looping sound, which will be triggered by the above sample
+        // 3. Rest of the song.
+        "audio": [["music/beats.mp3", "audio-low-pass", "loop", "1", "8"],
+                  ["music/move.wav", "audio-output"],
+                  ["music/jump1.wav", "audio-output"],
+                  ["music/jump2.wav", "audio-output"],
+                  ["music/jump3.wav", "audio-output"],
+                  ["music/jump4.wav", "audio-output"],
+                  ["music/background.wav", "audio-delay", "loop", "0", "8"]],
+        // Syntax of pieces: name, texture, array of x-y coordinate strings
+        // String values can either be absolute, or relative to prev. strings
+        // Can also specify loops of continuous increments
+        "piece-0": ["floor", "rug-texture", "1", "3", ["-11,-1", "20*(+1,+0)"]],
+        "piece-1": ["wall", "brick-texture", "1", "1", ["6,3", "+1,+1", "+1,+1", "+1,+1", "12*(+1,+0)",
+                                                        "+4,-2", "4*(+2,+0)",
+                                                        "-4,+2", "4*(-2,+0)",
+                                                        "+4,-2", "4*(+2,+0)",
+                                                        "-4,+2", "4*(-2,+0)",
+                                                        "+2,-3", "20*(+1,+0)"]],
+        "start-position": ["0", "300", "750"]
+    });
+
+    level0.setupDivs();
 
     // Used in collision detection.
     var WALL_NONE = 0;
@@ -24,7 +56,7 @@ function Game(gl_) {
 
     var thah = [];
 
-    config.initAudio(audio);
+    level0.initAudio(audio);
 
     this.matrix = theCanvas.matrix;
 
@@ -43,15 +75,15 @@ function Game(gl_) {
     // Jump distance is a vector of linear X values
     // When we increment y-pos by these array values, the effect is a parabolic jump
 
-    config.initMisc(); // this.grid and viewing translation
+    level0.initMisc(); // this.grid and viewing translation
 
     this.floor = [];
-    config.initPiece(this.floor, "piece-0");
+    level0.initPiece(this.floor, "piece-0");
     // new shader effect
     this.floor_effect = 0;
 
     this.push_button = [];
-    config.initPiece(this.push_button, "piece-1");
+    level0.initPiece(this.push_button, "piece-1");
     this.push_button[1].magical = true;
 
     // Placeholder for 3d blocks -- MST
@@ -69,7 +101,6 @@ function Game(gl_) {
 	.setTexture(HEAVEN_TEXTURE)
 	.setShader(theCanvas.gl.shader_canvas);
 
-
     this.initBuffers = function(gl_) {
 
 	player.initBuffers(gl_);
@@ -78,6 +109,22 @@ function Game(gl_) {
 	this.floor.forEach(function(flo) { flo.initBuffers(gl_); });
 	this.push_button.forEach(function(but) { but.initBuffers(gl_); });
 	this.three_dee.forEach(function(cube) { cube.initBuffers(gl_); });
+    };
+
+    this.loadLevel = function() {
+
+        level0.setupDivs();
+
+        level0.initMisc(); // this.grid and viewing translation
+        this.floor = [];
+        level0.initPiece(this.floor, "piece-0");
+        this.floor_effect = 0;
+
+        this.push_button = [];
+        level0.initPiece(this.push_button, "piece-1");
+        this.three_dee = [];
+
+        level0.initAudio(audio);
     };
 
     this.draw = function(gl_) {

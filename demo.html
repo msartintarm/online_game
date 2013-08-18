@@ -90,7 +90,6 @@
         if (!GLcanvas || !Game) {
           window.setTimeout(window.initGLcanvas, 50);
         } else if (!theCanvas){
-          new GameLevel().setupDivs();
           theCanvas = new GLcanvas();
           window.setTimeout(window.initGLcanvas, 50);
           inputz = document.getElementsByClassName("beginner");
