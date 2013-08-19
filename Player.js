@@ -32,11 +32,11 @@ function Player(gl_, grid_size) {
     this.movement_old = vec3.create();
 
     // Specify string to use, texture ID, and shader to use
-    var player_string = new GLstring(this.name, TEXT_TEXTURE, theCanvas.gl.shader_player);
-    var left_string = new GLstring("left", TEXT_TEXTURE, theCanvas.gl.shader_player);
-    var right_string = new GLstring("right", TEXT_TEXTURE, theCanvas.gl.shader_player);
-    var jump_string = new GLstring("jump", TEXT_TEXTURE, theCanvas.gl.shader_player);
-    var collision_string = new GLstring("Ouch!", TEXT_TEXTURE, theCanvas.gl.shader_player);
+    var player_string = new GLstring(this.name, TEXT_TEXTURE, theCanvas.shader["player"]);
+    var left_string = new GLstring("left", TEXT_TEXTURE, theCanvas.shader["player"]);
+    var right_string = new GLstring("right", TEXT_TEXTURE, theCanvas.shader["player"]);
+    var jump_string = new GLstring("jump", TEXT_TEXTURE, theCanvas.shader["player"]);
+    var collision_string = new GLstring("Ouch!", TEXT_TEXTURE, theCanvas.shader["player"]);
 
     this.jump_count = 0;
     this.left_count = 0;
@@ -77,7 +77,7 @@ function Player(gl_, grid_size) {
 		    [-w, 0, l]);
     this.o.setTexture(TEXT_TEXTURE);
     this.o.initTextures([1,0], [1,1], [0,0], [0,1]);
-    this.o.shader = theCanvas.gl.shader_player;
+    this.o.shader = theCanvas.shader["player"];
     this.width = w;
     this.height = h;
 
@@ -97,10 +97,9 @@ function Player(gl_, grid_size) {
 	theMatrix.translate(this.movement);
 
 	var player_shader = this.o.shader;
-	theCanvas.changeShader(player_shader);
-	var unis = player_shader.unis;
-	gl_.uniform1f(unis["hi_hat_u"], hi_hat);
-	theMatrix.setVertexUniforms(player_shader);
+	var shader = theCanvas.changeShader("player");
+	gl_.uniform1f(shader.unis["hi_hat_u"], hi_hat);
+	theMatrix.setVertexUniforms(shader);
 
 	this.o.draw(gl_);
 	theMatrix.pop();

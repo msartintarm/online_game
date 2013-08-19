@@ -7,7 +7,7 @@ function GLstring(text_to_write, string_num, shader_) {
     this.active = (++ theCanvas.gl.active);
     this.num = string_num;
     theCanvas.gl.tex_enum[this.num] = this.active;
-    this.shader = (shader_)? shader_: theCanvas.gl.shader;
+    this.shader = (shader_)? shader_: theCanvas.shader["default"];
     this.text = text_to_write;
     this.canvas = document.getElementById('textureCanvas');
     this.sampler = (++ this.shader.sampler);

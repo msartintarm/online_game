@@ -99,7 +99,7 @@ function Game(gl_) {
 			       [ wh, wh, l2],
 			       [ wh,-wh, l2])
 	.setTexture(HEAVEN_TEXTURE)
-	.setShader(theCanvas.gl.shader_canvas);
+	.setShader(theCanvas.shader["canvas"]);
 
     this.initBuffers = function(gl_) {
 
@@ -143,9 +143,9 @@ function Game(gl_) {
 	//    this.background : gl_.shader_canvas
 	//    this.floor : gl_.shader
 
-	theCanvas.changeShader(gl_.shader);
-	theMatrix.setViewUniforms(gl_.shader);
-	var unis = gl_.shader.unis;
+	var shader = theCanvas.changeShader("default");
+	theMatrix.setViewUniforms(shader);
+	var unis = shader.unis;
 	gl_.uniform1f(unis["hi_hat_u"], this.hi_hat);
 	gl_.uniform1f(unis["wall_hit_u"], this.floor_effect);
 	gl_.uniform3fv(unis["lightPosU"], [200, 200, -400]);
@@ -168,9 +168,9 @@ function Game(gl_) {
 	theMatrix.push();
 	theMatrix.translate(this.bg_movement);
 
-	theCanvas.changeShader(gl_.shader_canvas);
-	theMatrix.setVertexUniforms(gl_.shader_canvas);
-	gl_.uniform1i(gl_.shader_canvas.unis["sampler1"], gl_.tex_enum[HEAVEN_NORMAL_TEXTURE]);
+	shader = theCanvas.changeShader("canvas");
+	theMatrix.setVertexUniforms(shader);
+	gl_.uniform1i(shader.unis["sampler1"], gl_.tex_enum[HEAVEN_NORMAL_TEXTURE]);
 
 	this.background.draw(gl_);
 	theMatrix.pop();

@@ -1,6 +1,6 @@
 /**
- * GLobject abstracts away buffers and arrays of data, 
- *  allowing us to work at a high level without 
+ * GLobject abstracts away buffers and arrays of data,
+ *  allowing us to work at a high level without
  *  tripping over low-level implementation details.
  */
 function GLobject() {
@@ -25,7 +25,7 @@ function GLobject() {
     //  of this object's data will do it correctly
     this.normsInverted = false;
     this.hasFlatNorms = false;
-    
+
     // default values
     this.ambient_coeff = 0.1;
     this.diffuse_coeff = 0.7;
@@ -37,7 +37,7 @@ function GLobject() {
      *
      * rewritten a la http://jsperf.com/array-indexing-in-loops
      */
-    this.addNorms = function(x,y,z) {     
+    this.addNorms = function(x,y,z) {
 	this.data["norm"].push(x);
 	this.data["norm"].push(y);
 	this.data["norm"].push(z); };
@@ -58,24 +58,24 @@ function GLobject() {
 	this.data["index"].push(z); };
 
     /**
-     * Or, pass a vec3 
+     * Or, pass a vec3
      * (only with arrays that it makes sense for)
      */
-    this.addNormVec = 
+    this.addNormVec =
 	function(vec) { this.data["norm"].push(vec[0]);
 			this.data["norm"].push(vec[1]);
 			this.data["norm"].push(vec[2]); };
-    this.addPosVec = 
+    this.addPosVec =
 	function(vec) { this.data["pos"].push(vec[0]);
 			this.data["pos"].push(vec[1]);
 			this.data["pos"].push(vec[2]); };
-    this.addColorVec = 
+    this.addColorVec =
 	function(vec) { this.data["col"].push(vec[0]);
 			this.data["col"].push(vec[1]);
 			this.data["col"].push(vec[2]); };
 
     /**
-     * Sometimes, we'll have to invert the norms 
+     * Sometimes, we'll have to invert the norms
      *  of objects
      */
     this.invertNorms = function() {
@@ -86,7 +86,7 @@ function GLobject() {
     };
 
     /**
-     * Sometimes, we'll have to invert the norms 
+     * Sometimes, we'll have to invert the norms
      *  of objects
      */
     this.invertFlatNorms = function() {
@@ -95,10 +95,10 @@ function GLobject() {
 	}
     };
 
-    /** 
-     *  A---C 
+    /**
+     *  A---C
      *  |  /|    Two triangles: ABC and BDC
-     *  |/  |     
+     *  |/  |
      *  B---D
      */
     this.addQuadIndexes = function(a, c) {
@@ -113,10 +113,10 @@ function GLobject() {
     /**
        Buffers a quadrilateral.
     */
-    this.Quad = function(a, b, c, d) { 
+    this.Quad = function(a, b, c, d) {
 	this.addPosVec(a);
-	this.addPosVec(b);   
-	this.addPosVec(c);   
+	this.addPosVec(b);
+	this.addPosVec(c);
 	this.addPosVec(d);
 
 	var temp1 = vec3.create();
@@ -135,22 +135,22 @@ function GLobject() {
 	return this;
     };
 
-    this.initTextures = function(at, bt, ct, dt) { 
+    this.initTextures = function(at, bt, ct, dt) {
 	this.addTexture(at[0], at[1]);
 	this.addTexture(bt[0], bt[1]);
-	this.addTexture(ct[0], ct[1]); 
+	this.addTexture(ct[0], ct[1]);
 	this.addTexture(dt[0], dt[1]);
     };
 
     /**
      *   Based upon the enumerated texture chosen,
      *   selects which lighting attributes this object
-     *   will receive. 
+     *   will receive.
      *
      *   These values are uniforms - the same for each vertice
      */
-    this.setTexture = function(theTexture) { 
-	
+    this.setTexture = function(theTexture) {
+
 	this.textureNum = theTexture;
 
 	switch(theTexture) {
@@ -170,7 +170,7 @@ function GLobject() {
 	    this.ambient_coeff = 0.1;
 	    this.diffuse_coeff = 0.2;
 	    var theTexture = new GLtexture(theCanvas.gl, this.textureNum);
-	    break; 
+	    break;
 	case TILE_TEXTURE:
 	    this.ambient_coeff = 0.1;
 	    this.diffuse_coeff = 0.3;
@@ -194,7 +194,7 @@ function GLobject() {
 	    var theTexture = new GLtexture(theCanvas.gl, this.textureNum);
 	    break;
 	case WOOD_TEXTURE:
-	case HEAVEN_TEXTURE: 
+	case HEAVEN_TEXTURE:
 	    var theTexture = new GLtexture(theCanvas.gl, this.textureNum);
 	    break;
 	case TEXT_TEXTURE:
@@ -221,12 +221,12 @@ function GLobject() {
     };
 
     /**
-     * Once the arrays are full, call to 
+     * Once the arrays are full, call to
      *  buffer WebGL with their data
      */
     this.initBuffers = function(gl_) {
 
-	if(this.textureNum === NO_TEXTURE) { 
+	if(this.textureNum === NO_TEXTURE) {
 	    // See if we need to create 'dummy' data
 
 	    if(this.data["tex"].length < 1) {
@@ -255,10 +255,10 @@ function GLobject() {
 	if(theData.length < 1) { this.buff[attribute] = -1; return; }
 	this.buff[attribute] = gl_.createBuffer();
 	gl_.bindBuffer(gl_.ARRAY_BUFFER, this.buff[attribute]);
-	gl_.bufferData(gl_.ARRAY_BUFFER, 
+	gl_.bufferData(gl_.ARRAY_BUFFER,
 		       new Float32Array(theData),
 		       gl_.STATIC_DRAW);
-	this.buff[attribute].itemSize = size; 
+	this.buff[attribute].itemSize = size;
 	this.buff[attribute].numItems = theData.length / size;
     };
 
@@ -270,7 +270,7 @@ function GLobject() {
 	var theData = this.data[elem_name];
 	this.buff[elem_name] = gl_.createBuffer();
 	gl_.bindBuffer(gl_.ELEMENT_ARRAY_BUFFER, this.buff[elem_name]);
-	gl_.bufferData(gl_.ELEMENT_ARRAY_BUFFER, 
+	gl_.bufferData(gl_.ELEMENT_ARRAY_BUFFER,
 		       new Uint16Array(theData),
 		       gl_.STATIC_DRAW);
 	this.buff[elem_name].itemSize = 1;
@@ -331,14 +331,14 @@ function GLobject() {
 
     this.scale = function(num) {
 	for(var i = 0; i < this.data["pos"].length; ++i) {
-	    this.data["pos"][i] *= num; 
+	    this.data["pos"][i] *= num;
 	}
 	return this;
     };
 
     this.translate = function(vec) {
 	for(var i = 0; i < this.data["pos"].length; ++i) {
-	    this.data["pos"][i] += vec[i%3]; 
+	    this.data["pos"][i] += vec[i%3];
 	}
 	return this;
     };
@@ -362,7 +362,7 @@ function GLobject() {
 	// check to see if texture is used in shader
 	gl_.uniform1i(shader_.unis["sampler0"], gl_.tex_enum[this.textureNum]);
 
-	if(shader_.unis["specular_color_u"] !== null) { 
+	if(shader_.unis["specular_color_u"] !== null) {
 	    gl_.uniform3fv(shader_.unis["specular_color_u"], this.specular_color); }
 
 	this.linkAttrib(gl_, shader_, "vNormA", "norm");
@@ -405,7 +405,7 @@ function GLobject() {
     */
     this.drawElements = function(gl_) {
 	gl_.bindBuffer(gl_.ELEMENT_ARRAY_BUFFER, this.buff["index"]);
-	gl_.drawElements(gl_.TRIANGLES, 
+	gl_.drawElements(gl_.TRIANGLES,
 			 this.buff["index"].numItems, gl_.UNSIGNED_SHORT, 0);
     };
 
@@ -417,18 +417,19 @@ function GLobject() {
 	var shader_;
 	if(this.shader !== -1) shader_ = this.shader;
 	else if(this.textureNum === NO_TEXTURE)
-	    shader_ = gl_.shader_color;
+	    shader_ = theCanvas.shader["color"];
 	else
-	    shader_ = gl_.shader;
+	    shader_ = theCanvas.shader["default"];
 
 	// The high level object is expected to handle these things itself
 	// if this is off (it'll set the shaders itself).
+/*
 	if (GLobject.draw_optimized === false) {
 	    theCanvas.changeShader(shader_);
 	    theMatrix.setViewUniforms(shader_);
 	    theMatrix.setVertexUniforms(shader_);
 	}
-	
+*/
 	this.linkAttribs(gl_, shader_);
 	this.drawElements(gl_);
     };

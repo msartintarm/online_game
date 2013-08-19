@@ -51,12 +51,12 @@ function GLcanvas() {
 	            [ 1.5, 0.8,-4.0],
 	            [ 1.5,-0.8,-4.0],
 	            [-1.5, 0.8,-4.0],
-	            [-1.5,-0.8,-4.0]).setTexture(TEXT_TEXTURE).setShader(this.gl.shader_canvas));
+	            [-1.5,-0.8,-4.0]).setTexture(TEXT_TEXTURE).setShader(this.shader["canvas"]));
 	        this.objects.push(new Quad(
 	            [ 1.5, 2.4,-4.0],
 	            [ 1.5, 0.8,-4.0],
 	            [-1.5, 2.4,-4.0],
-	            [-1.5, 0.8,-4.0]).setTexture(TEXT_TEXTURE2).setShader(this.gl.shader_player));
+	            [-1.5, 0.8,-4.0]).setTexture(TEXT_TEXTURE2).setShader(this.shader["player"]));
 
             } else if(objToDraw == "torus") {
 	        this.objects.push(new Torus(0.2, 2));
@@ -132,18 +132,17 @@ function GLcanvas() {
 
 	    this.shader_source = new GLshader;
 	    this.shader_count = 0;
+            this.shader = { "default": this.gl.createProgram(),
+	                    "frame": this.gl.createProgram(),
+	                    "color": this.gl.createProgram(),
+	                    "canvas": this.gl.createProgram(),
+	                    "player": this.gl.createProgram() };
 
-	    this.gl.shader = this.gl.createProgram();
-	    this.gl.shader_frame = this.gl.createProgram();
-	    this.gl.shader_color = this.gl.createProgram();
-	    this.gl.shader_canvas = this.gl.createProgram();
-	    this.gl.shader_player = this.gl.createProgram();
-
-	    if(this.initShaders(this.gl.shader,        "default",  "default") !== 0 ||
-	       this.initShaders(this.gl.shader_frame,  "frame",    "default") !== 0 ||
-	       this.initShaders(this.gl.shader_canvas, "canvas",   "default") !== 0 ||
-	       this.initShaders(this.gl.shader_player, "player",   "player") !== 0 ||
-	       this.initShaders(this.gl.shader_color,  "color",    "color") !== 0) {
+	    if(this.initShaders(this.shader["default"], "default",  "default") !== 0 ||
+	       this.initShaders(this.shader["frame"],  "frame",    "default") !== 0 ||
+	       this.initShaders(this.shader["canvas"], "canvas",   "default") !== 0 ||
+	       this.initShaders(this.shader["player"], "player",   "player") !== 0 ||
+	       this.initShaders(this.shader["color"],  "color",    "color") !== 0) {
 
 	        var theWindow = window.open(
 		    "GLerror_shader.php",
@@ -167,8 +166,8 @@ function GLcanvas() {
 	    // Instantiate models
 	    createScene(theScene);
 
-	    this.gl.useProgram(this.gl.shader);
-	    this.active_shader = this.gl.shader;
+	    this.gl.useProgram(this.shader["default"]);
+	    this.active_shader = this.shader["default"];
 
 	    this.status.appendChild(compiled_text);
 	    this.status.appendChild(break1);
@@ -249,15 +248,15 @@ function GLcanvas() {
 			      Math.max(1, this.canvas.height),
 			      0.1, 300000.0);
 
-	this.changeShader(this.gl.shader);
-	theMatrix.setViewUniforms(this.gl.shader);
-	this.gl.uniformMatrix4fv(this.gl.shader.unis["pMatU"], false, theMatrix.pMatrix);
-	this.changeShader(this.gl.shader_canvas);
-	theMatrix.setViewUniforms(this.gl.shader_canvas);
-	this.gl.uniformMatrix4fv(this.gl.shader_canvas.unis["pMatU"], false, theMatrix.pMatrix);
-	this.changeShader(this.gl.shader_player);
-	theMatrix.setViewUniforms(this.gl.shader_player);
-	this.gl.uniformMatrix4fv(this.gl.shader_player.unis["pMatU"], false, theMatrix.pMatrix);
+	this.changeShader("default");
+	theMatrix.setViewUniforms(this.shader["default"]);
+	this.gl.uniformMatrix4fv(this.shader["default"].unis["pMatU"], false, theMatrix.pMatrix);
+	this.changeShader("canvas");
+	theMatrix.setViewUniforms(this.shader["canvas"]);
+	this.gl.uniformMatrix4fv(this.shader["canvas"].unis["pMatU"], false, theMatrix.pMatrix);
+	this.changeShader("player");
+	theMatrix.setViewUniforms(this.shader["player"]);
+	this.gl.uniformMatrix4fv(this.shader["player"].unis["pMatU"], false, theMatrix.pMatrix);
     };
 
     /**
@@ -393,14 +392,14 @@ function GLcanvas() {
      * This is basically a wrapper for GLSL's 'useProgram' function that
      *  only disables an old program if it's not the same as the new one.
      */
-    this.changeShader = function(new_shader) {
+    this.changeShader = function(shader_id) {
 
-        //    GLSL way of polling, it is costly
-
+        // GLSL way of polling, it is costly
         //    var old_shader = this.gl.getParameter(this.gl.CURRENT_PROGRAM);
         //    if(old_shader === new_shader) return;
 
         // Our way
+        var new_shader = this.shader[shader_id];
         if (new_shader.count === this.active_shader.count) return;
 
         this.disableAttribute(this.active_shader, "vPosA");
@@ -410,6 +409,8 @@ function GLcanvas() {
 
         this.gl.useProgram(new_shader);
         this.active_shader = new_shader;
+
+        return new_shader;
     };
 
     this.initUniform = function(gl_shader, uni) {
