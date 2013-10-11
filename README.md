@@ -3,13 +3,13 @@
 **Title:** Brother Beat
 
 **Author:** Michael Vello Sartin-Tarm (credit goes to Christopher Aberger for 
- helping create [the predecessor](https://github.com/msartintarm/online_game))
+ helping create [the predecessor](https://github.com/msartintarm/webgl))
 
 **Description:** A combination 2D-3D game that's synced to audio! Work-in-progress.. this is ~ version 0.05.
 
 **Movement:**  Arrow keys to move and jump!
 
-###[Live demo!](https://mywebspace.wisc.edu/msartintarm/online_game/demo.html) (May not be the most current version.)
+###[Live demo!](http://msartintarm.github.io/online_game/demo.html) (May not be the most current version.)
 
 ###[A detailed description of each file in the project](DESCRIPTION.md). 
  - Still  accurate but somewhat out-of-date.
@@ -23,6 +23,7 @@
 - http://codeflow.org/entries/2013/feb/22/how-to-write-portable-webgl/: Texture limitations
 - http://www.html5rocks.com/en/tutorials/webaudio/intro/: Intro to using sounds in HTML5
 - http://graphics.cs.brown.edu/games/SteepParallax/: Cool Parallax!
+- http://acko.net/blog/zero-to-sixty-in-one-second/: WebGL, CSS 3D, HTML5 with music. kool. 
 
 ####Thinking about whether to stick with OOO, prototypes, or switch to closure-only
 - http://jsperf.com/mst shows a test - closure is faster for IE and FF, but not Chrome
