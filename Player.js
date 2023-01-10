@@ -255,7 +255,7 @@ function Player(gl_, grid_size) {
 
 	    if (this.jumping_up === true) {
 		var count = (++this.jump_count);
-		var up_dist = 15 - (count / 2);
+		var up_dist = 100 - (count / 2);
 		if (up_dist <= 0) {
 		    this.jumping_up = false;
 		    this.jumping_down = true;
